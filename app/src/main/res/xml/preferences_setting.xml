@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:title="Settings">
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="floatSwitch"
+        android:summaryOff="悬浮球已关闭"
+        android:summaryOn="悬浮球已启用"
+        android:title="悬浮控制" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="false"
+        android:key="moveSwitch"
+        android:summaryOff="悬浮球位置固定"
+        android:summaryOn="可自由移动悬浮球"
+        android:title="自由移动" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="vibratorSwitch"
+        android:summaryOff="关闭震动反馈"
+        android:summaryOn="开启震动反馈"
+        android:title="双击/长按震动" />
+
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="false"
+        android:key="toEdgeSwitch"
+        android:summaryOff="悬浮球停靠任意位置"
+        android:summaryOn="悬浮球停靠屏幕边缘"
+        android:title="吸附屏幕边缘" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:key="lockScreenSwitch"
+        android:summaryOff="锁屏功能关闭"
+        android:summaryOn="锁屏功能已开启"
+        android:title="开启锁屏" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="autoStartSwitch"
+        android:summaryOff="重启后需手动开启悬浮球!"
+        android:summaryOn="悬浮球随开机启动"
+        android:title="开机启动" />
+
+
+    <com.jenzz.materialpreference.Preference
+        android:key="floatBallSize"
+        android:title="悬浮球大小"
+        android:summary="50"/>
+
+
+    <com.jenzz.materialpreference.Preference
+        android:key="gestureSetting"
+        android:title="手势功能设置"/>
+
+    <com.jenzz.materialpreference.Preference
+        android:key="appSetting"
+        android:title="快捷应用设置"/>
+
+
+</PreferenceScreen>

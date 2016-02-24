@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.jenzz.materialpreference.Preference
+        android:defaultValue=""
+        android:key="app1"
+        android:summary=""
+        android:title="快捷应用1" />
+
+    <com.jenzz.materialpreference.Preference
+        android:defaultValue=""
+        android:key="app2"
+        android:summary=""
+        android:title="快捷应用2" />
+
+    <com.jenzz.materialpreference.Preference
+        android:defaultValue=""
+        android:key="app3"
+        android:summary=""
+        android:title="快捷应用3" />
+
+    <com.jenzz.materialpreference.Preference
+        android:defaultValue=""
+        android:key="app4"
+        android:summary=""
+        android:title="快捷应用4" />
+
+    <com.jenzz.materialpreference.Preference
+        android:defaultValue=""
+        android:key="app5"
+        android:summary=""
+        android:title="快捷应用5" />
+
+</PreferenceScreen>

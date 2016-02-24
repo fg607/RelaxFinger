@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="300dp"
+    android:layout_height="300dp"
+    android:background="#00000000"
+    >
+
+
+    <FrameLayout
+        android:id="@+id/menu_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:background="#00000000"
+        >
+
+        <com.ogaclejapan.arclayout.ArcLayout
+            android:id="@+id/arc_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            app:arc_axisRadius="@dimen/layout_child_offset_path"
+            app:arc_freeAngle="true"
+            app:arc_origin="right"
+            app:arc_radius="@dimen/layout_radius_path"
+            >
+
+           <!-- <Button
+                android:id="@+id/menuA"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:singleLine="true"
+                android:textColor="@color/path_purple"
+                android:background="@drawable/superman"
+                app:arc_angle="150"
+                />-->
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menuA"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:arc_angle="150"/>
+           <!-- <Button
+                android:id="@+id/menuB"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:singleLine="true"
+                android:background="@drawable/superman"
+                android:textColor="@color/path_green"
+                app:arc_angle="120"
+                />-->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menuB"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:arc_angle="120"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menuC"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:arc_angle="90"/>
+          <!--  <Button
+                android:id="@+id/menuC"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:singleLine="true"
+                android:background="@drawable/superman"
+                android:textColor="@color/path_black"
+                app:arc_angle="90"
+                />-->
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menuD"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:arc_angle="60"/>
+         <!--   <Button
+                android:id="@+id/menuD"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:singleLine="true"
+                android:background="@drawable/superman"
+                android:textColor="@color/path_blue"
+                app:arc_angle="60"
+                /> -->
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menuE"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:arc_angle="30"/>
+       <!--     <Button
+                android:id="@+id/menuE"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:singleLine="true"
+                android:textColor="@color/path_orange"
+                android:background="@drawable/superman"
+                app:arc_angle="30"/> -->
+
+
+        </com.ogaclejapan.arclayout.ArcLayout>
+
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/fab"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="#00000000"
+        android:text=""
+        android:textSize="24sp" />
+    <!--android:textColor="@color/white"-->
+
+</RelativeLayout>

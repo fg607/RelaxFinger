@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <ListPreference
+            android:key="click"
+            android:title="单击"
+            android:summary="返回键"
+            android:defaultValue="返回键"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+        <ListPreference
+            android:key="doubleClick"
+            android:defaultValue="移动(固定)悬浮球"
+            android:title="双击"
+            android:summary="移动(固定)悬浮球"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+        <ListPreference
+            android:key="swipeUp"
+            android:title="上滑"
+            android:summary="通知栏"
+            android:defaultValue="通知栏"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+        <ListPreference
+            android:key="swipeDown"
+            android:title="下滑"
+            android:summary="Home键"
+            android:defaultValue="Home键"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+
+        <ListPreference
+            android:key="swipeLeft"
+            android:title="左滑"
+            android:summary="最近任务键"
+            android:defaultValue="最近任务键"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+
+        <ListPreference
+            android:key="swipeRight"
+            android:title="右滑"
+            android:summary="电源面板"
+            android:defaultValue="电源面板"
+            android:entries="@array/array_function"
+            android:entryValues="@array/array_function"
+            android:dialogTitle="选择手势功能" />
+
+</PreferenceScreen>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="array_function">
+        <item>移动(固定)悬浮球</item>
+        <item>快捷应用</item>
+        <item>返回键</item>
+        <item>通知栏</item>
+        <item>Home键</item>
+        <item>最近任务键</item>
+        <item>休眠(需要开启锁屏功能)</item>
+        <item>电源面板</item>
+        <item>快速设置</item>
+    </array>
+
+</resources>
