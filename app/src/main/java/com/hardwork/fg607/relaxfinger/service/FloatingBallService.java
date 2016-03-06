@@ -118,6 +118,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mAppNumber = 0;
     private boolean[] mIsAppExist = new boolean[5];
     private boolean mIsFloatRight = true;
+    private boolean mIsCanPopup = true;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -714,6 +715,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                 mIsFloatRight = false;
                             }
 
+                            if(mBallWmParams.y > FloatingBallUtils.getStatusBarHeight(FloatingBallService.this) + (MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2)){
+
+                                mIsCanPopup = true;
+
+                            }else {
+
+                                mIsCanPopup = false;
+                            }
+
                             setUpFloatMenuView();
 
                             mCanmove = false;
@@ -932,7 +942,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 break;
             case "快捷应用":
                 if(mAppNumber > 0){
-                    popUpMenu();
+
+                    if(mIsCanPopup){
+                        popUpMenu();
+                    }else {
+
+                        Toast.makeText(this,"空间不足，向下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
+                    }
+
                 }else {
                     showAlertDialog();
                 }
