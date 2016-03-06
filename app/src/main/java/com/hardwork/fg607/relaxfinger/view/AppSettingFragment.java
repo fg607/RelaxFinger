@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -184,11 +185,23 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             if(data != null){
 
-                mCurrentTextView.setText(data.getStringExtra("name"));
-                mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(data.getByteArrayExtra("icon")));
-                mPreferences.put("app" + mCurrentApp, data.getStringExtra("package"));
+                if(!data.getStringExtra("name").equals("")){
+
+                    mCurrentTextView.setText(data.getStringExtra("name"));
+                    mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(data.getByteArrayExtra("icon")));
+                    mPreferences.put("app" + mCurrentApp, data.getStringExtra("package"));
+
+
+
+                }else {
+
+                    mCurrentTextView.setText(data.getStringExtra("name"));
+                    mCurrentIcon.setImageDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    mPreferences.put("app" + mCurrentApp,"");
+                }
 
                 sendMsg(Config.UPDATE_APP,"which",mCurrentApp);
+
             }
 
         }

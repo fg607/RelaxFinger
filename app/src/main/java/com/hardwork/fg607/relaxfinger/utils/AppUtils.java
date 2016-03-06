@@ -89,11 +89,17 @@ public class AppUtils {
 
     }
 
-    public static void startApplication(String packageName){
+    public static boolean startApplication(String packageName){
 
         PackageManager pm = context.getPackageManager();
         Intent intent = pm.getLaunchIntentForPackage(packageName);
-        context.startActivity(intent);
+        if(intent!=null){
+            context.startActivity(intent);
+            return true;
+        }
+
+        return false;
+
 
 
     }

@@ -25,6 +25,7 @@ public class ChooseAppActivity extends Activity {
     ListView mListView;
     private ArrayList<AppInfo> mAppList;
     private AppAdapter mAppAdapter;
+    private String mCheckedAppName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +41,13 @@ public class ChooseAppActivity extends Activity {
         mAppAdapter = new AppAdapter(this);
         mAppAdapter.addList(mAppList);
 
-        String checkedAppName;
         Intent intent = getIntent();
 
         if(intent != null){
 
-            checkedAppName = intent.getStringExtra("app_name");
+            mCheckedAppName = intent.getStringExtra("app_name");
 
-            mAppAdapter.setAppChecked(checkedAppName);
+            mAppAdapter.setAppChecked(mCheckedAppName);
         }
 
         mListView.setAdapter(mAppAdapter);
@@ -56,13 +56,23 @@ public class ChooseAppActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                mAppAdapter.setAppChecked(mAppList.get(i).getAppName());
-
                 Intent intent = new Intent();
 
-                intent.putExtra("name", mAppList.get(i).getAppName());
-                intent.putExtra("package", mAppList.get(i).getAppPackage());
-                intent.putExtra("icon", ImageUtils.Drawable2Bytes(mAppList.get(i).getAppIcon()));
+                if(!mAppList.get(i).getAppName().equals(mCheckedAppName)){
+
+                    mAppAdapter.setAppChecked(mAppList.get(i).getAppName());
+                    intent.putExtra("name", mAppList.get(i).getAppName());
+                    intent.putExtra("package", mAppList.get(i).getAppPackage());
+                    intent.putExtra("icon", ImageUtils.Drawable2Bytes(mAppList.get(i).getAppIcon()));
+                }else {
+                    mAppAdapter.setAppChecked("");
+                    intent.putExtra("name","");
+                }
+
+
+
+
+
                 ChooseAppActivity.this.setResult(Config.CHOOSE_APP_CODE, intent);
                 ChooseAppActivity.this.finish();
 
