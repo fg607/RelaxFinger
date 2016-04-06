@@ -6,6 +6,5 @@
 .DS_Store
 /build
 /captures
-fg607.jks
-hardwork.jks
-gradle.properties
+/hardwork.jks
+/gradle.properties
