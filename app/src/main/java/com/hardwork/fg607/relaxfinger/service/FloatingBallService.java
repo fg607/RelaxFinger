@@ -295,7 +295,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     break;
                 case Config.SHOW_TEACHING:
-                    showTeaching();
+                    //showTeaching();
                     break;
                 default:
                     break;
