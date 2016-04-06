@@ -8,9 +8,9 @@
         android:title="单击" />
 
     <com.jenzz.materialpreference.Preference
-        android:defaultValue="电源面板"
+        android:defaultValue="最近任务键"
         android:key="doubleClick"
-        android:summary="电源面板"
+        android:summary="最近任务键"
         android:title="双击" />
 
     <com.jenzz.materialpreference.Preference
@@ -33,9 +33,9 @@
 
 
     <com.jenzz.materialpreference.Preference
-        android:defaultValue="最近任务键"
+        android:defaultValue="快捷应用"
         android:key="swipeLeft"
-        android:summary="最近任务键"
+        android:summary="快捷应用"
         android:title="左滑" />
 
 

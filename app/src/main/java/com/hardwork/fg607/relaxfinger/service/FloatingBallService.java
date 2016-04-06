@@ -163,19 +163,19 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if (mCurrentFuncList.size() == 0) {
             mCurrentFuncList.add(mPreferences.getString("click", "返回键"));
-            mCurrentFuncList.add(mPreferences.getString("doubleClick", "电源面板"));
+            mCurrentFuncList.add(mPreferences.getString("doubleClick", "最近任务键"));
             mCurrentFuncList.add(mPreferences.getString("longPress", "移动(固定)悬浮球"));
             mCurrentFuncList.add(mPreferences.getString("swipeUp", "通知栏"));
             mCurrentFuncList.add(mPreferences.getString("swipeDown", "Home键"));
-            mCurrentFuncList.add(mPreferences.getString("swipeLeft", "最近任务键"));
+            mCurrentFuncList.add(mPreferences.getString("swipeLeft", "快捷应用"));
             mCurrentFuncList.add(mPreferences.getString("swipeRight", "快速设置"));
         } else {
             mCurrentFuncList.set(0, mPreferences.getString("click", "返回键"));
-            mCurrentFuncList.set(1, mPreferences.getString("doubleClick", "电源面板"));
+            mCurrentFuncList.set(1, mPreferences.getString("doubleClick", "最近任务键"));
             mCurrentFuncList.set(2, mPreferences.getString("longPress", "移动(固定)悬浮球"));
             mCurrentFuncList.set(3, mPreferences.getString("swipeUp", "通知栏"));
             mCurrentFuncList.set(4, mPreferences.getString("swipeDown", "Home键"));
-            mCurrentFuncList.set(5, mPreferences.getString("swipeLeft", "最近任务键"));
+            mCurrentFuncList.set(5, mPreferences.getString("swipeLeft", "快捷应用"));
             mCurrentFuncList.set(6, mPreferences.getString("swipeRight", "快速设置"));
         }
     }

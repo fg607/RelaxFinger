@@ -45,11 +45,11 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
     private void checkSetting() {
 
         mClick.setSummary(mPreferences.getString("click", "返回键"));
-        mDoubleClick.setSummary(mPreferences.getString("doubleClick", "电源面板"));
+        mDoubleClick.setSummary(mPreferences.getString("doubleClick", "最近任务键"));
         mLongPress.setSummary(mPreferences.getString("longPress","移动(固定)悬浮球"));
         mSwipeUp.setSummary(mPreferences.getString("swipeUp", "通知栏"));
         mSwipeDown.setSummary(mPreferences.getString("swipeDown", "Home键"));
-        mSwipeLeft.setSummary(mPreferences.getString("swipeLeft", "最近任务键"));
+        mSwipeLeft.setSummary(mPreferences.getString("swipeLeft", "快捷应用"));
         mSwipeRight.setSummary(mPreferences.getString("swipeRight", "快速设置"));
     }
 
