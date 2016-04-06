@@ -1,4 +1,5 @@
 language: android
+sudo: false
 android:
   components:
   - build-tools-23.0.1
@@ -9,6 +10,15 @@ android:
   - extra
 script:
 - "./gradlew assembleRelease"
+deploy:
+  provider: releases
+  api_key:
+    secure: BRFf+0Lin/76l6LbeBqPC2NOJuFWx/SnmJWD5Lmpzw6oe4arHKsnOZ2ky8nEn1prgp417W79+6QGrr+pB1CgGCeL22XsKWnUkGb0+GSsBWk+tK84B/ALVot2sE3+BrnZBovPJ0b0H4JFo1lC2W6QrRw6BF0BtHudg4KjVrkX6Zs07XcVs9hHSmPDrxPSYt3PdIgFCvqkjHQez62K9GjogJNtiDtJStPUa/97AyTA8kCjZS40O1dcN0ZPpc8x+5ZV3q40frjpzBWfd2oJYrQRIsjnUf/vimfJ2W9YhqMC+Cgsa2qpfghhFy/FPj0QwXjh3smYUfFrfYaQFfOPDJuIjnezkK+qJRim9TuflDAjmc+KaX5C77zey5jvNZxfQ5lQXRasFO4ty98jODAAmM2TP3pge/CIOMLlT2szVf3Vz5Ya7CTMDH3nKc9zk9s1JsyWjtM8hvrBdZRzqsSS8jzn96mLXs0ojO6EJO6Ikw2vSc8rbr4tPykmW1bMyQjf//DQkNpAF8wailg19lalWzG0GM1c1zhHcNL0Izf9tMznu07bOy4npKQQczs+Mz2CTsFTvrzxaK6SSfa5nrVtzPk0SnD9L/CL1en9HEhh5OnAgYM7iUEVT0BroDHBVFtR6m19l86PY0ov4Lbra7u5dXB8ohADChrEmzEOw4XjrTHCvOw=
+  file: app/build/outputs/apk/app-release.apk
+  skip_cleanup: true
+  on:
+    repo: fg607/RelaxFinger
+    tags: true
 before_install:
 - openssl aes-256-cbc -K $encrypted_9ed914d03b12_key -iv $encrypted_9ed914d03b12_iv
-  -in fg607.jks.enc -out app/fg607.jks -d
+  -in hardwork.jks.enc -out app/hardwork.jks -d

@@ -15,13 +15,13 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("fg607.jks")
-            //storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
-            //keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
-           // keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
-            storePassword "${System.env.KEYSTORE_PASSWORD}"
-            keyAlias "${System.env.FINANCE_ALIAS}"
-            keyPassword "${System.env.ALIAS_PASSWORD}"
+            storeFile file("hardwork.jks")
+            storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
+            keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
+            keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
+            //storePassword "${System.env.KEYSTORE_PASSWORD}"
+            //keyAlias "${System.env.FINANCE_ALIAS}"
+            //keyPassword "${System.env.ALIAS_PASSWORD}"
         }
     }
 
