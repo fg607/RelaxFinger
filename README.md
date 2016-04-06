@@ -29,5 +29,5 @@
   需要进入系统设置-->安全-->设备管理器-->关闭RelaxFinger  
   即可正常卸载RelaxFinger。
 
-                       ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot0)            ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
+　　　　　　　　　　　　　　　　　　　　　　　　![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot0)            ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
 
