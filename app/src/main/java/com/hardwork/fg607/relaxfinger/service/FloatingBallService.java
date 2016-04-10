@@ -38,7 +38,6 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +47,7 @@ import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.utils.AnimatorUtils;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.ogaclejapan.arclayout.Arc;
 import com.ogaclejapan.arclayout.ArcLayout;
@@ -63,6 +63,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private WindowManager mWindowManager = null;
     private WindowManager.LayoutParams mBallWmParams = null;
+    private WindowManager.LayoutParams mMenuWmParams = null;
     private WindowManager.LayoutParams mTrackWmParams = null;
     private View mBallView;
     private View mMenuView;
@@ -70,12 +71,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mTag;
     private FrameLayout mMenuLayout;
     private Button mFloatImage;
-    private PopupWindow mPopWindow;
     private boolean mIsmoving = false;
     private boolean mCanmove = false;
     private boolean mIsToEdge = false;
     private Notification mNotification = null;
     private boolean mIsAdd;
+    private boolean mIsMenuAdd;
     private boolean mIsTrackAdd;
     private int mClickCount;
     public static final long CLICK_SPACING_TIME = 200;//双击间隔时间
@@ -83,8 +84,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
     public static final int TRANSPARENT = 150;
     public static final int MIN_BALL_SIZE = FloatingBallUtils.getScreenWidth()/10;
     public static final int MAX_BALL_SIZE = FloatingBallUtils.getScreenWidth()/7;
-    public static final int MENU_WINDOW_WIDTH = 500;
-    public static final int MENU_WINDOW_HEIGHT = 800;
+    public static final int MENU_WINDOW_WIDTH = DensityUtil.dip2px(MyApplication.getApplication(),150);
+    public static final int MENU_WINDOW_HEIGHT = DensityUtil.dip2px(MyApplication.getApplication(),280);;
     private int floatBallSize;
     private Handler mHandler;
     private LongPressedThread mLongPressedThread;
@@ -133,10 +134,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         floatBallSize = mPreferences.getInt("ballsize", (MIN_BALL_SIZE + MAX_BALL_SIZE) / 2);
 
-        mIsVibrate = mPreferences.getBoolean("isVibrate",true);
+        mIsVibrate = mPreferences.getBoolean("isVibrate", true);
 
         mTag = 0;
         mIsAdd = false;
+        mIsMenuAdd=false;
         mIsTrackAdd = false;
         mClickCount = 0;
 
@@ -364,7 +366,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mHidePopMenuThread = new HidePopMenuThread();
 
         if(mIsFloatRight){
-            mMenuView = LayoutInflater.from(this).inflate(R.layout.popup, null);
+            mMenuView = LayoutInflater.from(this).inflate(R.layout.popup, null,false);
         }else {
             mMenuView = LayoutInflater.from(this).inflate(R.layout.popup_left, null);
         }
@@ -380,6 +382,25 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
 
         mFab.setOnClickListener(this);
+
+        mMenuWmParams = new WindowManager.LayoutParams();
+
+        if (Build.VERSION.SDK_INT < 19) {
+
+            mMenuWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+
+        }else {
+
+            mMenuWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        }
+        mMenuWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mMenuWmParams.gravity = Gravity.LEFT | Gravity.TOP;
+
+
+
+        mMenuWmParams.width = MENU_WINDOW_WIDTH;
+        mMenuWmParams.height = MENU_WINDOW_HEIGHT;
+        mMenuWmParams.format = PixelFormat.RGBA_8888;
     }
 
     private void initLeftPopup(){
@@ -508,7 +529,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
         @Override
         public void run() {
 
-            mPopWindow.dismiss();
+            mWindowManager.removeView(mMenuView);
+
+            mIsMenuAdd= false;
         }
     }
 
@@ -580,9 +603,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
         mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
         mBallWmParams.gravity = Gravity.LEFT | Gravity.TOP;
-
-        mBallWmParams.width = floatBallSize;
-        mBallWmParams.height = floatBallSize;
 
         mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()/2-floatBallSize/2);
         mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
@@ -1094,23 +1114,30 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private  void popUpMenu() {
 
-        mPopWindow = new PopupWindow(mMenuView, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT);
-        int offsetX = -(MENU_WINDOW_WIDTH-mBallWmParams.width);
-        int offsetY = -(MENU_WINDOW_HEIGHT/2+mBallWmParams.height/2);
+        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()/2-floatBallSize/2);
+        mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+
+        int offsetX,offsetY;
 
         if(mIsFloatRight){
-            //功能键面板位于悬浮球左边
-            mPopWindow.showAsDropDown(mBallView, offsetX, offsetY);
-        }else {
-            //功能键面板位于悬浮球右边
-            mPopWindow.showAsDropDown(mBallView, 0, offsetY);
 
+            offsetX = -(MENU_WINDOW_WIDTH-mBallWmParams.width);
+
+        }else {
+
+            offsetX = 0;
         }
 
+        offsetY = -(MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2);
 
-        //位于键盘之上
-        mPopWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
-        mPopWindow.update();
+
+        mMenuWmParams.x = mBallWmParams.x+offsetX;
+        mMenuWmParams.y = mBallWmParams.y+offsetY;
+
+
+        mWindowManager.addView(mMenuView, mMenuWmParams);
+        mIsMenuAdd = true;
+
 
         //弹出面板后延迟100ms开始播放功能键显示动画
         mHandler.postDelayed(mShowPopMenuThread, 100);
@@ -1197,7 +1224,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         switch (v.getId()) {
 
             case R.id.fab:
-                closePopupWindow();
+                closeMenu();
                 break;
             case R.id.menuA:
                 menuClick("1");
@@ -1215,7 +1242,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 menuClick("5");
                 break;
             default:
-                closePopupWindow();
+                closeMenu();
                 break;
         }
 
@@ -1241,7 +1268,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             }
         }
 
-        closePopupWindow();
+        closeMenu();
 
     }
 
@@ -1264,6 +1291,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         Drawable drawable = AppUtils.getAppIcon(mPreferences.getString("app"+which,""));
 
+
         if(drawable != null){
 
             if(view instanceof CircleImageView){
@@ -1284,6 +1312,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
             if(view instanceof CircleImageView){
 
                 CircleImageView circleImageView = (CircleImageView)view;
+
+
                 circleImageView.setImageDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
                 if(mIsAppExist[Integer.parseInt(which)-1]){
@@ -1299,12 +1329,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
     /**
      * 关闭功能键面板
      */
-    private void closePopupWindow() {
-        if(mPopWindow!=null && mPopWindow.isShowing()) {
+    private void closeMenu() {
+
+        if(mIsMenuAdd){
 
             hideMenu();
             mHandler.postDelayed(mHidePopMenuThread,500);
         }
+
     }
 
     /**

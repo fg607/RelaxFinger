@@ -303,8 +303,8 @@ public class SettingActivity extends AppCompatActivity{
     public void developerInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("开发者信息");
-        dialog.setMessage("应用作者：fg607\r\n联系方式：fg607@sina.com");
+        dialog.setTitle("关于RelaxFinger");
+        dialog.setMessage("版本：v1.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 

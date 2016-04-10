@@ -3,7 +3,6 @@ package com.hardwork.fg607.relaxfinger;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 /**
  * Created by fg607 on 16-1-23.
@@ -29,7 +28,7 @@ public class MyApplication extends Application {
         mMainLooper = getMainLooper();
         mInstance = this;
 
-        Log.i("悬浮球", "app create");
+
 
         //mMainThread.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
     }
@@ -71,8 +70,6 @@ public class MyApplication extends Application {
 
     @Override
     public void onTerminate() {
-
-        Log.i("悬浮球","application ondestory");
 
         super.onTerminate();
     }
