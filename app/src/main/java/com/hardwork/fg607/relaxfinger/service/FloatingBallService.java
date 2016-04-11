@@ -529,7 +529,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
         @Override
         public void run() {
 
-            mWindowManager.removeView(mMenuView);
+            if(mIsMenuAdd){
+
+                mWindowManager.removeView(mMenuView);
+            }
+
 
             mIsMenuAdd= false;
         }
