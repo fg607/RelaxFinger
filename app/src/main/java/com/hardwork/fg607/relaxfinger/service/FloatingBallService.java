@@ -1139,7 +1139,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mMenuWmParams.y = mBallWmParams.y+offsetY;
 
 
-        mWindowManager.addView(mMenuView, mMenuWmParams);
+        if(!mIsMenuAdd){
+            mWindowManager.addView(mMenuView, mMenuWmParams);
+        }
+
         mIsMenuAdd = true;
 
 
