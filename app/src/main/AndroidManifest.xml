@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hardwork.fg607.relaxfinger">
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -21,26 +29,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ChooseAppActivity"
-            android:label="选择快捷应用" >
-        </activity>
+            android:label="选择快捷应用" />
 
         <service
             android:name=".service.FloatingBallService"
             android:enabled="true"
             android:exported="true"
-            android:process=":remote">
-
-        </service>
-
+            android:process=":remote" />
         <service
             android:name=".service.NavAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:process=":remote">
-
-
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
@@ -50,34 +51,42 @@
                 android:resource="@xml/accessibilityservice" />
         </service>
 
-        <receiver android:name=".receiver.BootCompletedReceiver">
+        <receiver android:name=".receiver.FloatBallReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <!--
+                <action android:name="android.intent.action.SCREEN_ON" >
                 </action>
-                <action android:name="android.intent.action.USER_PRESENT" >
-                </action>
+                -->
+                <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.ScreenOffAdminReceiver"
             android:description="@string/admin"
             android:label="@string/admin"
-            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin_sample" />
+
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".service.NotificationService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+
+        </service>
     </application>
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
 </manifest>

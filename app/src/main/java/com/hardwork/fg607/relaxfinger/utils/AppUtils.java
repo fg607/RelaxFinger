@@ -1,16 +1,21 @@
 package com.hardwork.fg607.relaxfinger.utils;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,5 +145,129 @@ public class AppUtils {
             return applicationInfo.sourceDir;
         }
         return null;
+    }
+
+    public static List<String> getTasks() throws Exception {
+
+        if (Build.VERSION.SDK_INT >= 21) {
+
+            return  getTasksNew();
+
+        } else {
+
+           return getTasksOld();
+        }
+    }
+
+    //API 21 and above
+    public static List<String> getTasksNew() throws Exception {
+
+        List<String> packageNameList = new ArrayList<>();
+        Field field = null;
+        try {
+            field = ActivityManager.RunningAppProcessInfo.class.getDeclaredField("processState");
+        } catch (Exception ignored) {
+        }
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo app : appList) {
+            if (app.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+                    && app.importanceReasonCode == ActivityManager.RunningAppProcessInfo.REASON_UNKNOWN ) {
+                Integer state = null;
+                try {
+                    state = field.getInt(app);
+                } catch (Exception e) {
+                }
+
+                if (state != null) {
+                    ApplicationInfo info = getApplicationInfoByProcessName(app.processName);
+
+                    if(info!= null)
+                        packageNameList.add(info.packageName);
+
+                }
+            }
+        }
+
+        return packageNameList;
+    }
+
+    //API below 21
+    @SuppressWarnings("deprecation")
+    public static List<String>  getTasksOld() throws Exception {
+
+        List<String> packageNameList = new ArrayList<>();
+        String packageName = null;
+        ActivityManager activity = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> runningTask = activity.getRunningTasks(5);
+        if (runningTask != null) {
+            for(ActivityManager.RunningTaskInfo task:runningTask){
+                ComponentName componentTop = task.topActivity;
+                packageName = componentTop.getPackageName();
+                packageNameList.add(packageName);
+            }
+
+        }
+
+        return packageNameList;
+
+    }
+
+    /**
+     * 根据进程名获取应用信息
+     * @param processNames
+     * @return
+     */
+    public static ApplicationInfo getApplicationInfoByProcessName(String processNames)
+    {
+
+        //获取所有包信息
+        //List<ApplicationInfo> applicationInfoList
+        // = packageManager.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
+
+        List<ApplicationInfo> applicationInfoList = pm.getInstalledApplications(0);
+
+        for(ApplicationInfo applicationInfo : applicationInfoList)
+        {
+            if(applicationInfo.processName.equals(processNames)
+                    && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0)
+                //只显示第三方的应用进程,不显示系统应用
+                //要显示所有应用进程,删去(applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) <= 0 即可
+                return applicationInfo;
+        }
+        return null;
+    }
+
+    public static String getLauncherPackageName() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        final ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+        if (res.activityInfo == null) {
+            // should not happen. A home is always installed, isn't it?
+            return null;
+        }
+        if (res.activityInfo.packageName.equals("android")) {
+            // 有多个桌面程序存在，且未指定默认项时；
+            return null;
+        } else {
+            return res.activityInfo.packageName;
+        }
+    }
+
+    public static int getVersionCode(Context context)//获取版本号(内部识别号)
+    {
+        try {
+
+            PackageInfo pi= null;
+
+            pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+
+            return pi.versionCode;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

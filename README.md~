@@ -25,9 +25,9 @@
   默认左滑打开快捷应用菜单，点击应用图标即可快速打开和切换到对应的应用。
 
 ###卸载注意事项:
-- 开启锁屏功能后不能直接卸载RelaxFinger,  
-  需要进入系统设置-->安全-->设备管理器-->关闭RelaxFinger  
-  即可正常卸载RelaxFinger。
+- 开启锁屏功能后不能直接卸载RelaxFinger。  
+  在RelaxFinger设置主页面关闭"开启锁屏", 即可正常卸载RelaxFinger。  
+ 
 
 　　　　　　　![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot0)　　　　　　　　![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
 

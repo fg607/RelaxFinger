@@ -36,7 +36,7 @@
                 android:layout_height="40dp"
                 android:singleLine="true"
                 android:textColor="@color/path_purple"
-                android:background="@drawable/superman"
+                android:background="@drawable/windows"
                 app:arc_angle="150"
                 />-->
 
@@ -50,7 +50,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:singleLine="true"
-                android:background="@drawable/superman"
+                android:background="@drawable/windows"
                 android:textColor="@color/path_green"
                 app:arc_angle="120"
                 />-->
@@ -70,7 +70,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:singleLine="true"
-                android:background="@drawable/superman"
+                android:background="@drawable/windows"
                 android:textColor="@color/path_black"
                 app:arc_angle="90"
                 />-->
@@ -85,7 +85,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:singleLine="true"
-                android:background="@drawable/superman"
+                android:background="@drawable/windows"
                 android:textColor="@color/path_blue"
                 app:arc_angle="60"
                 /> -->
@@ -101,7 +101,7 @@
                 android:layout_height="40dp"
                 android:singleLine="true"
                 android:textColor="@color/path_orange"
-                android:background="@drawable/superman"
+                android:background="@drawable/windows"
                 app:arc_angle="30"/> -->
 
 
@@ -115,9 +115,6 @@
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="#00000000"
-        android:text=""
-        android:textSize="24sp" />
-    <!--android:textColor="@color/white"-->
+        android:background="#00000000" />
 
 </RelativeLayout>

@@ -23,7 +23,7 @@
         android:key="vibratorSwitch"
         android:summaryOff="关闭震动反馈"
         android:summaryOn="开启震动反馈"
-        android:title="双击/长按震动" />
+        android:title="长按震动" />
 
 
     <com.jenzz.materialpreference.SwitchPreference
@@ -34,10 +34,24 @@
         android:title="吸附屏幕边缘" />
 
     <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="false"
+        android:key="autoMoveSwitch"
+        android:summaryOff="自动避让已关闭"
+        android:summaryOn="自动避让已开启"
+        android:title="避让软键盘" />
+
+    <com.jenzz.materialpreference.SwitchPreference
         android:key="lockScreenSwitch"
         android:summaryOff="锁屏功能关闭"
         android:summaryOn="锁屏功能已开启"
         android:title="开启锁屏" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="notifySwitch"
+        android:summaryOff="通知栏已关闭"
+        android:summaryOn="通知栏已开启"
+        android:title="通知栏" />
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
@@ -48,8 +62,18 @@
 
 
     <com.jenzz.materialpreference.Preference
+        android:key="floatBallTheme"
+        android:title="悬浮球主题"
+        android:summary="默认"/>
+
+    <com.jenzz.materialpreference.Preference
         android:key="floatBallSize"
         android:title="悬浮球大小"
+        android:summary="50"/>
+
+    <com.jenzz.materialpreference.Preference
+        android:key="floatBallAlpha"
+        android:title="悬浮球透明度"
         android:summary="50"/>
 
 

@@ -17,7 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
@@ -54,6 +53,7 @@ import com.ogaclejapan.arclayout.ArcLayout;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,9 +81,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mClickCount;
     public static final long CLICK_SPACING_TIME = 200;//双击间隔时间
     public static final long LONG_PRESS_TIME = 300;
-    public static final int TRANSPARENT = 150;
-    public static final int MIN_BALL_SIZE = FloatingBallUtils.getScreenWidth()/10;
-    public static final int MAX_BALL_SIZE = FloatingBallUtils.getScreenWidth()/7;
+    public static final int MIN_BALL_ALPHA = 255;
+    public static final int MAX_BALL_ALPHA = 10;
+    public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(),30);
+    public static final int MAX_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(),60);
     public static final int MENU_WINDOW_WIDTH = DensityUtil.dip2px(MyApplication.getApplication(),150);
     public static final int MENU_WINDOW_HEIGHT = DensityUtil.dip2px(MyApplication.getApplication(),280);;
     private int floatBallSize;
@@ -93,7 +94,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private ShowPopMenuThread mShowPopMenuThread;
     private HidePopMenuThread mHidePopMenuThread;
     private long mPreClickTime;
-    public int transparent;
+    public int mFloatBallAlpha;
     private Button mFab;
     private ArrayList<String> mCurrentFuncList = new ArrayList<>();
     private boolean mLongPressing;
@@ -120,6 +121,21 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean[] mIsAppExist = new boolean[5];
     private boolean mIsFloatRight = true;
     private boolean mIsCanPopup = true;
+    private AnimatorSet mShowAnimator;
+    private AnimatorSet mHideAnimator;
+    private List<Animator> mShowAnimatorList;
+    private List<Animator> mHideAnimatorList;
+    //private List<String> mRunningAppList;
+    //private List<String> mSavedAppList;
+   // private boolean mIsRunMenuOpen = false;
+    //private boolean mIsSpeedApp = true;
+    //private boolean mIsDetectRunApp=false;
+    //private DetectAppThread mDetectThread;
+    //private boolean mIsInitDetect=true;
+    private boolean mIsNotifyOpened = true;
+    private Object wmgInstnace = null;
+    private Method trimMemory = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -134,6 +150,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         floatBallSize = mPreferences.getInt("ballsize", (MIN_BALL_SIZE + MAX_BALL_SIZE) / 2);
 
+        mFloatBallAlpha = mPreferences.getInt("ballalpha",(MIN_BALL_ALPHA + MAX_BALL_ALPHA) / 2);
         mIsVibrate = mPreferences.getBoolean("isVibrate", true);
 
         mTag = 0;
@@ -153,11 +170,25 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         startAccessibility();
 
-        createNotification();
-
         loadFunction();
 
         setUpFloatMenuView();
+
+        if(mPreferences.getBoolean("notifySwitch",true)){
+
+            createNotification();
+        }
+
+        /*
+        mDetectThread = new DetectAppThread();
+
+        if(mPreferences.getBoolean("detectApp",false)){
+
+            startDetect();
+        }
+
+        mSavedAppList= new ArrayList<>();*/
+
 
     }
 
@@ -205,16 +236,17 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mBuilder.setContentIntent(resultPendingIntent);
 
         startForeground(0x112, mBuilder.build());
+        mIsNotifyOpened = true;
     }
 
     private void initFloatView() {
-        mBallView = LayoutInflater.from(this).inflate(R.layout.floatball, null);
+        LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        mBallView = li.inflate(R.layout.floatball, null);
         mFloatImage = (Button) mBallView.findViewById(R.id.float_image);
-        mTrackView = LayoutInflater.from(this).inflate(R.layout.track, null);
+        setBallTheme(mPreferences.getString("theme", "默认"));
+        mTrackView = li.inflate(R.layout.track, null);
         mTrackImage = (Button) mTrackView.findViewById(R.id.track_image);
-
-        transparent = TRANSPARENT;
-        mFloatImage.getBackground().setAlpha(transparent);
+        mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
     }
 
     private void startAccessibility() {
@@ -272,22 +304,51 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     break;
                 case Config.GESTURE_FUNCTION:
                     if (intent.getBooleanExtra("loadfunction", false)) {
-
-                        Log.i("悬浮窗","function");
                         loadFunction();
                     }
                     break;
+                case Config.START_DETECT:
+                    int detectSum = mPreferences.getInt("detectSum",0);
+
+                    if (detectSum==0) {
+
+                        startDetect();
+                    }
+                    mPreferences.put("detectSum",detectSum+1);
+                    break;
+                case Config.STOP_DETECT:
+                    int detectSum1 = mPreferences.getInt("detectSum",0);
+
+
+                    if (detectSum1-1==0) {
+
+                        stopDetect();
+                    }
+                    mPreferences.put("detectSum",detectSum1-1);
+                    break;
                 case Config.MOVE_SWITCH:
-                    setMove(intent.getBooleanExtra("canmove",false));
+                    setMove(intent.getBooleanExtra("canmove", false));
                     break;
                 case Config.VIBRATOR_SWITCH:
-                    setVibrator(intent.getBooleanExtra("isVibrate",true));
+                    setVibrator(intent.getBooleanExtra("isVibrate", true));
+                    break;
+                case Config.NOTIFY_SWITCH:
+                    setNotify(intent.getBooleanExtra("isNotify", true));
                     break;
                 case Config.FLOAT_SWITCH:
-                    setFloatState(intent.getBooleanExtra("ballstate",false));
+                    setFloatState(intent.getBooleanExtra("ballstate", false));
+                    break;
+                case Config.FLOAT_AUTOMOVE:
+                    setFloatAutoMove(intent.getBooleanExtra("move", false));
+                    break;
+                case Config.FLOAT_THEME:
+                    setBallTheme(intent.getStringExtra("theme"));
                     break;
                 case Config.BALL_SIZE:
-                    setBallSize(intent.getIntExtra("ballsize",1));
+                    setBallSize(intent.getIntExtra("ballsize", 1));
+                    break;
+                case Config.BALL_ALPHA:
+                    setBallAlpha(intent.getIntExtra("ballalpha", 1));
                     break;
                 case Config.UPDATE_APP:
                     String which = intent.getStringExtra("which");
@@ -308,6 +369,94 @@ public class FloatingBallService extends Service implements View.OnClickListener
         flags = START_STICKY;
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void setFloatAutoMove(boolean move) {
+
+        if(move){
+
+            int y = (int)(DensityUtil.getScreenHeight(this)/2-mBallWmParams.height*1.5);
+            if(mBallWmParams.y >y){
+
+                mBallWmParams.y=y;
+            }
+
+
+        }else {
+
+
+            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+
+        }
+
+        if(mIsAdd){
+
+            mWindowManager.updateViewLayout(mBallView,mBallWmParams);
+
+        }
+    }
+
+    private void setBallTheme(String theme) {
+
+        switch (theme) {
+            case "默认":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.floatball_bg));
+                break;
+            case "四叶草":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.clover));
+                break;
+            case "气泡":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.babble));
+                break;
+            case "苹果":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.iphone));
+                break;
+            case "窗口":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.windows));
+                break;
+            case "音乐":
+                mFloatImage.setBackground(getResources().getDrawable(R.drawable.music));
+                break;
+            default:
+                break;
+        }
+
+        mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
+
+    }
+
+    private void setBallAlpha(int ballalpha) {
+
+        mFloatBallAlpha = (int)(MIN_BALL_ALPHA + (float)((MAX_BALL_ALPHA - MIN_BALL_ALPHA) * ballalpha/ 100));
+
+        saveStates("ballalpha", mFloatBallAlpha);
+
+        mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
+
+    }
+
+    private void setNotify(boolean isNotify) {
+
+        if(isNotify){
+
+            createNotification();
+
+        }else {
+
+            closeNotification();
+        }
+    }
+
+    private void closeNotification() {
+
+        //销毁时停止前台
+        if(mIsNotifyOpened){
+
+            stopForeground(true);
+            mIsNotifyOpened=false;
+        }
+
+
     }
 
     private void setVibrator(boolean isVibrator) {
@@ -336,7 +485,17 @@ public class FloatingBallService extends Service implements View.OnClickListener
         if(ballstate){
             showFloatBall();
         }else {
+            hideTrack();
             closeFloatBall();
+            closeMenu();
+           /*
+            if (mDetectThread!=null&& mDetectThread.isAlive()){
+
+                mIsDetectRunApp=false;
+                mDetectThread=null;
+            }*/
+
+
             stopSelf();
         }
     }
@@ -365,10 +524,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mShowPopMenuThread = new ShowPopMenuThread();
         mHidePopMenuThread = new HidePopMenuThread();
 
+        LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
         if(mIsFloatRight){
-            mMenuView = LayoutInflater.from(this).inflate(R.layout.popup, null,false);
+            mMenuView = li.inflate(R.layout.popup, null);
         }else {
-            mMenuView = LayoutInflater.from(this).inflate(R.layout.popup_left, null);
+            mMenuView = li.inflate(R.layout.popup_left, null);
         }
 
         mMenuLayout = (FrameLayout) mMenuView.findViewById(R.id.menu_layout);
@@ -382,6 +543,27 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
 
         mFab.setOnClickListener(this);
+
+
+        mShowAnimatorList = new ArrayList<>();
+        mShowAnimator = new AnimatorSet();
+        mShowAnimator.setDuration(400);
+        mShowAnimator.setInterpolator(new OvershootInterpolator());
+
+        mHideAnimatorList= new ArrayList<>();
+        mHideAnimator = new AnimatorSet();
+        mHideAnimator.setDuration(400);
+        mHideAnimator.setInterpolator(new AnticipateInterpolator());
+        mHideAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mMenuLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+
 
         mMenuWmParams = new WindowManager.LayoutParams();
 
@@ -421,17 +603,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void showMenu() {
 
         mMenuLayout.setVisibility(View.VISIBLE);
-        List<Animator> animList = new ArrayList<>();
+
+        mShowAnimatorList.clear();
 
         for (int i = 0, len = mArcLayout.getChildCount(); i < len; i++) {
-            animList.add(createShowItemAnimator(mArcLayout.getChildAt(i)));
+            mShowAnimatorList.add(createShowItemAnimator(mArcLayout.getChildAt(i)));
         }
 
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
-        animSet.setInterpolator(new OvershootInterpolator());
-        animSet.playTogether(animList);
-        animSet.start();
+        mShowAnimator.playTogether(mShowAnimatorList);
+        mShowAnimator.start();
+        mFab.setClickable(true);
     }
 
 
@@ -440,24 +621,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void hideMenu() {
 
-        List<Animator> animList = new ArrayList<>();
+        mFab.setClickable(false);
+        mHideAnimatorList.clear();
 
         for (int i = mArcLayout.getChildCount() - 1; i >= 0; i--) {
-            animList.add(createHideItemAnimator(mArcLayout.getChildAt(i)));
+            mHideAnimatorList.add(createHideItemAnimator(mArcLayout.getChildAt(i)));
         }
+        mHideAnimator.playTogether(mHideAnimatorList);
+        mHideAnimator.start();
 
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
-        animSet.setInterpolator(new AnticipateInterpolator());
-        animSet.playTogether(animList);
-        animSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                mMenuLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-        animSet.start();
 
     }
 
@@ -531,11 +703,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             if(mIsMenuAdd){
 
-                mWindowManager.removeView(mMenuView);
+                mWindowManager.removeViewImmediate(mMenuView);
+                mIsMenuAdd= false;
+                clearCache();
+
             }
 
 
-            mIsMenuAdd= false;
+
         }
     }
 
@@ -608,12 +783,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
         mBallWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
-        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()/2-floatBallSize/2);
+        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
         mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
 
         mBallWmParams.width = floatBallSize;
         mBallWmParams.height = floatBallSize;
         mBallWmParams.format = PixelFormat.RGBA_8888;
+
 
         //注册触摸事件监听器
         mFloatImage.setOnTouchListener(new View.OnTouchListener() {
@@ -691,7 +867,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         break;
                     case MotionEvent.ACTION_UP:
                         mFloatImage.setPressed(false);
-                        mFloatImage.getBackground().setAlpha(transparent);
+                        mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
                         mTag = 0;
 
@@ -750,8 +926,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                             setUpFloatMenuView();
 
-                            mCanmove = false;
-                            saveStates("moveSwitch", mCanmove);
+                            mPreferences.getBoolean("moveSwitch",false);
+                            if(!mPreferences.getBoolean("moveSwitch",false)){
+
+                                mCanmove = false;
+                            }
+
+                            //saveStates("moveSwitch", mCanmove);
 
 
                         } else {
@@ -962,13 +1143,24 @@ public class FloatingBallService extends Service implements View.OnClickListener
         switch (action) {
             case "移动(固定)悬浮球":
                 mCanmove = true;
-                saveStates("moveSwitch", mCanmove);
+                //saveStates("moveSwitch", mCanmove);
                 break;
             case "快捷应用":
                 if(mAppNumber > 0){
 
                     if(mIsCanPopup){
+
+                        /*if(!mIsSpeedApp){
+
+                            updateMenuIcons();
+
+                            mIsSpeedApp = true;
+                        }*/
+
+
                         popUpMenu();
+
+
                     }else {
 
                         Toast.makeText(this,"空间不足，向下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
@@ -1015,10 +1207,128 @@ public class FloatingBallService extends Service implements View.OnClickListener
             case "音量键减":
                 FloatingBallUtils.vloumeDown();
                 break;
+            case "后台应用":
+                /*try {
+
+                    if(mIsCanPopup){
+
+                        if(mSavedAppList.size()>0){
+
+                            mIsRunMenuOpen=true;
+                            createRunAppMenu(mSavedAppList);
+
+                            mIsRunMenuOpen=true;
+                            mIsSpeedApp = false;
+
+                            popUpMenu();
+
+                        }else {
+
+                            if(mIsInitDetect){
+                                Toast.makeText(this,"正在检测，请稍后！",Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(this,"没有后台应用！",Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+
+                    }else {
+
+                        Toast.makeText(this,"空间不足，向下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this,"打开应用出错！",Toast.LENGTH_SHORT).show();
+                }*/
+                break;
             default:
                 break;
 
         }
+
+
+    }
+
+    private void createRunAppMenu(List<String> packageNameList) {
+
+        /*CircleImageView imageView = null;
+
+        int size = packageNameList.size();
+        if(size==0){
+            return;
+        }
+
+        imageView = (CircleImageView) mMenuView.findViewById(R.id.menuA);
+
+        if(size>=1){
+
+
+            imageView.setImageDrawable(AppUtils.getAppIcon(packageNameList.get(0)));
+            imageView.setClickable(true);
+        }else {
+
+            imageView.setImageDrawable(null);
+            imageView.setClickable(false);
+
+        }
+
+        imageView = (CircleImageView) mMenuView.findViewById(R.id.menuB);
+
+        if(size>=2){
+
+
+            imageView.setImageDrawable(AppUtils.getAppIcon(packageNameList.get(1)));
+            imageView.setClickable(true);
+        }else {
+
+            imageView.setImageDrawable(null);
+            imageView.setClickable(false);
+        }
+
+        imageView = (CircleImageView) mMenuView.findViewById(R.id.menuC);
+
+        if(size>=3){
+
+
+            imageView.setImageDrawable(AppUtils.getAppIcon(packageNameList.get(2)));
+            imageView.setClickable(true);
+
+        }else {
+
+            imageView.setImageDrawable(null);
+            imageView.setClickable(false);
+        }
+
+
+        imageView = (CircleImageView) mMenuView.findViewById(R.id.menuD);
+
+        if(size>=4){
+
+
+            imageView.setImageDrawable(AppUtils.getAppIcon(packageNameList.get(3)));
+            imageView.setClickable(true);
+        }else {
+
+            imageView.setImageDrawable(null);
+            imageView.setClickable(false);
+
+        }
+
+        imageView = (CircleImageView) mMenuView.findViewById(R.id.menuE);
+
+        if(size>=5){
+
+
+            imageView.setImageDrawable(AppUtils.getAppIcon(packageNameList.get(4)));
+            imageView.setClickable(true);
+        }else {
+
+            imageView.setImageDrawable(null);
+            imageView.setClickable(false);
+        }*/
 
 
     }
@@ -1118,7 +1428,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private  void popUpMenu() {
 
-        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()/2-floatBallSize/2);
+        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
         mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
 
         int offsetX,offsetY;
@@ -1140,6 +1450,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
         if(!mIsMenuAdd){
+
             mWindowManager.addView(mMenuView, mMenuWmParams);
         }
 
@@ -1177,14 +1488,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
     /**
      * 更新功能键图标
      */
-    public void updateMenuIcons()
-    {
+    public void updateMenuIcons() {
         updateMenuIcons("1");
         updateMenuIcons("2");
         updateMenuIcons("3");
         updateMenuIcons("4");
         updateMenuIcons("5");
-
 
     }
     public void updateMenuIcons(String which){
@@ -1213,7 +1522,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(imageView != null){
 
-            updateViewIcon(imageView,which);
+            updateViewIcon(imageView, which);
         }
 
     }
@@ -1261,19 +1570,51 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void menuClick(String whichApp) {
 
-        String packageName = mPreferences.getString("app"+whichApp,"");
 
-        if(packageName != ""){
+       // if(mIsSpeedApp){
 
-            boolean isOpen = AppUtils.startApplication(packageName);
+            String packageName = mPreferences.getString("app"+whichApp,"");
 
-            if(!isOpen){
+            if(packageName != ""){
 
-                Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
-                mPreferences.put("app"+whichApp,"");
-                updateMenuIcons(whichApp);
+                boolean isOpen = AppUtils.startApplication(packageName);
+
+                if(!isOpen){
+
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+                }
             }
-        }
+
+        /*}else {
+
+            int which = Integer.parseInt(whichApp);
+
+            if(mSavedAppList.size()>=which){
+
+                String packageName = mSavedAppList.get(which-1);
+
+                if(packageName != ""){
+
+                    boolean isOpen = AppUtils.startApplication(packageName);
+
+                    if(!isOpen){
+
+                        Toast.makeText(this,"后台没有该应用！",Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            }else {
+
+
+                Toast.makeText(this,"后台没有该应用！",Toast.LENGTH_SHORT).show();
+            }
+
+
+        }*/
+        
+
 
         closeMenu();
 
@@ -1285,7 +1626,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void updateBallIcon() {
         String menuName = mPreferences.getString("currentfunction", null);
         updateViewIcon(mFloatImage, menuName);
-        mFloatImage.getBackground().setAlpha(transparent);
+        mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
     }
 
@@ -1296,7 +1637,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void updateViewIcon(View view, String which) {
 
-        Drawable drawable = AppUtils.getAppIcon(mPreferences.getString("app"+which,""));
+
+        Drawable drawable = AppUtils.getAppIcon(mPreferences.getString("app" + which, ""));
 
 
         if(drawable != null){
@@ -1305,6 +1647,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 CircleImageView circleImageView = (CircleImageView)view;
                 circleImageView.setImageDrawable(drawable);
+                circleImageView.setClickable(true);
 
                 if(!mIsAppExist[Integer.parseInt(which)-1]){
 
@@ -1320,8 +1663,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 CircleImageView circleImageView = (CircleImageView)view;
 
-
-                circleImageView.setImageDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                circleImageView.setImageDrawable(null);
+                circleImageView.setClickable(false);
 
                 if(mIsAppExist[Integer.parseInt(which)-1]){
 
@@ -1343,6 +1686,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
             hideMenu();
             mHandler.postDelayed(mHidePopMenuThread,500);
         }
+
+        /*if(mIsRunMenuOpen){
+
+            mIsRunMenuOpen=false;
+        }*/
 
     }
 
@@ -1372,7 +1720,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     public void showTrack() {
 
-        if(!mIsTrackAdd){
+        if (!mIsTrackAdd) {
             mWindowManager.addView(mTrackView, mTrackWmParams);
             mIsTrackAdd = !mIsTrackAdd;
         }
@@ -1437,8 +1785,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         closeFloatBall();
 
-        //销毁时停止前台
-        stopForeground(true);
+        closeNotification();
 
         super.onDestroy();
     }
@@ -1581,4 +1928,90 @@ public class FloatingBallService extends Service implements View.OnClickListener
     public void listenSoftKeyboard(){
         
     }
+
+
+    public void startDetect(){
+
+        /*mIsDetectRunApp = true;
+
+        mPreferences.put("detectApp",true);
+
+        if(mDetectThread!= null){
+
+            mDetectThread.start();
+
+        }else {
+
+            mDetectThread = new DetectAppThread();
+
+            mDetectThread.start();
+        }*/
+
+    }
+
+
+    public void stopDetect(){
+
+        /*if(mDetectThread!= null){
+
+            mIsDetectRunApp=false;
+            mPreferences.put("detectApp",false);
+            mDetectThread = null;
+
+            mRunningAppList.clear();
+            mRunningAppList=null;
+            mSavedAppList.clear();
+            mSavedAppList=null;
+        }*/
+
+    }
+
+    class DetectAppThread extends Thread{
+
+        @Override
+        public void run() {
+
+         /*   mIsInitDetect = true;
+            while (mIsDetectRunApp){
+
+                try {
+                    mRunningAppList = AppUtils.getTasks();
+                    if(!mIsRunMenuOpen){
+
+                        if(mSavedAppList==null){
+
+                            mSavedAppList=new ArrayList<>();
+                        }
+                        mSavedAppList.clear();
+                        mSavedAppList.addAll(mRunningAppList);
+                        mIsInitDetect=false;
+                    }
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }*/
+        }
+    }
+
+
+    private void clearCache() {
+        try {
+
+            if(wmgInstnace==null){
+
+                Class wmgClass = Class.forName("android.view.WindowManagerGlobal");
+                wmgInstnace = wmgClass.getMethod("getInstance").invoke(null, (Object[]) null);
+                trimMemory = wmgClass.getMethod("trimMemory",int.class);
+            }
+
+
+            trimMemory.invoke(wmgInstnace,TRIM_MEMORY_COMPLETE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("CLEAR","failed");
+        }
+    }
+
 }

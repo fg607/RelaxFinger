@@ -29,7 +29,6 @@ public class MyApplication extends Application {
         mInstance = this;
 
 
-
         //mMainThread.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
     }
 

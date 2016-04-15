@@ -16,7 +16,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Set;
 
 
@@ -265,6 +268,32 @@ public class FloatingBallUtils {
 
     }
 
+    public static void previousApp() throws Exception {
+
+        String prePackageName = null;
+
+        List<String> packageList = AppUtils.getTasks();
+        Log.i("tasks:",packageList.toString());
+        if(packageList.size()>0){
+            prePackageName = packageList.get(0);
+        }else {
+
+            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
+        }
+
+        if(prePackageName!=null){
+
+            AppUtils.startApplication(prePackageName);
+        }
+
+
+    }
+
+    public static void nextApp(){
+
+
+    }
+
     /**
      * 根据图标信息获取图标
      * @param iconName
@@ -279,11 +308,11 @@ public class FloatingBallUtils {
             case "iphone":
                 bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.iphone))).getBitmap();
                 break;
-            case "superman":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.superman))).getBitmap();
+            case "windows":
+                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.windows))).getBitmap();
                 break;
-            case "american":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.american))).getBitmap();
+            case "babble":
+                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.babble))).getBitmap();
                 break;
             case "clover":
                 bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.clover))).getBitmap();
@@ -475,5 +504,8 @@ public class FloatingBallUtils {
         }
         return statusBarHeight;
     }
+
+
+
 }
 

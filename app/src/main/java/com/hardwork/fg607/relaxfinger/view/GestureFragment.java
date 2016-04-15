@@ -91,7 +91,7 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
     public void showFunctionDialog(final Preference preference){
 
 
-        String summary = preference.getSummary().toString();
+        final String summary = preference.getSummary().toString();
 
         Resources res =getResources();
         String[] function=res.getStringArray(R.array.array_function);
@@ -114,11 +114,11 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                        switch (preference.getKey()){
+                        switch (preference.getKey()) {
 
                             case "click":
                                 mClick.setSummary(text);
-                                mPreferences.put("click",text.toString());
+                                mPreferences.put("click", text.toString());
                                 break;
                             case "doubleClick":
                                 mDoubleClick.setSummary(text);
@@ -134,11 +134,11 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
                                 break;
                             case "swipeDown":
                                 mSwipeDown.setSummary((String) text);
-                                mPreferences.put("swipeDown",text.toString());
+                                mPreferences.put("swipeDown", text.toString());
                                 break;
                             case "swipeLeft":
                                 mSwipeLeft.setSummary((String) text);
-                                mPreferences.put("swipeLeft",text.toString());
+                                mPreferences.put("swipeLeft", text.toString());
                                 break;
                             case "swipeRight":
                                 mSwipeRight.setSummary((String) text);
@@ -151,9 +151,17 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
 
                         sendMsg(Config.GESTURE_FUNCTION, "loadfunction", true);
 
-                        if(text.equals("休眠(需要开启锁屏功能)")){
+                        if (text.equals("休眠(需要开启锁屏功能)")) {
 
 
+                        } else if (text.equals("后台应用")) {
+
+                            sendMsg(Config.START_DETECT, "startDetect", true);
+                        }
+
+                        if(summary.equals("后台应用") && !text.equals("后台应用")){
+
+                            sendMsg(Config.STOP_DETECT, "stopDetect", true);
                         }
 
                         return true;

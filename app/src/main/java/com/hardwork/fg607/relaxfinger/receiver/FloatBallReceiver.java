@@ -12,7 +12,7 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 /**
  * Created by fg607 on 15-8-23.
  */
-public class BootCompletedReceiver extends BroadcastReceiver {
+public class FloatBallReceiver extends BroadcastReceiver {
 
     private SharedPreferences sp;
     private Context mContext;

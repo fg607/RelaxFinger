@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.accessibility.AccessibilityEvent;
@@ -19,6 +21,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.view.AppSettingFragment;
@@ -53,7 +56,7 @@ public class SettingActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
 
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
-        mIsShowTeaching = mPreferences.getBoolean("showTeaching",true);
+        mIsShowTeaching = mPreferences.getBoolean("showTeaching", true);
 
         mSettingFragment.setGestureSettingClickListener(new SettingFragment.OnSettingClickListener() {
             @Override
@@ -62,22 +65,21 @@ public class SettingActivity extends AppCompatActivity{
                 FragmentTransaction transaction = getFragmentManager().beginTransaction()
                         .setCustomAnimations(
                                 R.animator.fragment_left_enter,
-                                R.animator.fragment_left_exit);
+                                R.animator.fragment_left_exit,
+                                R.animator.fragment_pop_left_enter,
+                                R.animator.fragment_pop_left_exit);
 
 
-                transaction.hide(mSettingFragment);
 
-                mGestureFragment = (GestureFragment) getFragmentManager().findFragmentByTag("gesture");
-
-                if(mGestureFragment == null){
-
+                if (mGestureFragment == null) {
 
                     mGestureFragment = new GestureFragment();
-                    transaction.add(R.id.fragment, mGestureFragment, "gesture");
-                }else {
 
-                    transaction.show(mGestureFragment);
                 }
+
+                transaction.replace(R.id.fragment, mGestureFragment);
+
+                transaction.addToBackStack(null);
 
                 transaction.commit();
 
@@ -92,22 +94,20 @@ public class SettingActivity extends AppCompatActivity{
                 FragmentTransaction transaction = getFragmentManager().beginTransaction()
                         .setCustomAnimations(
                                 R.animator.fragment_left_enter,
-                                R.animator.fragment_left_exit);
+                                R.animator.fragment_left_exit,
+                                R.animator.fragment_pop_left_enter,
+                                R.animator.fragment_pop_left_exit);
 
 
-                transaction.hide(mSettingFragment);
-
-                mAppSettingFragment =  getFragmentManager().findFragmentByTag("app");
-
-                if(mAppSettingFragment == null){
-
+                if (mAppSettingFragment == null) {
 
                     mAppSettingFragment = new AppSettingFragment();
-                    transaction.add(R.id.fragment, mAppSettingFragment, "app");
-                }else {
 
-                    transaction.show(mAppSettingFragment);
                 }
+
+                transaction.replace(R.id.fragment, mAppSettingFragment);
+
+                transaction.addToBackStack(null);
 
                 transaction.commit();
 
@@ -118,8 +118,20 @@ public class SettingActivity extends AppCompatActivity{
             }
         });
 
+        getFragmentManager().beginTransaction().replace(R.id.fragment, mSettingFragment).addToBackStack(null).commit();
 
-        getFragmentManager().beginTransaction().add(R.id.fragment, mSettingFragment,"setting").commit();
+        //防止内存不足重绘重叠
+       /* if(savedInstanceState == null){
+
+            getFragmentManager().beginTransaction().add(R.id.fragment, mSettingFragment, "setting").commit();
+
+        }else {
+
+            Fragment fragmentGesture = getFragmentManager().findFragmentByTag("gesture");
+            Fragment fragmentApp = getFragmentManager().findFragmentByTag("app");
+            Fragment fragmentSetting = getFragmentManager().findFragmentByTag("setting");
+            getFragmentManager().beginTransaction().show(fragmentSetting).hide(fragmentGesture).hide(fragmentApp).commit();
+        }*/
 
 
         initAccessibility();
@@ -128,32 +140,15 @@ public class SettingActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
 
-        Fragment fragmentGesture = getFragmentManager().findFragmentByTag("gesture");
-        Fragment fragmentApp = getFragmentManager().findFragmentByTag("app");
-        FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(
-                R.animator.fragment_pop_left_enter,
-                R.animator.fragment_pop_left_exit);
 
-        if(fragmentGesture != null && !fragmentGesture.isHidden()){
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 1) {
 
-            transaction.hide(mGestureFragment);
-
-            transaction.show(mSettingFragment).commit();
-
+            fm.popBackStack();
             SettingActivity.this.setTitle("RelaxFinger");
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        } else {
 
-        }else if(fragmentApp != null && !fragmentApp.isHidden()) {
-
-            transaction.hide(mAppSettingFragment);
-
-            transaction.show(mSettingFragment).commit();
-
-            SettingActivity.this.setTitle("RelaxFinger");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
-
-        }else {
             super.onBackPressed();
         }
     }
@@ -168,6 +163,13 @@ public class SettingActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(mPreferences.getInt("versionCode",0)< AppUtils.getVersionCode(this)){
+
+            showUpdateInfo();
+
+            mPreferences.put("versionCode",AppUtils.getVersionCode(this));
+        }
 
         if(mAlertDialog != null && mAlertDialog.isShowing()){
 
@@ -203,13 +205,18 @@ public class SettingActivity extends AppCompatActivity{
 
         mIsAdmin = mDeviceManager.isAdminActive(mComponentName);
 
-        if(mIsAdmin){
+        try{
+            if(mIsAdmin){
+                mSettingFragment.getLockScreenSwitch().setChecked(true);
+            }else {
+                mSettingFragment.getLockScreenSwitch().setChecked(false);
+            }
+        }catch (Exception e){
 
-            mSettingFragment.getLockScreenSwitch().setChecked(true);
-        }else {
-
-            mSettingFragment.getLockScreenSwitch().setChecked(false);
+            e.printStackTrace();
+            Log.e("ERROR","resume error");
         }
+
     }
 
     public void openAlertDialog(){
@@ -279,23 +286,17 @@ public class SettingActivity extends AppCompatActivity{
 
         if(id == android.R.id.home){
 
-            Fragment fragment = getFragmentManager().findFragmentByTag("gesture");
-            FragmentTransaction transaction = getFragmentManager().beginTransaction().setCustomAnimations(
-                    R.animator.fragment_pop_left_enter,
-                    R.animator.fragment_pop_left_exit);
+            FragmentManager fm = getFragmentManager();
+            if (fm.getBackStackEntryCount() > 1) {
 
-            if(fragment != null && !fragment.isHidden()){
-                transaction.hide(mGestureFragment);
-            }else {
+                fm.popBackStack();
+                SettingActivity.this.setTitle("RelaxFinger");
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            } else {
 
-                transaction.hide(mAppSettingFragment);
+                super.onBackPressed();
             }
 
-
-            transaction.show(mSettingFragment).commit();
-
-            SettingActivity.this.setTitle("RelaxFinger");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -304,8 +305,26 @@ public class SettingActivity extends AppCompatActivity{
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("关于RelaxFinger");
-        dialog.setMessage("版本：v1.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
+    }
+
+    public void showUpdateInfo(){
+
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle("RelaxFinger-1.2版本更新内容");
+        dialog.setCancelable(true);
+        dialog.setMessage("1.添加自动避让软键盘功能\r\n" +
+                          "(4.4版本以上并且安装两个以上输入法时有效)\r\n" +
+                          "2.添加通知栏开启关闭设置\r\n" +
+                          "3.添加悬浮球主题设置\r\n" +
+                          "4.添加悬浮球透明度设置\r\n" +
+                          "5.添加灭屏休眠功能\r\n" +
+                          "6.修复自由移动失效问题\r\n" +
+                          "7.修复内存不足导致设置界面重叠问题\r\n" +
+                          "8.优化内存占用\r\n");
+        dialog.show();
+
     }
 
 }

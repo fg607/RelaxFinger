@@ -10,8 +10,12 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -25,17 +29,24 @@ import com.jenzz.materialpreference.SwitchPreference;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
-public class SettingFragment extends PreferenceFragment implements OnPreferenceChangeListener {
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
+public class SettingFragment extends PreferenceFragment implements OnPreferenceChangeListener,View.OnClickListener {
 
     private SwitchPreference mFloatSwitch;
     private SwitchPreference mMoveSwitch;
     private SwitchPreference mToEdgeSwitch;
     private SwitchPreference mLockScreenSwitch;
+    private SwitchPreference mAutoMoveSwitch;
     private SwitchPreference mAutoStartSwitch;
     private SwitchPreference mVibratorSwitch;
+    private SwitchPreference mNotifySwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
+    private com.jenzz.materialpreference.Preference mFloatBallTheme;
     private com.jenzz.materialpreference.Preference mFloatBallSize;
+    private com.jenzz.materialpreference.Preference mFloatBallAlpha;
 
     private boolean mIsAdmin;
     private DevicePolicyManager mDeviceManager;
@@ -43,6 +54,23 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private OnSettingClickListener mClickListener;
     private TrayAppPreferences mPreferences;
     private SharedPreferences mSharePreferences;
+
+    private View mThemeView;
+    @Bind(R.id.img1) RelativeLayout mImg1;
+    @Bind(R.id.img2) RelativeLayout mImg2;
+    @Bind(R.id.img3) RelativeLayout mImg3;
+    @Bind(R.id.img4) RelativeLayout mImg4;
+    @Bind(R.id.img5) RelativeLayout mImg5;
+    @Bind(R.id.img6) RelativeLayout mImg6;
+    @Bind(R.id.check1) ImageView mCheck1;
+    @Bind(R.id.check2) ImageView mCheck2;
+    @Bind(R.id.check3) ImageView mCheck3;
+    @Bind(R.id.check4) ImageView mCheck4;
+    @Bind(R.id.check5) ImageView mCheck5;
+    @Bind(R.id.check6) ImageView mCheck6;
+    private ImageView mViewChoosed;
+
+    private AlertDialog mThemeDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +117,18 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
         mFloatBallSize.setSummary(position + "");
 
+        position = mSharePreferences.getInt("alpha_position", 50);
+
+        mFloatBallAlpha.setSummary(position + "");
+
+        if(isNotifyEnabled()){
+
+            mAutoMoveSwitch.setChecked(true);
+        }else {
+
+            mAutoMoveSwitch.setChecked(false);
+        }
+
     }
 
 
@@ -105,6 +145,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mToEdgeSwitch.setOnPreferenceChangeListener(this);
         mLockScreenSwitch = (SwitchPreference) findPreference("lockScreenSwitch");
         mLockScreenSwitch.setOnPreferenceChangeListener(this);
+        mAutoMoveSwitch = (SwitchPreference) findPreference("autoMoveSwitch");
+        mAutoMoveSwitch.setOnPreferenceChangeListener(this);
+        mNotifySwitch = (SwitchPreference) findPreference("notifySwitch");
+        mNotifySwitch.setOnPreferenceChangeListener(this);
         mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
         mAutoStartSwitch.setOnPreferenceChangeListener(this);
         mGestureSetting = (com.jenzz.materialpreference.Preference) findPreference("gestureSetting");
@@ -140,14 +184,153 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                showSeekBarDialog();
+                showSizeDialog();
+
+                return true;
+            }
+        });
+
+        mFloatBallAlpha = (com.jenzz.materialpreference.Preference) findPreference("floatBallAlpha");
+        mFloatBallAlpha.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                showAlphaDialog();
+
+                return true;
+            }
+        });
+
+        mFloatBallTheme = (com.jenzz.materialpreference.Preference) findPreference("floatBallTheme");
+        mFloatBallTheme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                showThemeDialog();
 
                 return true;
             }
         });
     }
 
-    private void showSeekBarDialog() {
+    private void showThemeDialog() {
+
+
+        if(mThemeDialog==null){
+
+            mThemeDialog = new AlertDialog.Builder(getActivity()).setTitle("悬浮球主题").create();
+
+            if(mThemeView==null){
+                initThemeView();
+            }
+
+            mThemeDialog.setView(mThemeView);
+        }
+
+
+
+        mThemeDialog.show();
+    }
+
+    private void initThemeView() {
+
+        mThemeView = getActivity().getLayoutInflater().inflate(R.layout.balltheme_dialog_layout, null);
+
+        ButterKnife.bind(this, mThemeView);
+
+        mImg1.setOnClickListener(this);
+        mImg2.setOnClickListener(this);
+        mImg3.setOnClickListener(this);
+        mImg4.setOnClickListener(this);
+        mImg5.setOnClickListener(this);
+        mImg6.setOnClickListener(this);
+
+        String which = mPreferences.getString("theme","默认");
+
+        mViewChoosed = setIconChoosed(which);
+
+
+    }
+
+    public ImageView setIconChoosed(String iconName) {
+
+        ImageView imageView = null;
+        switch (iconName) {
+            case "默认":
+                imageView = mCheck1;
+                break;
+            case "四叶草":
+                imageView = mCheck2;
+                break;
+            case "气泡":
+                imageView = mCheck3;
+                break;
+            case "苹果":
+                imageView = mCheck4;
+                break;
+            case "窗口":
+                imageView = mCheck5;
+                break;
+            case "音乐":
+                imageView = mCheck6;
+                break;
+            default:
+                break;
+        }
+
+        if(imageView != null) {
+            imageView.setVisibility(View.VISIBLE);
+        }
+
+        return imageView;
+
+    }
+
+    private void showAlphaDialog() {
+
+        int position = mSharePreferences.getInt("alpha_position", 50);
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(getActivity());
+        builder.setTitle("悬浮球透明度");
+        View layout = getActivity().getLayoutInflater().inflate(R.layout.ballsize_dialog_layout, null);
+        builder.setView(layout);
+
+
+        final TextView textView = (TextView) layout.findViewById(R.id.textview_size);
+        final SeekBar seekBar = (SeekBar) layout.findViewById(R.id.seekbar);
+        textView.setText(position + "");
+        seekBar.setProgress(position);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mFloatBallAlpha.setSummary(progress + "");
+                textView.setText(progress + "");
+
+                if (progress != mSharePreferences.getInt("alpha_position", -1)) {
+
+                    FloatingBallUtils.saveState("alpha_position", progress);
+
+                    sendMsg(Config.BALL_ALPHA, "ballalpha", progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        builder.show();
+
+    }
+
+    private void showSizeDialog() {
 
         //获取seekbar位置
         int position = mSharePreferences.getInt("seekbar_position", 50);
@@ -217,6 +400,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "lockScreenSwitch":
                 lockScreenChange((boolean) newValue);
                 break;
+            case "autoMoveSwitch":
+                autoMoveChange((boolean) newValue);
+                break;
+            case "notifySwitch":
+                notifyChange((boolean) newValue);
+                break;
             case "autoStartSwitch":
                 autoStartChange((boolean) newValue);
                 break;
@@ -227,6 +416,43 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
 
         return true;
+    }
+
+    private void autoMoveChange(boolean newValue) {
+
+       // mPreferences.put("autoMoveSwitch",newValue);
+
+        openNotificationAccess();
+
+    }
+
+    private void openNotificationAccess() {
+
+        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+    }
+
+    private boolean isNotifyEnabled() {
+        String pkgName = getActivity().getPackageName();
+        final String flat = Settings.Secure.getString(getActivity().getContentResolver(),
+                "enabled_notification_listeners");
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void notifyChange(boolean newValue) {
+
+        mPreferences.put("notifySwitch", newValue);
+        sendMsg(Config.NOTIFY_SWITCH, "isNotify", newValue);
     }
 
     private void vibratorChange(boolean newValue) {
@@ -308,6 +534,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         getActivity().startService(intent);
     }
 
+    public void sendMsg(int what, String name, String msg) {
+        Intent intent = new Intent();
+        intent.putExtra("what", what);
+        intent.putExtra(name, msg);
+        intent.setClass(getActivity(), FloatingBallService.class);
+        getActivity().startService(intent);
+    }
+
     public void sendMsg(int what, String name, boolean action) {
         Intent intent = new Intent();
         intent.putExtra("what", what);
@@ -331,6 +565,43 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     public SwitchPreference getAutoStartSwitch() {
         return mAutoStartSwitch;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        String which = "";
+
+        switch (v.getId())
+        {
+            case R.id.img1:
+                which="默认";
+                break;
+            case R.id.img2:
+                which="四叶草";
+                break;
+            case R.id.img3:
+                which="气泡";
+                break;
+            case R.id.img4:
+                which="苹果";
+                break;
+            case R.id.img5:
+                which="窗口";
+                break;
+            case R.id.img6:
+                which="音乐";
+                break;
+            default:
+                break;
+        }
+
+        mPreferences.put("theme",which);
+        mViewChoosed.setVisibility(View.INVISIBLE);
+        mViewChoosed = setIconChoosed(which);
+
+        sendMsg(Config.FLOAT_THEME, "theme", which);
+
     }
 
     /* @Override
@@ -387,5 +658,15 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         boolean canMove = mPreferences.getBoolean("moveSwitch", false);
 
         mMoveSwitch.setChecked(canMove);
+
+        if(isNotifyEnabled()){
+
+            mAutoMoveSwitch.setChecked(true);
+
+        }else {
+
+            mAutoMoveSwitch.setChecked(false);
+
+        }
     }
 }
