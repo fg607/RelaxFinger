@@ -135,6 +135,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean mIsNotifyOpened = true;
     private Object wmgInstnace = null;
     private Method trimMemory = null;
+    private boolean mIsAutoMoved=false;
 
     @Override
     public void onCreate() {
@@ -381,12 +382,19 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mBallWmParams.y=y;
             }
 
+            closeMenu();
+            updateTrack();
+
+            mIsAutoMoved=true;
+
+
 
         }else {
 
 
             mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
 
+            mIsAutoMoved=false;
         }
 
         if(mIsAdd){
@@ -848,6 +856,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                 mBallWmParams.y = FloatingBallUtils.getScreenHeight() - mBallWmParams.height;
                             }
                             updateViewPosition();
+
+                            mIsAutoMoved =false;
 
                         } else {
 
@@ -1428,8 +1438,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private  void popUpMenu() {
 
-        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
-        mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+        if(!mIsAutoMoved){
+            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+
+        }else {
+
+            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+            mBallWmParams.y = (int)(DensityUtil.getScreenHeight(this)/2-mBallWmParams.height*1.5);
+        }
+
 
         int offsetX,offsetY;
 
