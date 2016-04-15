@@ -30,7 +30,7 @@
   在RelaxFinger设置主页面关闭"开启锁屏", 即可正常卸载RelaxFinger。  
  
 
-![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot4.jpg)　　　　　　　　  ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
+![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot4.jpg)　　　　　　　　  ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1.jpg)
 
 ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot5.jpg)　　　　　　　　  ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot2.jpg)
 

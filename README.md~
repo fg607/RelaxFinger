@@ -4,6 +4,7 @@
 ###特点：
 - 采用安卓辅助功能开发，绿色安全。
 - 不需要获取root权限。
+- 占用内存低，资源消耗少。
 - 操作流畅，反应敏捷，无延迟。
 - 可设置快捷应用，快速开启和切换。
 
@@ -29,5 +30,9 @@
   在RelaxFinger设置主页面关闭"开启锁屏", 即可正常卸载RelaxFinger。  
  
 
-　　　　　　　![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot0)　　　　　　　　![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
+![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot4.jpg)　　　　　　　　  ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot1)
+
+![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot5.jpg)　　　　　　　　  ![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot2.jpg)
+
+![image](https://github.com/fg607/RelaxFinger/blob/master/screenshot3.jpg)
 
