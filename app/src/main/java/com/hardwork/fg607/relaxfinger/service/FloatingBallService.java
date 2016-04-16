@@ -48,6 +48,7 @@ import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
+import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 import com.ogaclejapan.arclayout.Arc;
 import com.ogaclejapan.arclayout.ArcLayout;
 
@@ -1199,6 +1200,18 @@ public class FloatingBallService extends Service implements View.OnClickListener
             case "快速设置":
                 FloatingBallUtils.openQuickSetting(mAccessibilityService.instance);
                 break;
+            case "屏幕截图":
+                if(Build.VERSION.SDK_INT > 20){
+
+                    mPreferences.put("capture",true);
+                    startActivity(new Intent().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setClass(
+                            this, ScreenshotActivity.class));
+                }else {
+
+                    Toast.makeText(this,"截图功能适用于5.0以上系统！",Toast.LENGTH_SHORT).show();
+                }
+
+                break;
             case "菜单键":
                 FloatingBallUtils.keyMenu();
                 break;
@@ -1969,7 +1982,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
     public void stopDetect(){
-
         /*if(mDetectThread!= null){
 
             mIsDetectRunApp=false;
@@ -2031,5 +2043,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             Log.i("CLEAR","failed");
         }
     }
+
+
 
 }

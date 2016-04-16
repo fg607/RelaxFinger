@@ -8,4 +8,5 @@
     <string name="accessibility">RelaxFinger</string>
     <string name="admin">RelaxFinger</string>
     <string name="functionChooseTitle">选择手势功能</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

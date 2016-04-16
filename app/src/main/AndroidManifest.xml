@@ -54,10 +54,6 @@
         <receiver android:name=".receiver.FloatBallReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <!--
-                <action android:name="android.intent.action.SCREEN_ON" >
-                </action>
-                -->
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
@@ -79,14 +75,17 @@
             android:name=".service.NotificationService"
             android:enabled="true"
             android:exported="true"
-            android:process=":remote"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:process=":remote">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
-
         </service>
+
+        <activity
+            android:name=".view.ScreenshotActivity"
+            android:theme="@style/Theme.Transparent"
+            android:launchMode="singleInstance"></activity>
     </application>
 
 </manifest>

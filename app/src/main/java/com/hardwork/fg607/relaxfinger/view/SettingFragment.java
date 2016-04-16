@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
@@ -401,7 +403,18 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 lockScreenChange((boolean) newValue);
                 break;
             case "autoMoveSwitch":
-                autoMoveChange((boolean) newValue);
+                if(Build.VERSION.SDK_INT > 18){
+
+                    autoMoveChange((boolean) newValue);
+                }else {
+                    if((boolean)newValue) {
+
+                        Toast.makeText(getActivity(), "避让功能适用于4.4以上系统！", Toast.LENGTH_SHORT).show();
+
+                        return false;
+                    }
+                }
+
                 break;
             case "notifySwitch":
                 notifyChange((boolean) newValue);
@@ -418,6 +431,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         return true;
     }
 
+
     private void autoMoveChange(boolean newValue) {
 
        // mPreferences.put("autoMoveSwitch",newValue);
@@ -432,7 +446,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     }
 
     private boolean isNotifyEnabled() {
-        String pkgName = getActivity().getPackageName();
+
+        if(Build.VERSION.SDK_INT < 19){
+
+            return false;
+        }
+
+            String pkgName = getActivity().getPackageName();
         final String flat = Settings.Secure.getString(getActivity().getContentResolver(),
                 "enabled_notification_listeners");
         if (!TextUtils.isEmpty(flat)) {

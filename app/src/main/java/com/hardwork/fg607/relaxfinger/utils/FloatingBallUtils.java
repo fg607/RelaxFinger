@@ -337,7 +337,7 @@ public class FloatingBallUtils {
      */
     public static String saveBitmap(Bitmap bitmap,String fileName) throws IOException {
 
-        String rootdir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/hwfb";
+        String rootdir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/RelaxFinger";
 
         File dir = new File(rootdir);
 
