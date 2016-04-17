@@ -171,6 +171,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         startActivityForResult(intent, Config.CHOOSE_APP_CODE);
     }
 
+    public void popupFunctionDialog(){
+
+
+    }
+
     public  void sendMsg(int what,String name,String msg) {
         Intent intent = new Intent();
         intent.putExtra("what",what);

@@ -311,14 +311,14 @@ public class SettingActivity extends AppCompatActivity{
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("关于RelaxFinger");
-        dialog.setMessage("版本：v1.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("RelaxFinger-1.2版本更新内容");
+        dialog.setTitle("RelaxFinger-1.2.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setMessage("1.添加自动避让软键盘功能\r\n" +
                 "(4.4版本以上并且安装两个以上输入法时有效)\r\n" +
@@ -326,9 +326,11 @@ public class SettingActivity extends AppCompatActivity{
                 "3.添加悬浮球主题设置\r\n" +
                 "4.添加悬浮球透明度设置\r\n" +
                 "5.添加灭屏休眠功能\r\n" +
-                          "6.修复自由移动失效问题\r\n" +
-                          "7.修复内存不足导致设置界面重叠问题\r\n" +
-                          "8.优化内存占用\r\n");
+                "6.添加屏幕截屏功能\r\n" +
+                "7.添加音量调节功能\r\n" +
+                          "8.修复自由移动失效问题\r\n" +
+                          "9.修复内存不足导致设置界面重叠问题\r\n" +
+                          "10.优化内存占用\r\n");
         dialog.show();
 
     }
