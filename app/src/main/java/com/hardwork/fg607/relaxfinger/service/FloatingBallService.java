@@ -1205,8 +1205,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 break;
             case "屏幕截图":
                 if(Build.VERSION.SDK_INT > 20){
-
-                    mPreferences.put("capture",true);
+                    
                     startActivity(new Intent().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setClass(
                             this, ScreenshotActivity.class));
                 }else {

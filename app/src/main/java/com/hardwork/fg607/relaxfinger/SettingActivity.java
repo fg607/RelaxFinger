@@ -136,6 +136,7 @@ public class SettingActivity extends AppCompatActivity{
 
 
         initAccessibility();
+
     }
 
     @Override
@@ -177,6 +178,8 @@ public class SettingActivity extends AppCompatActivity{
             mAlertDialog.dismiss();
         }
         checkAccessibility();
+
+
 
 
     }
@@ -318,18 +321,16 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("RelaxFinger-1.2版本更新内容");
         dialog.setCancelable(true);
         dialog.setMessage("1.添加自动避让软键盘功能\r\n" +
-                          "(4.4版本以上并且安装两个以上输入法时有效)\r\n" +
-                          "2.添加通知栏开启关闭设置\r\n" +
-                          "3.添加悬浮球主题设置\r\n" +
-                          "4.添加悬浮球透明度设置\r\n" +
-                          "5.添加灭屏休眠功能\r\n" +
+                "(4.4版本以上并且安装两个以上输入法时有效)\r\n" +
+                "2.添加通知栏开启关闭设置\r\n" +
+                "3.添加悬浮球主题设置\r\n" +
+                "4.添加悬浮球透明度设置\r\n" +
+                "5.添加灭屏休眠功能\r\n" +
                           "6.修复自由移动失效问题\r\n" +
                           "7.修复内存不足导致设置界面重叠问题\r\n" +
                           "8.优化内存占用\r\n");
         dialog.show();
 
     }
-
-
 
 }

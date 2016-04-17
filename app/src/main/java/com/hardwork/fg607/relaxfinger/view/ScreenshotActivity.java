@@ -14,12 +14,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
-import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ScreenshotCallback;
 import com.hardwork.fg607.relaxfinger.utils.Screenshotter;
-
-import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -43,21 +40,7 @@ public class ScreenshotActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        TrayAppPreferences preferences = FloatingBallUtils.getMultiProcessPreferences();
-        if(preferences.getBoolean("capture",false)){
-
             takeScreenshot();
-
-            preferences.put("capture", false);
-
-        }else {
-
-            startActivity(new Intent(this, SettingActivity.class));
-            finish();
-        }
-
-
 
     }
 

@@ -85,6 +85,7 @@
         <activity
             android:name=".view.ScreenshotActivity"
             android:theme="@style/Theme.Transparent"
+            android:excludeFromRecents="true"
             android:launchMode="singleInstance"></activity>
     </application>
 
