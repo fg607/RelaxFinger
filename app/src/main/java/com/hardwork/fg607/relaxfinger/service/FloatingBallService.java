@@ -384,7 +384,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
             }
 
             closeMenu();
-            updateTrack();
 
             mIsAutoMoved=true;
 
@@ -396,7 +395,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
 
             mIsAutoMoved=false;
+
+
         }
+
+        updateTrack();
 
         if(mIsAdd){
 
