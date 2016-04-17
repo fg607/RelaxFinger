@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -45,6 +46,7 @@ public class FloatingBallUtils {
 
     public static final TrayAppPreferences multiProcessPreferences = new TrayAppPreferences(context);
     public static SharedPreferences sp = getSharedPreferences();
+    public static AudioManager mAudioManager=null;
     /**
      * 获取MainActivity的SharedPreferences共享数据
      * @return
@@ -235,6 +237,19 @@ public class FloatingBallUtils {
      */
     public static void volumeUp() {
 
+        if(mAudioManager ==null){
+            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+        if(mAudioManager.isMusicActive()){
+
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+        }else {
+
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
+
+        }
+
        // runCmd("input keyevent KEYCODE_VOLUME_UP");
        // simulateKey(KeyEvent.KEYCODE_VOLUME_UP);
 
@@ -245,7 +260,20 @@ public class FloatingBallUtils {
      */
     public static void vloumeDown() {
 
-       // runCmd("input keyevent KEYCODE_VOLUME_DOWN");
+        if(mAudioManager ==null){
+            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+        if(mAudioManager.isMusicActive()){
+
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+        }else {
+
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
+
+        }
+
+        //runCmd("input keyevent KEYCODE_VOLUME_DOWN");
        //simulateKey(KeyEvent.KEYCODE_VOLUME_DOWN);
 
     }

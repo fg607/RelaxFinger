@@ -9,6 +9,8 @@
         <item>Home键</item>
         <item>最近任务键</item>
         <item>休眠(需要开启锁屏功能)</item>
+        <item>音量键加</item>
+        <item>音量键减</item>
         <item>电源面板</item>
         <item>快速设置</item>
     </array>
