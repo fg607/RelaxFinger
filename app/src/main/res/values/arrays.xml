@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="array_function">
+        <item>无操作</item>
         <item>移动(固定)悬浮球</item>
         <item>快捷应用</item>
         <item>返回键</item>

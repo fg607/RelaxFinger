@@ -16,8 +16,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.InputEvent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -121,18 +125,34 @@ public class FloatingBallUtils {
      * @param keyCode
      *            键值
      */
-   /* public static void simulateKey(int keyCode) {
+    public static void simulateKey(int keyCode) {
 
         //使用KeyEvent模拟按键按下与弹起
         long l = SystemClock.uptimeMillis();
         KeyEvent localKeyEvent = new KeyEvent(l,l, KeyEvent.ACTION_DOWN,keyCode,0);
         KeyEvent localKeyEvent1 = new KeyEvent(l,l, KeyEvent.ACTION_UP,keyCode,0);
 
-        InputManager.getInstance().injectInputEvent(localKeyEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
-        InputManager.getInstance().injectInputEvent(localKeyEvent1, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+
+        try {
+
+
+
+                Class ipmClass = Class.forName("android.hardware.input.InputManager");
+            Object  ipmInstnace = ipmClass.getMethod("getInstance").invoke(null, (Object[]) null);
+            Method trimMemory = ipmClass.getMethod("injectInputEvent",InputEvent.class,int.class);
+
+
+            trimMemory.invoke(ipmInstnace,localKeyEvent,0);
+
+            trimMemory.invoke(ipmInstnace,localKeyEvent1,0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("CLEAR","failed");
+        }
 
     }
-*/
+
     /**
      * 按下back
      */
@@ -154,7 +174,7 @@ public class FloatingBallUtils {
      */
     public static void  keyMenu(){
         //runCmd("input keyevent KEYCODE_MENU");
-       //simulateKey(KeyEvent.KEYCODE_MENU);
+       simulateKey(KeyEvent.KEYCODE_BACK);
     }
 
 

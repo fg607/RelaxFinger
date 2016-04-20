@@ -5,10 +5,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <SeekBar
-        android:id="@+id/seekbar"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        app:tabIndicatorColor="#ee702b"
+        app:tabIndicatorHeight="3dp"/>
 
-    </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+</LinearLayout>

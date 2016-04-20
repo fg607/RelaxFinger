@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
+import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ScreenshotCallback;
 import com.hardwork.fg607.relaxfinger.utils.Screenshotter;
@@ -48,11 +50,14 @@ public class ScreenshotActivity extends Activity {
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
                 getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
+        sendMsg(Config.FLOAT_SWITCH, "ballstate", false);
+
         startActivityForResult(
                 mediaProjectionManager.createScreenCaptureIntent(),
                 REQUEST_MEDIA_PROJECTION);
 
-      shootSound();
+        shootSound();
+
     }
 
     @Override
@@ -60,6 +65,9 @@ public class ScreenshotActivity extends Activity {
 
         if(requestCode == REQUEST_MEDIA_PROJECTION) {
             if (resultCode == RESULT_OK) {
+
+                sendMsg(Config.FLOAT_SWITCH, "ballstate", true);
+                
                     Screenshotter.getInstance()
                             .setSize(720, 1280)
                             .takeScreenshot(this, resultCode, data, new ScreenshotCallback() {
@@ -155,5 +163,13 @@ public class ScreenshotActivity extends Activity {
             }
 
         }
+    }
+
+    public  void sendMsg(int what,String name,boolean action) {
+        Intent intent = new Intent();
+        intent.putExtra("what",what);
+        intent.putExtra(name, action);
+        intent.setClass(this, FloatingBallService.class);
+        startService(intent);
     }
 }

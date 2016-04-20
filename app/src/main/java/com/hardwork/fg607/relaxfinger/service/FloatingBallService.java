@@ -15,6 +15,7 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
@@ -66,6 +67,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private WindowManager.LayoutParams mBallWmParams = null;
     private WindowManager.LayoutParams mMenuWmParams = null;
     private WindowManager.LayoutParams mTrackWmParams = null;
+    private WindowManager.LayoutParams mPopBackWmParams = null;
     private View mBallView;
     private View mMenuView;
     private int mOldOffsetX, mOldOffsetY, mNewOffsetX, mNewOffsetY;
@@ -74,6 +76,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private Button mFloatImage;
     private boolean mIsmoving = false;
     private boolean mCanmove = false;
+    private boolean mIsSavePos = true;
     private boolean mIsToEdge = false;
     private Notification mNotification = null;
     private boolean mIsAdd;
@@ -136,8 +139,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean mIsNotifyOpened = true;
     private Object wmgInstnace = null;
     private Method trimMemory = null;
-    private boolean mIsAutoMoved=false;
+    private boolean mIsBallFree = false;
+    private boolean mIsKeyboardShow=false;
+    private boolean mIsLandscape=false;
 
+    private View mPopBackgroundView;
+    private boolean mIsBackAdded= false;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -152,8 +159,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         floatBallSize = mPreferences.getInt("ballsize", (MIN_BALL_SIZE + MAX_BALL_SIZE) / 2);
 
-        mFloatBallAlpha = mPreferences.getInt("ballalpha",(MIN_BALL_ALPHA + MAX_BALL_ALPHA) / 2);
+        mFloatBallAlpha = mPreferences.getInt("ballalpha", (MIN_BALL_ALPHA + MAX_BALL_ALPHA) / 2);
         mIsVibrate = mPreferences.getBoolean("isVibrate", true);
+        mIsFloatRight = mPreferences.getBoolean("floatRight", true);
+        mIsCanPopup = mPreferences.getBoolean("canPopup",true);
 
         mTag = 0;
         mIsAdd = false;
@@ -174,12 +183,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         loadFunction();
 
+        initPopBackground();
         setUpFloatMenuView();
+
 
         if(mPreferences.getBoolean("notifySwitch",true)){
 
             createNotification();
         }
+
+
 
         /*
         mDetectThread = new DetectAppThread();
@@ -190,6 +203,60 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
 
         mSavedAppList= new ArrayList<>();*/
+
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int orientation = newConfig.orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT){
+
+
+            mIsLandscape = false;
+            changeBallToOrigin();
+
+
+        }
+        else if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+            mIsLandscape = true;
+            changeBallToFree();
+        }
+    }
+
+
+    public void changeBallToFree(){
+
+        if(!mIsBallFree){
+
+            mIsBallFree = true;
+            closeMenu();
+            mCanmove = true;
+            mIsSavePos = false;
+        }
+
+    }
+
+    public void changeBallToOrigin(){
+
+        if(mIsBallFree && !mIsKeyboardShow && !mIsLandscape){
+
+            mIsBallFree = false;
+            mCanmove = mPreferences.getBoolean("moveSwitch",false);
+
+            mIsSavePos = true;
+
+            mIsFloatRight = mPreferences.getBoolean("floatRight",true);
+            mIsCanPopup = mPreferences.getBoolean("canPopup",true);
+
+            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+
+            updateFloatBall();
+        }
+
 
 
     }
@@ -375,31 +442,31 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void setFloatAutoMove(boolean move) {
 
+        mIsKeyboardShow = move;
+
         if(move){
 
-            int y = (int)(DensityUtil.getScreenHeight(this)/2-mBallWmParams.height*1.5);
-            if(mBallWmParams.y >y){
+            avoidKeyboard();
 
-                mBallWmParams.y=y;
-            }
-
-            closeMenu();
-
-            mIsAutoMoved=true;
-
+            changeBallToFree();
 
 
         }else {
 
 
-            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
-
-            mIsAutoMoved=false;
+            changeBallToOrigin();
 
 
         }
 
-        updateTrack();
+    }
+
+    private void avoidKeyboard() {
+        int y = (int)(DensityUtil.getScreenHeight(this)/2-mBallWmParams.height*1.5);
+        if(mBallWmParams.y >y){
+
+            mBallWmParams.y=y;
+        }
 
         if(mIsAdd){
 
@@ -545,6 +612,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
 
         mMenuLayout = (FrameLayout) mMenuView.findViewById(R.id.menu_layout);
+
+        mMenuLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeMenu();
+            }
+        });
         updateMenuIcons();
         mArcLayout = (ArcLayout) mMenuView.findViewById(R.id.arc_layout);
         mFab = (Button) mMenuView.findViewById(R.id.fab);
@@ -591,10 +665,37 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mMenuWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
 
-
+       // mMenuWmParams.dimAmount=0.5f;
         mMenuWmParams.width = MENU_WINDOW_WIDTH;
         mMenuWmParams.height = MENU_WINDOW_HEIGHT;
         mMenuWmParams.format = PixelFormat.RGBA_8888;
+    }
+
+    private  void initPopBackground(){
+
+        mPopBackWmParams = new WindowManager.LayoutParams();
+
+        if (Build.VERSION.SDK_INT < 19) {
+
+            mPopBackWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+
+        }else {
+
+            mPopBackWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        }
+        mPopBackWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mPopBackWmParams.gravity = Gravity.LEFT | Gravity.TOP;
+
+        //mPopBackWmParams.alpha=0.3f;
+        //mPopBackWmParams.dimAmount=0.5f;
+
+
+        mPopBackWmParams.x=0;
+        mPopBackWmParams.y=0;
+
+        mPopBackWmParams.width = DensityUtil.getScreenWidth(this);
+        mPopBackWmParams.height = DensityUtil.getScreenHeight(this);
+        mPopBackWmParams.format = PixelFormat.RGBA_8888;
     }
 
     private void initLeftPopup(){
@@ -713,13 +814,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
         @Override
         public void run() {
 
-            if(mIsMenuAdd){
+            //if(mIsMenuAdd){
 
+                removePopBackground();
                 mWindowManager.removeViewImmediate(mMenuView);
-                mIsMenuAdd= false;
+               // mIsMenuAdd= false;
                 clearCache();
 
-            }
+           // }
 
 
 
@@ -861,7 +963,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             }
                             updateViewPosition();
 
-                            mIsAutoMoved =false;
 
                         } else {
 
@@ -915,33 +1016,45 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 moveToScreenEdge();
 
-                            } else {
+                            } else if(mIsSavePos) {
 
                                 saveStates("ballWmParamsX", mBallWmParams.x);
                                 saveStates("ballWmParamsY", mBallWmParams.y);
                             }
 
-                            if(mBallWmParams.x + mBallWmParams.width/2 >= FloatingBallUtils.getScreenWidth()/2){
+                            if(mIsSavePos){
 
-                                mIsFloatRight = true;
-                            }else {
+                                if(mBallWmParams.x + mBallWmParams.width/2 >= FloatingBallUtils.getScreenWidth()/2){
 
-                                mIsFloatRight = false;
+                                    mIsFloatRight = true;
+                                }else {
+
+                                    mIsFloatRight = false;
+                                }
+
+                                saveStates("floatRight",mIsFloatRight);
                             }
 
-                            if(mBallWmParams.y > FloatingBallUtils.getStatusBarHeight(FloatingBallService.this) + (MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2)){
 
-                                mIsCanPopup = true;
+                            if(mIsSavePos){
 
-                            }else {
+                                if(mBallWmParams.y > FloatingBallUtils.getStatusBarHeight(FloatingBallService.this) + (MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2)){
 
-                                mIsCanPopup = false;
+                                    mIsCanPopup = true;
+
+                                }else {
+
+                                    mIsCanPopup = false;
+                                }
+
+                                saveStates("canPopup",mIsCanPopup);
                             }
+
 
                             setUpFloatMenuView();
 
                             mPreferences.getBoolean("moveSwitch",false);
-                            if(!mPreferences.getBoolean("moveSwitch",false)){
+                            if(!mPreferences.getBoolean("moveSwitch",false) && mIsSavePos){
 
                                 mCanmove = false;
                             }
@@ -1390,7 +1503,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void onFloatBallLongPressed() {
 
-        chooseFunction(mCurrentFuncList.get(2));
+        if(mIsBallFree){
+
+            chooseFunction("屏幕截图");
+
+        }else {
+
+            chooseFunction(mCurrentFuncList.get(2));
+        }
+
     }
 
     /**
@@ -1399,7 +1520,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void onFloatBallClick() {
 
-        chooseFunction(mCurrentFuncList.get(0));
+        if(mIsBallFree){
+
+            chooseFunction("返回键");
+
+        }else {
+
+            chooseFunction(mCurrentFuncList.get(0));
+
+        }
+
     }
 
     /**
@@ -1407,7 +1537,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void onFloatBallDoubleClick() {
 
-        chooseFunction(mCurrentFuncList.get(1));
+        if(mIsBallFree){
+
+            chooseFunction("Home键");
+
+        }else {
+
+            chooseFunction(mCurrentFuncList.get(1));
+        }
+
+
 
     }
 
@@ -1453,15 +1592,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private  void popUpMenu() {
 
-        if(!mIsAutoMoved){
-            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
-            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
-
-        }else {
-
-            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
-            mBallWmParams.y = (int)(DensityUtil.getScreenHeight(this)/2-mBallWmParams.height*1.5);
-        }
+        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+        mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
 
 
         int offsetX,offsetY;
@@ -1484,16 +1616,59 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(!mIsMenuAdd){
 
+
+            addPopBackground();
             mWindowManager.addView(mMenuView, mMenuWmParams);
+
+            mIsMenuAdd = true;
+
         }
 
-        mIsMenuAdd = true;
+
 
 
         //弹出面板后延迟100ms开始播放功能键显示动画
         mHandler.postDelayed(mShowPopMenuThread, 100);
+
+
     }
 
+    private void addPopBackground() {
+
+       if(!mIsBackAdded){
+
+
+           mIsBackAdded=true;
+           mPopBackgroundView = new ImageView(this);
+           mPopBackgroundView.setBackgroundColor(getResources().getColor(R.color.popbackground));
+
+           mPopBackgroundView.setClickable(true);
+           mPopBackgroundView.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+
+                   closeMenu();
+               }
+           });
+
+           mWindowManager.addView(mPopBackgroundView,mPopBackWmParams);
+
+
+       }
+
+    }
+
+    private void removePopBackground(){
+
+        if(mIsBackAdded){
+
+            mWindowManager.removeViewImmediate(mPopBackgroundView);
+
+            mPopBackgroundView=null;
+            mIsBackAdded=false;
+        }
+
+    }
 
     /**
      * 更新悬浮球的显示位置
@@ -1716,7 +1891,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsMenuAdd){
 
+            mIsMenuAdd=false;
+
             hideMenu();
+
             mHandler.postDelayed(mHidePopMenuThread,500);
         }
 
@@ -2045,6 +2223,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
             Log.i("CLEAR","failed");
         }
     }
+
+
 
 
 

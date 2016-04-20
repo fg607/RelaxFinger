@@ -10,4 +10,5 @@
     <color name="tumblr_grey">#748089</color>
     <color name="tumblr_blue">#4aa8d8</color>
     <color name="transparent">#00000000</color>
+    <color name="popbackground">#49000000</color>
 </resources>

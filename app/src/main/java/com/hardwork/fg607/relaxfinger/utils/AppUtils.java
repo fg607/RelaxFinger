@@ -11,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
@@ -59,6 +60,11 @@ public class AppUtils {
 
     public static String getAppName(String packageName){
 
+        if(TextUtils.isEmpty(packageName)){
+
+            return  null;
+        }
+
         PackageInfo packageInfo = null;
         try {
             packageInfo = pm.getPackageInfo(packageName,0);
@@ -77,6 +83,11 @@ public class AppUtils {
     }
 
     public static Drawable getAppIcon(String packageName){
+
+        if(TextUtils.isEmpty(packageName)){
+
+            return  null;
+        }
 
         PackageInfo packageInfo = null;
         try {
