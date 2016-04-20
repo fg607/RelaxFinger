@@ -1038,7 +1038,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                             if(mIsSavePos){
 
-                                if(mBallWmParams.y > FloatingBallUtils.getStatusBarHeight(FloatingBallService.this) + (MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2)){
+                                int statBarHeight = FloatingBallUtils.getStatusBarHeight(FloatingBallService.this);
+                                int screenHeight = DensityUtil.getScreenHeight(FloatingBallService.this);
+
+                                if(mBallWmParams.y >= (statBarHeight + (MENU_WINDOW_HEIGHT/2-mBallWmParams.height/2))
+                                        && mBallWmParams.y<= screenHeight-(MENU_WINDOW_HEIGHT/2+mBallWmParams.height/2+statBarHeight)){
 
                                     mIsCanPopup = true;
 
@@ -1290,7 +1294,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     }else {
 
-                        Toast.makeText(this,"空间不足，向下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
                     }
 
                 }else {
