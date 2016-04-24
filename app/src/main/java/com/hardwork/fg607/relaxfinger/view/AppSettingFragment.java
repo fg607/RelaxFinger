@@ -253,6 +253,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
+    public void onDetach() {
+
+        if(mFuncDialog!=null){
+
+            mFuncDialog.dismiss();
+            mFuncDialog=null;
+        }
+        super.onDetach();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == Config.CHOOSE_APP_CODE){
 
