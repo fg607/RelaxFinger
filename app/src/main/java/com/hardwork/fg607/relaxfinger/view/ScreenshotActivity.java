@@ -151,7 +151,8 @@ public class ScreenshotActivity extends Activity {
 
 
 
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, 0);
+        int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int)(maxVolume/3), 0);
 
         if (mOriginVolume != 0)
         {
