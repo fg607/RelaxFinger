@@ -1165,8 +1165,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     }
                 }
 
-                saveStates("ballWmParamsX", mBallWmParams.x);
-                saveStates("ballWmParamsY", mBallWmParams.y);
+                if(mIsSavePos){
+
+                    saveStates("ballWmParamsX", mBallWmParams.x);
+                    saveStates("ballWmParamsY", mBallWmParams.y);
+                }
+
             }
         }).start();
     }
@@ -1199,8 +1203,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     }
                 }
 
-                saveStates("ballWmParamsX", mBallWmParams.x);
-                saveStates("ballWmParamsY", mBallWmParams.y);
+                if(mIsSavePos){
+
+                    saveStates("ballWmParamsX", mBallWmParams.x);
+                    saveStates("ballWmParamsY", mBallWmParams.y);
+                }
+
             }
         }).start();
 
