@@ -50,7 +50,7 @@ public class ScreenshotActivity extends Activity {
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
                 getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
-        sendMsg(Config.FLOAT_SWITCH, "ballstate", false);
+        sendMsg(Config.HIDE_BALL, "hide", true);
 
         startActivityForResult(
                 mediaProjectionManager.createScreenCaptureIntent(),
@@ -65,8 +65,6 @@ public class ScreenshotActivity extends Activity {
 
         if(requestCode == REQUEST_MEDIA_PROJECTION) {
             if (resultCode == RESULT_OK) {
-
-                sendMsg(Config.FLOAT_SWITCH, "ballstate", true);
                 
                     Screenshotter.getInstance()
                             .setSize(720, 1280)
@@ -76,6 +74,7 @@ public class ScreenshotActivity extends Activity {
 
                                     if(!mIsExist){
 
+                                        sendMsg(Config.HIDE_BALL, "hide", false);
                                         verifyStoragePermissions(ScreenshotActivity.this);
                                         saveScreenshot(bitmap);
 

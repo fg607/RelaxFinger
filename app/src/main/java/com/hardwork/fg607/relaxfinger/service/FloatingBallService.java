@@ -407,6 +407,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 case Config.FLOAT_SWITCH:
                     setFloatState(intent.getBooleanExtra("ballstate", false));
                     break;
+                case Config.HIDE_BALL:
+                    setBallHide(intent.getBooleanExtra("hide",false));
+                    break;
                 case Config.FLOAT_AUTOMOVE:
                     setFloatAutoMove(intent.getBooleanExtra("move", false));
                     break;
@@ -440,6 +443,24 @@ public class FloatingBallService extends Service implements View.OnClickListener
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private void setBallHide(boolean hide) {
+
+        if(hide){
+
+                mFloatImage.getBackground().setAlpha(0);
+
+            if(mIsTrackAdd){
+
+                mWindowManager.removeViewImmediate(mTrackView);
+
+                mIsTrackAdd = false;
+            }
+        }else {
+
+            mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
+        }
+    }
+
     private void setFloatAutoMove(boolean move) {
 
         mIsKeyboardShow = move;
@@ -451,7 +472,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             changeBallToFree();
 
 
-        }else {
+        } else {
 
 
             changeBallToOrigin();

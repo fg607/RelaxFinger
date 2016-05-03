@@ -20,4 +20,5 @@ public class Config {
     public static final int BALL_ALPHA =13;
     public static final int FLOAT_THEME =14;
     public static final int FLOAT_AUTOMOVE=15;
+    public static final int HIDE_BALL=16;
 }
