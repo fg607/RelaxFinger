@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
@@ -263,6 +264,51 @@ public class AppUtils {
         } else {
             return res.activityInfo.packageName;
         }
+    }
+
+    /**
+     * 获取程序包名(本程序包名5.0版本上下都可获取)
+     *
+     * @return
+     */
+    public static ActivityManager.RunningAppProcessInfo getCurrentAppInfo() {
+        ActivityManager.RunningAppProcessInfo currentInfo = null;
+        Field field = null;
+        int START_TASK_TO_FRONT = 2;
+        ApplicationInfo currentApp = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                field = ActivityManager.RunningAppProcessInfo.class.getDeclaredField("processState");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo app : appList) {
+                if (app.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    Integer state = null;
+                    try {
+                        state = field.getInt(app);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (state != null && state == START_TASK_TO_FRONT) {
+                        currentInfo = app;
+                        break;
+                    }
+                }
+            }
+            if (currentInfo != null) {
+                currentApp = getApplicationInfoByProcessName(currentInfo.processName);
+            }
+        } else {
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> tasks = am.getRunningAppProcesses();
+            currentApp = getApplicationInfoByProcessName(tasks.get(0).processName);
+            currentInfo=tasks.get(0);
+        }
+        Log.i("TAG", "Current App in foreground is: " + currentApp);
+        return currentInfo;
     }
 
     public static int getVersionCode(Context context)//获取版本号(内部识别号)

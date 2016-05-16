@@ -16,12 +16,15 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -49,6 +52,8 @@ import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
+import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
+import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 import com.ogaclejapan.arclayout.Arc;
 import com.ogaclejapan.arclayout.ArcLayout;
@@ -223,6 +228,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mIsLandscape = true;
             changeBallToFree();
+
+            mBallWmParams.x = DensityUtil.getScreenWidth(this)*3/4;
+            mBallWmParams.y = DensityUtil.getScreenHeight(this)-floatBallSize;
+
+            if(mIsAdd){
+
+                mWindowManager.updateViewLayout(mBallView,mBallWmParams);
+            }
         }
     }
 
@@ -234,7 +247,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mIsBallFree = true;
             closeMenu();
             mCanmove = true;
+            mIsToEdge=false;
             mIsSavePos = false;
+
         }
 
     }
@@ -245,6 +260,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mIsBallFree = false;
             mCanmove = mPreferences.getBoolean("moveSwitch",false);
+
+            mIsToEdge = mPreferences.getBoolean("toEdgeSwitch",false);
 
             mIsSavePos = true;
 
@@ -410,6 +427,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 case Config.HIDE_BALL:
                     setBallHide(intent.getBooleanExtra("hide",false));
                     break;
+                case Config.CLOSE_MENU:
+                    closeMenu();
+                    Log.i("close","fasdf");
+                    break;
                 case Config.FLOAT_AUTOMOVE:
                     setFloatAutoMove(intent.getBooleanExtra("move", false));
                     break;
@@ -514,8 +535,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
             case "窗口":
                 mFloatImage.setBackground(getResources().getDrawable(R.drawable.windows));
                 break;
-            case "音乐":
-                mFloatImage.setBackground(getResources().getDrawable(R.drawable.music));
+            case "自定义":
+                if(FloatingBallUtils.isFileExist("/RelaxFinger/DIY.png")){
+
+                    String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
+                            +"/RelaxFinger/DIY.png";
+                    Bitmap icon = ImageUtils.scaleBitmap(filePath,200);
+
+                    mFloatImage.setBackground(ImageUtils.bitmap2Drawable(icon));
+                }
+
                 break;
             default:
                 break;
@@ -1002,6 +1031,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mTouchY = mCurrentY;
                         break;
                     case MotionEvent.ACTION_UP:
+                        mHandler.removeCallbacks(mLongPressedThread);
                         mFloatImage.setPressed(false);
                         mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
@@ -1019,7 +1049,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 //取消注册的长按事件
 
-                                mHandler.removeCallbacks(mLongPressedThread);
+                                //mHandler.removeCallbacks(mLongPressedThread);
 
                                 mClickPressedThread = new ClickPressedThread();
                                 mHandler.postDelayed(mClickPressedThread, CLICK_SPACING_TIME);
@@ -1668,7 +1698,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void addPopBackground() {
 
-       if(!mIsBackAdded){
+        final Intent intent = new Intent(this, BlankActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+      /* if(!mIsBackAdded){
 
 
            mIsBackAdded=true;
@@ -1687,20 +1722,26 @@ public class FloatingBallService extends Service implements View.OnClickListener
            mWindowManager.addView(mPopBackgroundView,mPopBackWmParams);
 
 
-       }
+       }*/
 
     }
 
     private void removePopBackground(){
 
-        if(mIsBackAdded){
+        final Intent intent = new Intent(this, BlankActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("finish",true);
+        startActivity(intent);
+
+      /*  if(mIsBackAdded){
 
             mWindowManager.removeViewImmediate(mPopBackgroundView);
 
             mPopBackgroundView=null;
             mIsBackAdded=false;
         }
-
+*/
     }
 
     /**
@@ -1814,19 +1855,27 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
        // if(mIsSpeedApp){
 
-            String packageName = mPreferences.getString("app"+whichApp,"");
+        String name = mPreferences.getString("app"+whichApp,"");
+        int type = mPreferences.getInt("type"+whichApp,0);
 
-            if(packageName != ""){
+        if(name != ""){
 
-                boolean isOpen = AppUtils.startApplication(packageName);
+            if(type==0){
+
+                boolean isOpen = AppUtils.startApplication(name);
 
                 if(!isOpen){
-
                     Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
                     mPreferences.put("app"+whichApp,"");
                     updateMenuIcons(whichApp);
                 }
+            }else if(type==1){
+
+                FloatingBallUtils.switchButton(name);
+
             }
+
+        }
 
         /*}else {
 
@@ -1879,7 +1928,19 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void updateViewIcon(View view, String which) {
 
 
-        Drawable drawable = AppUtils.getAppIcon(mPreferences.getString("app" + which, ""));
+        Drawable drawable = null;
+
+        int type = mPreferences.getInt("type"+which,0);
+
+        if(type == 0){
+
+            drawable = AppUtils.getAppIcon(mPreferences.getString("app" + which, ""));
+
+        }else if(type == 1){
+
+            drawable = FloatingBallUtils.getSwitcherIcon(mPreferences.getString("app" + which, ""));
+        }
+
 
 
         if(drawable != null){
@@ -1887,6 +1948,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
             if(view instanceof CircleImageView){
 
                 CircleImageView circleImageView = (CircleImageView)view;
+                if(type==0){
+
+                    circleImageView.setBackground(null);
+
+                }else if(type==1){
+
+                    circleImageView.setBackgroundResource(R.drawable.path_blue_oval);
+                }
                 circleImageView.setImageDrawable(drawable);
                 circleImageView.setClickable(true);
 
@@ -1903,7 +1972,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             if(view instanceof CircleImageView){
 
                 CircleImageView circleImageView = (CircleImageView)view;
-
+                circleImageView.setBackground(null);
                 circleImageView.setImageDrawable(null);
                 circleImageView.setClickable(false);
 

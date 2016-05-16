@@ -5,19 +5,36 @@ package com.hardwork.fg607.relaxfinger.utils;
  *
  */
 
+import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.hardware.Camera;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.InputEvent;
 import android.view.KeyEvent;
@@ -25,7 +42,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
+import com.hardwork.fg607.relaxfinger.R;
+import com.hardwork.fg607.relaxfinger.SettingActivity;
+import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
+import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.view.BlankActivity;
+import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
@@ -37,7 +60,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +76,15 @@ public class FloatingBallUtils {
     public static final TrayAppPreferences multiProcessPreferences = new TrayAppPreferences(context);
     public static SharedPreferences sp = getSharedPreferences();
     public static AudioManager mAudioManager=null;
+    public static ActivityManager mActivitymanager = null;
+    public static  WifiManager mWifiManager = null;
+    public static TelephonyManager mTelephonyManager = null;
+    public static ConnectivityManager mConnectivityManager = null;
+    public static Method mMethod = null;
+    public static  Camera mCamera = null;
+    public static boolean iRotationOpen = false;
+    public static AudioManager.OnAudioFocusChangeListener listener= null;
+    public static  boolean mIsFlashOpened = false;
     /**
      * 获取MainActivity的SharedPreferences共享数据
      * @return
@@ -136,8 +170,7 @@ public class FloatingBallUtils {
         try {
 
 
-
-                Class ipmClass = Class.forName("android.hardware.input.InputManager");
+            Class ipmClass = Class.forName("android.hardware.input.InputManager");
             Object  ipmInstnace = ipmClass.getMethod("getInstance").invoke(null, (Object[]) null);
             Method trimMemory = ipmClass.getMethod("injectInputEvent",InputEvent.class,int.class);
 
@@ -342,9 +375,35 @@ public class FloatingBallUtils {
 
     }
 
+    public static void killCurrentApp(){
+
+        if(mActivitymanager==null){
+
+           mActivitymanager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        }
+
+        if(mActivitymanager!=null){
+
+            ActivityManager.RunningAppProcessInfo info=AppUtils.getCurrentAppInfo();
+
+            keyHome(context);
+
+            if(info!=null){
+
+                android.os.Process.killProcess(info.pid);
+                android.os.Process.sendSignal(info.pid, android.os.Process.SIGNAL_KILL);
+                mActivitymanager.killBackgroundProcesses(AppUtils.getApplicationInfoByProcessName(info.processName).packageName);
+            }
+
+        }
+
+    }
+
+
     /**
      * 根据图标信息获取图标
-     * @param iconName
+     * @param
      * @return
      */
   /*  public static Bitmap getBitmap(String iconName) {
@@ -376,6 +435,16 @@ public class FloatingBallUtils {
 
 
     }*/
+
+    public static boolean isFileExist(String filePath){
+
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+filePath;
+
+        File file = new File(path);
+
+        return file.exists();
+
+    }
 
     /**
      * 保存图标到sd卡
@@ -553,6 +622,391 @@ public class FloatingBallUtils {
         return statusBarHeight;
     }
 
+    public static ArrayList<ToolInfo> getToolInfos() {
+
+        ArrayList<ToolInfo> toolList =  new ArrayList<>();
+
+        ToolInfo wifi = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_1_wifi),"WIFI");
+        ToolInfo data = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_2_data),"移动数据");
+        ToolInfo bluetooth = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_10_bluetooth),"蓝牙");
+        ToolInfo flash = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_9_flashlight),"手电筒");
+        ToolInfo vibration = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_6_vibration),"震动");
+        ToolInfo mute = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_5_mute),"静音");
+        ToolInfo rotation = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_8_rotation),"屏幕旋转");
+        ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
+        ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
+        ToolInfo musicPrev = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_17_music_prev),"音乐上一曲");
+
+        if(Build.VERSION.SDK_INT<23){
+
+            toolList.add(wifi);
+            // toolList.add(data);
+            toolList.add(bluetooth);
+            toolList.add(rotation);
+        }
+
+        toolList.add(flash);
+        toolList.add(vibration);
+        toolList.add(mute);
+        toolList.add(music);
+        toolList.add(musicNext);
+        toolList.add(musicPrev);
+
+        return toolList;
+    }
+
+
+    public static Drawable getSwitcherIcon(String name){
+
+        Drawable icon = null;
+
+        switch (name){
+
+            case "WIFI":
+                icon = context.getResources().getDrawable(R.drawable.switch_1_wifi);
+                break;
+            case "移动数据":
+                icon = context.getResources().getDrawable(R.drawable.switch_2_data);
+                break;
+            case "蓝牙":
+                icon = context.getResources().getDrawable(R.drawable.switch_10_bluetooth);
+                break;
+            case "手电筒":
+                icon = context.getResources().getDrawable(R.drawable.switch_9_flashlight);
+                break;
+            case "震动":
+                icon = context.getResources().getDrawable(R.drawable.switch_6_vibration);
+                break;
+            case "静音":
+                icon = context.getResources().getDrawable(R.drawable.switch_5_mute);
+                break;
+            case "屏幕旋转":
+                icon = context.getResources().getDrawable(R.drawable.switch_8_rotation);
+                break;
+            case "音乐开关":
+                icon = context.getResources().getDrawable(R.drawable.switch_15_music);
+                break;
+            case "音乐上一曲":
+                icon = context.getResources().getDrawable(R.drawable.switch_17_music_prev);
+                break;
+            case "音乐下一曲":
+                icon = context.getResources().getDrawable(R.drawable.switch_16_music_next);
+                break;
+            default:
+                break;
+
+        }
+
+        return icon;
+    }
+
+    public static void switchButton(String name){
+
+        switch (name){
+
+            case "WIFI":
+                switchWifi();
+                break;
+            case "移动数据":
+                switchMoblieData();
+                break;
+            case "蓝牙":
+                switchBluetooth();
+                break;
+            case "手电筒":
+                switchFlashlight();
+                break;
+            case "震动":
+                vibrationMode();
+                break;
+            case "静音":
+                muteMode();
+                break;
+            case "屏幕旋转":
+                switchRotation();
+                break;
+            case "音乐开关":
+                switchMusic();
+                break;
+            case "音乐上一曲":
+                prevMusic();
+                break;
+            case "音乐下一曲":
+                nextMusic();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private static void prevMusic() {
+
+        simulateKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+        /*final Intent intent = new Intent(context, BlankActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(100);
+                    simulateKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+                    intent.putExtra("finish",true);
+                    context.startActivity(intent);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();*/
+
+        /*long eventtime = SystemClock.uptimeMillis();
+        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
+        KeyEvent downEvent = new KeyEvent(eventtime, eventtime, KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_MEDIA_NEXT, 0);
+        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
+        context.sendOrderedBroadcast(downIntent, null);*/
+    }
+
+    private static void nextMusic() {
+
+        simulateKey(KeyEvent.KEYCODE_MEDIA_NEXT);
+       /* long eventtime = SystemClock.uptimeMillis();
+        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
+        KeyEvent downEvent = new KeyEvent(eventtime, eventtime, KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_MEDIA_NEXT, 0);
+        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
+        context.sendOrderedBroadcast(downIntent, null);*/
+    }
+
+    private static void switchMusic() {
+
+
+        if(mAudioManager ==null){
+            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+        if(mAudioManager.isMusicActive()){
+
+            if(listener == null){
+
+                listener = new AudioManager.OnAudioFocusChangeListener() {
+                    @Override
+                    public void onAudioFocusChange(int focusChange) {
+
+                    }
+                };
+            }
+
+            mAudioManager.requestAudioFocus(listener,AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+        }else {
+
+            if(listener != null){
+
+                mAudioManager.abandonAudioFocus(listener);
+
+                listener = null;
+            }
+
+        }
+
+
+    }
+
+    private static void switchRotation() {
+
+
+        if(Build.VERSION.SDK_INT < 23) {
+            ContentResolver resolver = context.getContentResolver();
+
+            int gravity = -1;
+
+            try {
+                gravity = Settings.System.getInt(context.getContentResolver(),
+                        Settings.System.ACCELEROMETER_ROTATION);
+
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            if (gravity == 0) {
+
+                //打开
+                Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 1);
+
+            } else if (gravity == 1) {
+
+                //关闭
+                Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 0);
+            }
+        }else {
+
+            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    private static void muteMode() {
+
+        if(mAudioManager ==null){
+            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+
+        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+    }
+
+    private static void vibrationMode() {
+
+        if(mAudioManager ==null){
+            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+
+        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+
+
+    }
+
+    private static void switchFlashlight() {
+
+
+        if(Build.VERSION.SDK_INT < 23) {
+            if (mCamera == null) {
+
+                mCamera = Camera.open();
+            }
+
+            Camera.Parameters parameter = mCamera.getParameters();
+
+
+            if (!parameter.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
+
+                mCamera.startPreview();
+                parameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                mCamera.setParameters(parameter);
+
+            } else {
+                parameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(parameter);
+                mCamera.release();
+                mCamera = null;
+            }
+        }else {
+
+            CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+
+            String[] list={};
+
+            if(!mIsFlashOpened){
+
+                try {
+                    list = manager.getCameraIdList();
+                    manager.setTorchMode(list[0], true);
+                    mIsFlashOpened = true;
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+
+
+            }else {
+
+
+                try {
+                    list = manager.getCameraIdList();
+                    manager.setTorchMode(list[0], false);
+                    mIsFlashOpened = false;
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+    }
+
+    private static void switchBluetooth() {
+
+        if(Build.VERSION.SDK_INT < 23){
+
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+
+            if(adapter.isEnabled()){
+
+                adapter.disable();
+
+            }else {
+
+                adapter.enable();
+            }
+
+        }else {
+
+            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    private static void switchMoblieData() {
+
+
+      /*  boolean isMobileDataEnabled;
+
+        if(mTelephonyManager==null){
+
+            mTelephonyManager=(TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        }
+
+        if(mConnectivityManager==null){
+
+            mConnectivityManager=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        }
+
+        //判断当前手机是否在使用MobileData(移动数据)
+        if (mTelephonyManager.getDataState()== TelephonyManager.DATA_CONNECTED) {
+            isMobileDataEnabled=true;
+        }else {
+
+            isMobileDataEnabled = false;
+        }
+
+        try {
+            if(mMethod == null){
+                mMethod=mConnectivityManager.getClass().getDeclaredMethod("setMobileDataEnabled", boolean.class);
+            }
+
+            mMethod.setAccessible(true);
+            mMethod.invoke(mConnectivityManager, !isMobileDataEnabled);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            Log.e("RelaxFinger","切换移动数据失败！");
+        }*/
+
+
+    }
+
+    private static void switchWifi() {
+
+        if(Build.VERSION.SDK_INT < 23) {
+            if (mWifiManager == null) {
+                mWifiManager = (WifiManager) context
+                        .getSystemService(Context.WIFI_SERVICE);
+            }
+
+            mWifiManager.setWifiEnabled(!mWifiManager.isWifiEnabled());
+
+        }else {
+
+            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
 
 
 }

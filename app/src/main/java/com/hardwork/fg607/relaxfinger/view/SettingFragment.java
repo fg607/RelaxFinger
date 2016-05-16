@@ -2,15 +2,21 @@ package com.hardwork.fg607.relaxfinger.view;
 
 
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -27,9 +33,12 @@ import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
+import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
 
 import net.grandcentrix.tray.TrayAppPreferences;
+
+import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -63,14 +72,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     @Bind(R.id.img3) RelativeLayout mImg3;
     @Bind(R.id.img4) RelativeLayout mImg4;
     @Bind(R.id.img5) RelativeLayout mImg5;
-    @Bind(R.id.img6) RelativeLayout mImg6;
+    @Bind(R.id.img6) ImageView mImg6;
     @Bind(R.id.check1) ImageView mCheck1;
     @Bind(R.id.check2) ImageView mCheck2;
     @Bind(R.id.check3) ImageView mCheck3;
     @Bind(R.id.check4) ImageView mCheck4;
     @Bind(R.id.check5) ImageView mCheck5;
-    @Bind(R.id.check6) ImageView mCheck6;
     private ImageView mViewChoosed;
+    private String mThemeChoosed;
 
     private AlertDialog mThemeDialog;
 
@@ -244,12 +253,27 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mImg2.setOnClickListener(this);
         mImg3.setOnClickListener(this);
         mImg4.setOnClickListener(this);
-        mImg5.setOnClickListener(this);
+
+        if(FloatingBallUtils.isFileExist("/RelaxFinger/DIY.png")){
+
+            String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
+                    +"/RelaxFinger/DIY.png";
+            Bitmap icon = ImageUtils.scaleBitmap(filePath,100);
+
+            mImg5.setBackground(ImageUtils.bitmap2Drawable(icon));
+            mImg5.setClickable(true);
+            mImg5.setOnClickListener(this);
+
+        }else {
+
+            mImg5.setClickable(false);
+        }
+
         mImg6.setOnClickListener(this);
 
-        String which = mPreferences.getString("theme","默认");
+        mThemeChoosed = mPreferences.getString("theme","默认");
 
-        mViewChoosed = setIconChoosed(which);
+        mViewChoosed = setIconChoosed(mThemeChoosed);
 
 
     }
@@ -264,17 +288,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "四叶草":
                 imageView = mCheck2;
                 break;
-            case "气泡":
+            case "窗口":
                 imageView = mCheck3;
                 break;
             case "苹果":
                 imageView = mCheck4;
                 break;
-            case "窗口":
+            case "自定义":
                 imageView = mCheck5;
-                break;
-            case "音乐":
-                imageView = mCheck6;
                 break;
             default:
                 break;
@@ -590,61 +611,133 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     @Override
     public void onClick(View v) {
 
-        String which = "";
+        boolean isDIY = false;
 
         switch (v.getId())
         {
             case R.id.img1:
-                which="默认";
+                mThemeChoosed="默认";
                 break;
             case R.id.img2:
-                which="四叶草";
+                mThemeChoosed="四叶草";
                 break;
             case R.id.img3:
-                which="气泡";
+                mThemeChoosed="窗口";
                 break;
             case R.id.img4:
-                which="苹果";
+                mThemeChoosed="苹果";
                 break;
             case R.id.img5:
-                which="窗口";
+                mThemeChoosed="自定义";
                 break;
             case R.id.img6:
-                which="音乐";
+                isDIY = true;
+               choosePicture();
                 break;
             default:
                 break;
         }
 
-        mPreferences.put("theme",which);
-        mViewChoosed.setVisibility(View.INVISIBLE);
-        mViewChoosed = setIconChoosed(which);
+        if(!isDIY){
 
-        sendMsg(Config.FLOAT_THEME, "theme", which);
+            mPreferences.put("theme",mThemeChoosed);
+            mViewChoosed.setVisibility(View.INVISIBLE);
+            mViewChoosed = setIconChoosed(mThemeChoosed);
+
+            sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+        }
+
+
+    }
+
+    private void choosePicture() {
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("image/*");
+        try {
+            startActivityForResult(intent, Config.REQUEST_PICK);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == Config.REQUEST_PICK) {
+
+            if(data != null) {
+                Uri imageUri = data.getData();
+                try {
+                    //将选择的图片进行暂存
+                    FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                    Intent intent = new Intent();
+                    intent.setClass(getActivity(), ClipImageActivity.class);
+                    startActivityForResult(intent,Config.REQUEST_CLIP);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        //得到裁剪后的图标
+        else if (requestCode == Config.REQUEST_CLIP) {
+
+            String iconName = null;
+
+            if(data != null) {
+                iconName = data.getStringExtra("filename");
+            }
+
+
+            if (iconName != null) {
+                try {
+                    FloatingBallUtils.saveBitmap(FloatingBallUtils.bitmap,iconName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //显示裁剪后的图标
+                mImg5.setBackground(ImageUtils.bitmap2Drawable(FloatingBallUtils.bitmap));
+
+                mImg5.setClickable(true);
+
+                if("自定义".equals(mThemeChoosed)){
+
+                    sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+                }
+
+
+                FloatingBallUtils.bitmap = null;
+                //showImg6(mUserBitmap);
+                /*mViewChoosed.setVisibility(View.INVISIBLE);
+                mViewChoosed = setIconChoosed(mIconPath);*/
+            }
+        }
 
     }
 
     /* @Override
-     public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
-         Animator animator = null;
+         public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
+             Animator animator = null;
 
-         if (nextAnim == R.animator.fragment_pop_left_enter) {
-             animator = AnimatorInflater.loadAnimator(getActivity(), nextAnim);
-             if (animator != null && enter) {
+             if (nextAnim == R.animator.fragment_pop_left_enter) {
+                 animator = AnimatorInflater.loadAnimator(getActivity(), nextAnim);
+                 if (animator != null && enter) {
 
-                 animator.addListener(new Animator.AnimatorListener() {
-                     @Override
-                     public void onAnimationStart(Animator animation) {
-                         if(mCallBack != null){
+                     animator.addListener(new Animator.AnimatorListener() {
+                         @Override
+                         public void onAnimationStart(Animator animation) {
+                             if(mCallBack != null){
 
-                             mCallBack.enterAnimationEnd();
+                                 mCallBack.enterAnimationEnd();
 
+                             }
                          }
-                     }
 
-                     @Override
-                     public void onAnimationEnd(Animator animation) {
-                         *//*if(mCallBack != null){
+                         @Override
+                         public void onAnimationEnd(Animator animation) {
+                             *//*if(mCallBack != null){
 
                             mCallBack.enterAnimationEnd();
 

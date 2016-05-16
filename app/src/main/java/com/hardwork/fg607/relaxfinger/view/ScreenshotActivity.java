@@ -23,6 +23,7 @@ import com.hardwork.fg607.relaxfinger.utils.Screenshotter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.RunnableFuture;
 
 public class ScreenshotActivity extends Activity {
 

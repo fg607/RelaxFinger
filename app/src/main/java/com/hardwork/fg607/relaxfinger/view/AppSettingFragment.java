@@ -1,6 +1,7 @@
 package com.hardwork.fg607.relaxfinger.view;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,10 +10,15 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,7 +36,9 @@ import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.adapter.AppAdapter;
 import com.hardwork.fg607.relaxfinger.adapter.MyPagerAdapter;
+import com.hardwork.fg607.relaxfinger.adapter.ToolAdapter;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
+import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
@@ -70,6 +78,10 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     private FunctionDialog mFuncDialog;
     private Activity mActivity;
 
+    static ArrayList<AppInfo> appList;
+    static ArrayList<ToolInfo> toolList;
+
+
     public AppSettingFragment() {
 
     }
@@ -83,7 +95,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         ButterKnife.bind(this,fragmentView);
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
+        //initDialog();
         intView();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                appList =  AppUtils.getAppInfos();
+                toolList = FloatingBallUtils.getToolInfos();
+            }
+        }).start();
+
 
         return fragmentView;
     }
@@ -96,51 +118,139 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         mLayout4.setOnClickListener(this);
         mLayout5.setOnClickListener(this);
 
-        String packageName;
+        String name;
+        int type;
 
-        packageName = mPreferences.getString("app1","");
+        name = mPreferences.getString("app1","");
+        type = mPreferences.getInt("type1",0);
+        if(name != ""){
 
-        if(packageName != ""){
+            if(type==0){
+                mAppTextView1.setText(AppUtils.getAppName(name));
+                mAppIcon1.setBackground(null);
+                mAppIcon1.setImageDrawable(AppUtils.getAppIcon(name));
+            }else if(type==1){
+                mAppTextView1.setText(name);
+                mAppIcon1.setBackgroundResource(R.drawable.path_blue_oval);
+                mAppIcon1.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }
 
-            mAppTextView1.setText(AppUtils.getAppName(packageName));
-            mAppIcon1.setImageDrawable(AppUtils.getAppIcon(packageName));
+
         }
 
-        packageName = mPreferences.getString("app2","");
+        name = mPreferences.getString("app2","");
+        type = mPreferences.getInt("type2",0);
 
-        if(packageName != ""){
+        if(name != ""){
 
-            mAppTextView2.setText(AppUtils.getAppName(packageName));
-            mAppIcon2.setImageDrawable(AppUtils.getAppIcon(packageName));
+            if(type==0){
+                mAppTextView2.setText(AppUtils.getAppName(name));
+                mAppIcon2.setBackground(null);
+                mAppIcon2.setImageDrawable(AppUtils.getAppIcon(name));
+            }else if(type==1){
+                mAppTextView2.setText(name);
+                mAppIcon2.setBackgroundResource(R.drawable.path_blue_oval);
+                mAppIcon2.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }
         }
 
 
-        packageName = mPreferences.getString("app3","");
+        name = mPreferences.getString("app3","");
+        type = mPreferences.getInt("type3",0);
 
-        if(packageName != ""){
+        if(name != ""){
 
-            mAppTextView3.setText(AppUtils.getAppName(packageName));
-            mAppIcon3.setImageDrawable(AppUtils.getAppIcon(packageName));
+            if(type==0){
+                mAppTextView3.setText(AppUtils.getAppName(name));
+                mAppIcon3.setBackground(null);
+                mAppIcon3.setImageDrawable(AppUtils.getAppIcon(name));
+            }else if(type==1){
+                mAppTextView3.setText(name);
+                mAppIcon3.setBackgroundResource(R.drawable.path_blue_oval);
+                mAppIcon3.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }
         }
 
-        packageName = mPreferences.getString("app4","");
+        name = mPreferences.getString("app4","");
+        type = mPreferences.getInt("type4",0);
 
-        if(packageName != ""){
+        if(name != ""){
 
-            mAppTextView4.setText(AppUtils.getAppName(packageName));
-            mAppIcon4.setImageDrawable(AppUtils.getAppIcon(packageName));
+            if(type==0){
+                mAppTextView4.setText(AppUtils.getAppName(name));
+                mAppIcon4.setBackground(null);
+                mAppIcon4.setImageDrawable(AppUtils.getAppIcon(name));
+            }else if(type==1){
+                mAppTextView4.setText(name);
+                mAppIcon4.setBackgroundResource(R.drawable.path_blue_oval);
+                mAppIcon4.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }
         }
 
-        packageName = mPreferences.getString("app5","");
+        name = mPreferences.getString("app5","");
+        type = mPreferences.getInt("type5",0);
 
-        if(packageName != ""){
+        if(name != ""){
 
-            mAppTextView5.setText(AppUtils.getAppName(packageName));
-            mAppIcon5.setImageDrawable(AppUtils.getAppIcon(packageName));
+            if(type==0){
+                mAppTextView5.setText(AppUtils.getAppName(name));
+                mAppIcon5.setBackground(null);
+                mAppIcon5.setImageDrawable(AppUtils.getAppIcon(name));
+            }else if(type==1){
+                mAppTextView5.setText(name);
+                mAppIcon5.setBackgroundResource(R.drawable.path_blue_oval);
+                mAppIcon5.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }
         }
 
 
     }
+
+    private void initDialog(String funcName) {
+
+        mFuncDialog = FunctionDialog.newInstance(funcName);
+
+        mFuncDialog.setDialogClickListener(new OnDialogClickListener() {
+            @Override
+            public void onDialogClick(Intent intent) {
+
+                if (intent != null) {
+
+                    if (!intent.getStringExtra("name").equals("")) {
+
+                        mCurrentTextView.setText(intent.getStringExtra("name"));
+                        if (intent.getIntExtra("type", 0) == 1) {
+                            mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
+
+
+                        } else {
+                            mCurrentIcon.setBackground(null);
+                        }
+
+                        mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
+                        mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
+
+
+                    } else {
+
+                        mCurrentTextView.setText(intent.getStringExtra("name"));
+                        mCurrentIcon.setBackground(null);
+                        mCurrentIcon.setImageDrawable(null);
+                        mPreferences.put("app" + mCurrentApp, "");
+
+                    }
+
+                    mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
+
+                    sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
+
+                }
+
+            }
+        });
+
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -180,7 +290,8 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 break;
         }
 
-        popupFunctionDialog(mAppName);
+        int type = mPreferences.getInt("type"+mCurrentApp,0);
+        popupFunctionDialog(type,mAppName);
 
     }
 
@@ -191,48 +302,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    public void popupFunctionDialog(String funcName){
+    public void popupFunctionDialog(int type,String funcName){
 
         if(mFuncDialog ==null){
 
-            mFuncDialog = FunctionDialog.newInstance(funcName);
-
-            mFuncDialog.setDialogClickListener(new OnDialogClickListener() {
-                @Override
-                public void onDialogClick(Intent intent) {
-
-                    if(intent != null){
-
-                        if(!intent.getStringExtra("name").equals("")){
-
-                            mCurrentTextView.setText(intent.getStringExtra("name"));
-                            mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
-                            mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
-
-
-
-                        }else {
-
-                            mCurrentTextView.setText(intent.getStringExtra("name"));
-                            mCurrentIcon.setImageDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            mPreferences.put("app" + mCurrentApp,"");
-                        }
-
-                        sendMsg(Config.UPDATE_APP,"which",mCurrentApp);
-
-                    }
-
-                }
-            });
-
-
+            initDialog(funcName);
         }
 
 
+        mFuncDialog.setCheckedFuncName(type,funcName);
 
         if(mFuncDialog.getDialog()!=null){
-
-            mFuncDialog.setCheckedFuncName(funcName);
 
             mFuncDialog.getDialog().show();
 
@@ -253,15 +333,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
-    public void onDetach() {
+    public void onPause() {
+        DialogFragment dialogFragment = (DialogFragment) getActivity().getFragmentManager().findFragmentByTag("dialogFragment");
 
-        if(mFuncDialog!=null){
+        if(dialogFragment!=null){
 
-            mFuncDialog.dismiss();
-            mFuncDialog=null;
+            getActivity().getFragmentManager().beginTransaction().remove(dialogFragment).commit();
         }
-        super.onDetach();
+        super.onPause();
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -301,13 +383,16 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         ViewPager mViewPager;
         @Bind(R.id.tabs)
         TabLayout mTabs;
-        private View mAppView;
-        private View mButtonView;
+        private View mAppView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
+        private View mButtonView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
         private View mShotcutView;
 
+        private MyPagerAdapter mPagerAdapter;
         private  AppAdapter adapter;
+        private  ToolAdapter mToolAdapter;
         private String mCheckdedFuncName;
         private OnDialogClickListener mClickListener;
+        private int mType=0;
 
         static FunctionDialog newInstance(String checkedName) {
 
@@ -325,11 +410,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mCheckdedFuncName = getArguments().getString("checkedName");
+
         }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View view = inflater.inflate(R.layout.function_dialog_layout, null);
 
@@ -360,6 +445,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                     if(keyCode==KeyEvent.KEYCODE_BACK){
 
                         getDialog().hide();
+
                         return true;
                     }
 
@@ -381,15 +467,39 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             mClickListener = listener;
         }
-        private void setCheckedFuncName(String funcName){
+        private void setCheckedFuncName(int type,String funcName){
 
             mCheckdedFuncName = funcName;
 
-            if(adapter!=null){
+            mType = type;
 
-                adapter.setAppChecked(funcName);
-                adapter.notifyDataSetChanged();
+            if(mType==0){
+
+                if(adapter!=null){
+
+                    adapter.setAppChecked(funcName);
+                    adapter.notifyDataSetChanged();
+                }
+
+                if(mViewPager!=null){
+                    mViewPager.setCurrentItem(0);
+                }
+
+
+            }else if(mType==1){
+
+                if(mToolAdapter != null){
+
+                    mToolAdapter.setToolChecked(funcName);
+                    mToolAdapter.notifyDataSetChanged();
+                }
+
+                if(mViewPager!=null){
+                    mViewPager.setCurrentItem(1);
+                }
+
             }
+
 
         }
 
@@ -399,20 +509,94 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         private void initButtonView() {
 
+            //mButtonView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            ListView mListView = (ListView) mButtonView.findViewById(R.id.lv_app);
+
+            mToolAdapter= new ToolAdapter(getActivity());
+            mToolAdapter.setToolChecked(mCheckdedFuncName);
+            if(toolList==null){
+
+                mToolAdapter.addList(FloatingBallUtils.getToolInfos());
+
+            }else {
+
+                mToolAdapter.addList(toolList);
+            }
+
+
+            mListView.setAdapter(mToolAdapter);
+
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    Intent intent = new Intent();
+
+                    String name = toolList.get(i).getToolName();
+
+                    if (!name.equals(mCheckdedFuncName)) {
+
+                        if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
+
+                            checkPermissionGranted(Manifest.permission.CAMERA);
+                        }
+
+
+                        mToolAdapter.setToolChecked(name);
+                        intent.putExtra("name", name);
+                        intent.putExtra("package", name);
+                        intent.putExtra("type",1);
+                        intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
+                    } else {
+                        mToolAdapter.setToolChecked("");
+                        intent.putExtra("name", "");
+                    }
+
+
+                    mClickListener.onDialogClick(intent);
+
+                    getDialog().hide();
+
+
+                }
+            });
+
         }
+
+        private void checkPermissionGranted(String permission) {
+
+
+            if(Build.VERSION.SDK_INT>22){
+
+                int grant = getActivity().checkSelfPermission(permission);
+
+                if (grant != PackageManager.PERMISSION_GRANTED) {
+                    // We don't have permission so prompt the user
+                    requestPermissions(new String[]{permission}, 123);
+                }
+            }
+
+        }
+
 
         private void initAppView() {
 
-            mAppView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            //mAppView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
 
             ListView mListView = (ListView) mAppView.findViewById(R.id.lv_app);
 
-            final ArrayList<AppInfo> appList =  AppUtils.getAppInfos();
-
-
             adapter= new AppAdapter(getActivity());
             adapter.setAppChecked(mCheckdedFuncName);
-            adapter.addList(appList);
+
+            if(appList==null){
+
+                adapter.addList(AppUtils.getAppInfos());
+
+            }else {
+
+                adapter.addList(appList);
+            }
+
 
             mListView.setAdapter(adapter);
 
@@ -422,11 +606,13 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                     Intent intent = new Intent();
 
-                    if (!appList.get(i).getAppName().equals(mCheckdedFuncName)) {
+                    String name = appList.get(i).getAppName();
+                    if (!name.equals(mCheckdedFuncName)) {
 
-                        adapter.setAppChecked(appList.get(i).getAppName());
-                        intent.putExtra("name", appList.get(i).getAppName());
+                        adapter.setAppChecked(name);
+                        intent.putExtra("name", name);
                         intent.putExtra("package", appList.get(i).getAppPackage());
+                        intent.putExtra("type",0);
                         intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
                     } else {
                         adapter.setAppChecked("");
@@ -446,19 +632,35 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         public void setupViewPager(){
 
-            MyPagerAdapter adapter = new MyPagerAdapter();
+            mPagerAdapter = new MyPagerAdapter();
 
             if(mAppView!=null){
 
-                adapter.addView(mAppView,"应用程序");
+                mPagerAdapter.addView(mAppView,"应用程序");
+                mPagerAdapter.addView(mButtonView,"快捷开关");
             }
 
 
-            mViewPager.setAdapter(adapter);
+            mViewPager.setAdapter(mPagerAdapter);
 
             mTabs.setupWithViewPager(mViewPager);
 
             mViewPager.setOffscreenPageLimit(3);
+
+            switch (mType){
+
+                case 0:
+                    mViewPager.setCurrentItem(0);
+                    break;
+                case 1:
+                    mViewPager.setCurrentItem(1);
+                    break;
+                case 2:
+                    mViewPager.setCurrentItem(2);
+                    break;
+                default:
+                    break;
+            }
 
             mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override

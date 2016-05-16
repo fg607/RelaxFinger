@@ -75,7 +75,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/babble"
+            android:background="@drawable/windows"
             android:clickable="true"
             >
 
@@ -133,7 +133,6 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/windows"
             android:clickable="true"
             >
 
@@ -158,14 +157,23 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:id="@+id/img6"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/music"
-            android:clickable="true"
-            >
+            android:layout_centerInParent="true">
+           <!-- android:background="@drawable/bg_diy"
+            android:src="@drawable/theme_diy"
+            android:clickable="true"-->
 
+            <ImageView
+                android:id="@+id/img6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@drawable/bg_diy"
+                android:src="@drawable/theme_diy"
+                android:clickable="true"
+                />
+<!--
             <ImageView
                 android:id="@+id/check6"
                 android:layout_width="20dp"
@@ -176,7 +184,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginRight="5dp"
                 android:src="@drawable/sl_choosestyle"
-                />
+                />-->
         </RelativeLayout>
 
     </RelativeLayout>

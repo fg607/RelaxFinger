@@ -21,4 +21,7 @@ public class Config {
     public static final int FLOAT_THEME =14;
     public static final int FLOAT_AUTOMOVE=15;
     public static final int HIDE_BALL=16;
+    public static final int CLOSE_MENU=17;
+    public static final int REQUEST_PICK = 18;
+    public static final int REQUEST_CLIP = 19;
 }

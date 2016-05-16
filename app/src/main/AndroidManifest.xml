@@ -2,14 +2,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hardwork.fg607.relaxfinger">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-   <!-- <uses-permission android:name="android.permission.GET_TASKS" />-->
-   <!-- <uses-permission android:name="android.permission..INJECT_EVENTS" />-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.autofocus" />
 
     <application
         android:name=".MyApplication"
@@ -36,11 +46,11 @@
 
         <service
             android:name=".service.FloatingBallService"
+            android:configChanges="orientation|keyboardHidden"
             android:enabled="true"
             android:exported="true"
-            android:screenOrientation="sensor"
-            android:configChanges="orientation|keyboardHidden"
-            android:process=":remote" />
+            android:process=":remote"
+            android:screenOrientation="sensor" />
         <service
             android:name=".service.NavAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -87,9 +97,16 @@
 
         <activity
             android:name=".view.ScreenshotActivity"
-            android:theme="@style/Theme.Transparent"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance"></activity>
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.Transparent" />
+        <activity
+            android:name=".view.BlankActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/MyDialogStyle"/>
+        <activity android:name=".view.ClipImageActivity"/>
+
     </application>
 
 </manifest>
