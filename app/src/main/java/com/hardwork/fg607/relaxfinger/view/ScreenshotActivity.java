@@ -12,10 +12,12 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ScreenshotCallback;
 import com.hardwork.fg607.relaxfinger.utils.Screenshotter;
@@ -68,7 +70,6 @@ public class ScreenshotActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 
                     Screenshotter.getInstance()
-                            .setSize(720, 1280)
                             .takeScreenshot(this, resultCode, data, new ScreenshotCallback() {
                                 @Override
                                 public void onScreenshot(Bitmap bitmap) {
