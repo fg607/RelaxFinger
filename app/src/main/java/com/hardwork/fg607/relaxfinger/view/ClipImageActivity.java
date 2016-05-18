@@ -38,7 +38,7 @@ public class ClipImageActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_clip) {
             // 此处获取剪裁后的bitmap,进行缩放后暂存
-            FloatingBallUtils.bitmap = FloatingBallUtils.scaleBitmap(mImageView.clip(),100);
+            FloatingBallUtils.bitmap = mImageView.clip();
             //当前时间为图标名字
             String fileName = "DIY.png";
             Intent intent = new Intent();

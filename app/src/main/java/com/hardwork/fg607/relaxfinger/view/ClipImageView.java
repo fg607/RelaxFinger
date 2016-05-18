@@ -488,7 +488,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 			dst_right = width;
 			dst_bottom = width;
 		} else {
-			roundPx = height / 2;
+			roundPx =  height / 2;
 			float clip = (width - height) / 2;
 			left = clip;
 			right = width - clip;
@@ -509,7 +509,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		final Rect src = new Rect((int) left, (int) top, (int) right,
 				(int) bottom);
 		final Rect dst = new Rect((int) dst_left, (int) dst_top,
-				(int) dst_right-5, (int) dst_bottom-5);
+				(int) dst_right, (int) dst_bottom);
 		final RectF rectF = new RectF(dst);
 
 		paint.setAntiAlias(true);
@@ -533,7 +533,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		mBorderPaint.setColor(bordercolor);
 		mBorderPaint.setStrokeWidth(10);
 		mBorderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-		float mBorderRadius = Math.min(width / 2 - 30, height / 2 - 30);
+		float mBorderRadius = Math.min((float) width / 2 - 30, (float) height / 2 - 30);
 	//	canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);
 
 		//º”“ı”∞
@@ -546,8 +546,8 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 				,20);
 		mShaderPaint.setStrokeWidth(strokeWidth);
 		mShaderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-		float mShaderRadius = Math.min(width / 2 -strokeWidth/2, height / 2 -strokeWidth/2);
-		canvas.drawCircle(width / 2, height / 2, mShaderRadius, mShaderPaint);
+		float mShaderRadius = Math.min( width / 2 - strokeWidth/2, height / 2 -strokeWidth/2);
+		canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
 		return output;
 	}
 }

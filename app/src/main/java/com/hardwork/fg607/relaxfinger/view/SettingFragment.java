@@ -645,6 +645,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             mViewChoosed = setIconChoosed(mThemeChoosed);
 
             sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+
+            mFloatBallTheme.setSummary(mThemeChoosed);
         }
 
 
@@ -701,6 +703,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 mImg5.setBackground(ImageUtils.bitmap2Drawable(FloatingBallUtils.bitmap));
 
                 mImg5.setClickable(true);
+
+                mImg5.setOnClickListener(this);
 
                 if("自定义".equals(mThemeChoosed)){
 

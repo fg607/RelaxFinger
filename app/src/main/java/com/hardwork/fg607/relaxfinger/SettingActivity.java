@@ -311,21 +311,19 @@ public class SettingActivity extends AppCompatActivity{
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("关于RelaxFinger");
-        dialog.setMessage("版本：v1.2.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.2.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("RelaxFinger-1.2.2版本更新内容");
+        dialog.setTitle("RelaxFinger-1.2.3版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.添加快捷菜单弹出背景变暗效果，点击任意位置关闭。\r\n" +
-                "2.横屏下悬浮球进入自由模式，可自由移动，切换回竖屏后恢复原有状态。\r\n" +
-                "3.打开输入法同样会进入自由模式，关闭后复原。\r\n" +
-                "4.手势功能添加'无操作'选项。\r\n" +
-                "5.优化部分机型截屏声音过大问题。\r\n");
+        dialog.setMessage("1.添加自定义主题功能。\r\n" +
+                "2.快捷菜单增加打开wifi,蓝牙,响铃模式,音乐控制和手电筒等功能。\r\n" +
+                "3.修复横屏下点击截屏的问题。\r\n");
         dialog.show();
 
     }

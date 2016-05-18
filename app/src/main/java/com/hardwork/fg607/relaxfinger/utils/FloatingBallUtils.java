@@ -854,8 +854,17 @@ public class FloatingBallUtils {
             mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
+        if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
 
-        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+        }else {
+
+            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        }
+
+
+
+
     }
 
     private static void vibrationMode() {
@@ -865,7 +874,14 @@ public class FloatingBallUtils {
         }
 
 
-        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_VIBRATE){
+
+            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        }else {
+
+            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        }
+
 
 
     }
