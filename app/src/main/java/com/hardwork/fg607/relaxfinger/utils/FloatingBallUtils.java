@@ -630,8 +630,8 @@ public class FloatingBallUtils {
         ToolInfo data = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_2_data),"移动数据");
         ToolInfo bluetooth = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_10_bluetooth),"蓝牙");
         ToolInfo flash = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_9_flashlight),"手电筒");
-        ToolInfo vibration = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_6_vibration),"震动");
-        ToolInfo mute = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_5_mute),"静音");
+        ToolInfo vibration = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_6_vibration),"震动/声音");
+        ToolInfo mute = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_5_mute),"静音/声音");
         ToolInfo rotation = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_8_rotation),"屏幕旋转");
         ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
         ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
@@ -674,10 +674,10 @@ public class FloatingBallUtils {
             case "手电筒":
                 icon = context.getResources().getDrawable(R.drawable.switch_9_flashlight);
                 break;
-            case "震动":
+            case "震动/声音":
                 icon = context.getResources().getDrawable(R.drawable.switch_6_vibration);
                 break;
-            case "静音":
+            case "静音/声音":
                 icon = context.getResources().getDrawable(R.drawable.switch_5_mute);
                 break;
             case "屏幕旋转":
@@ -716,10 +716,10 @@ public class FloatingBallUtils {
             case "手电筒":
                 switchFlashlight();
                 break;
-            case "震动":
+            case "震动/声音":
                 vibrationMode();
                 break;
-            case "静音":
+            case "静音/声音":
                 muteMode();
                 break;
             case "屏幕旋转":
@@ -834,11 +834,13 @@ public class FloatingBallUtils {
 
                 //打开
                 Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 1);
+                Toast.makeText(context,"屏幕旋转已启用",Toast.LENGTH_SHORT).show();
 
             } else if (gravity == 1) {
 
                 //关闭
                 Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 0);
+                Toast.makeText(context,"屏幕旋转已关闭",Toast.LENGTH_SHORT).show();
             }
         }else {
 
@@ -857,9 +859,11 @@ public class FloatingBallUtils {
         if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            Toast.makeText(context,"静音模式已启用",Toast.LENGTH_SHORT).show();
         }else {
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
         }
 
 
@@ -877,9 +881,11 @@ public class FloatingBallUtils {
         if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_VIBRATE){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+            Toast.makeText(context,"震动模式已启用",Toast.LENGTH_SHORT).show();
         }else {
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
         }
 
 

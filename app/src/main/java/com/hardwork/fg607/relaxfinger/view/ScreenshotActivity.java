@@ -45,7 +45,9 @@ public class ScreenshotActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-            takeScreenshot();
+        verifyStoragePermissions(ScreenshotActivity.this);
+
+        takeScreenshot();
 
     }
 
@@ -77,7 +79,6 @@ public class ScreenshotActivity extends Activity {
                                     if(!mIsExist){
 
                                         sendMsg(Config.HIDE_BALL, "hide", false);
-                                        verifyStoragePermissions(ScreenshotActivity.this);
                                         saveScreenshot(bitmap);
 
                                         mIsExist = true;

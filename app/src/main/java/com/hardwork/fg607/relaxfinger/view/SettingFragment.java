@@ -222,6 +222,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 return true;
             }
         });
+
+        mFloatBallTheme.setSummary(mPreferences.getString("theme","默认"));
     }
 
     private void showThemeDialog() {
@@ -709,6 +711,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 if("自定义".equals(mThemeChoosed)){
 
                     sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+                    mFloatBallTheme.setSummary(mThemeChoosed);
                 }
 
 

@@ -5,30 +5,30 @@
         android:defaultValue=""
         android:key="app1"
         android:summary=""
-        android:title="快捷应用1" />
+        android:title="快捷菜单1" />
 
     <com.jenzz.materialpreference.Preference
         android:defaultValue=""
         android:key="app2"
         android:summary=""
-        android:title="快捷应用2" />
+        android:title="快捷菜单2" />
 
     <com.jenzz.materialpreference.Preference
         android:defaultValue=""
         android:key="app3"
         android:summary=""
-        android:title="快捷应用3" />
+        android:title="快捷菜单3" />
 
     <com.jenzz.materialpreference.Preference
         android:defaultValue=""
         android:key="app4"
         android:summary=""
-        android:title="快捷应用4" />
+        android:title="快捷菜单4" />
 
     <com.jenzz.materialpreference.Preference
         android:defaultValue=""
         android:key="app5"
         android:summary=""
-        android:title="快捷应用5" />
+        android:title="快捷菜单5" />
 
 </PreferenceScreen>

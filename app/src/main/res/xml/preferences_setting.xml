@@ -83,7 +83,7 @@
 
     <com.jenzz.materialpreference.Preference
         android:key="appSetting"
-        android:title="快捷应用设置"/>
+        android:title="快捷菜单设置"/>
 
 
 </PreferenceScreen>

@@ -112,7 +112,7 @@ public class SettingActivity extends AppCompatActivity{
 
                 transaction.commit();
 
-                SettingActivity.this.setTitle("快捷应用设置");
+                SettingActivity.this.setTitle("快捷菜单设置");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -324,7 +324,8 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setMessage("1.添加自定义主题功能。\r\n" +
                 "2.快捷菜单增加打开wifi,蓝牙,响铃模式,音乐控制和手电筒等功能。\r\n" +
                 "3.修复横屏下点击截屏的问题。\r\n" +
-                "4.修复主题名称不随主题改变的问题。");
+                "4.修复截屏黑边问题。\r\n" +
+                "5.修复主题名称不随主题改变的问题。");
         dialog.show();
 
     }
