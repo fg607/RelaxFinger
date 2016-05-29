@@ -42,6 +42,12 @@ public class FloatBallReceiver extends BroadcastReceiver {
                     sendMsg(Config.FLOAT_SWITCH,"ballstate",true);
                 }
                 break;
+            case Config.ACTION_SHOW_FLOATBALL:
+                if(sp.getBoolean("floatSwitch",false)){
+
+                    sendMsg(Config.RECOVER_FLOATBALL,"ballstate",true);
+                }
+                break;
             default:
                 break;
 

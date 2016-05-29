@@ -1,6 +1,9 @@
 package com.hardwork.fg607.relaxfinger.utils;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +22,7 @@ import com.hardwork.fg607.relaxfinger.model.AppInfo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -120,6 +124,21 @@ public class AppUtils {
 
 
 
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static  void startActivity(Class<?> cls) {
+
+        Intent intent = new Intent(context, cls);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        long now = Calendar.getInstance().getTimeInMillis();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now, pendingIntent);
+        else
+            alarmManager.set(AlarmManager.RTC_WAKEUP, now, pendingIntent);
     }
 
     public static void uninstallApplication(String packageName){

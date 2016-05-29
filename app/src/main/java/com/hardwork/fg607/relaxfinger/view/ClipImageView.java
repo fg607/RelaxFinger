@@ -543,11 +543,11 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		mShaderPaint.setAntiAlias(true);
 		mShaderPaint.setColor(shadercolor);
 		int strokeWidth = DensityUtil.dip2px(MyApplication.getApplication()
-				,20);
+				,10);
 		mShaderPaint.setStrokeWidth(strokeWidth);
 		mShaderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		float mShaderRadius = Math.min( width / 2 - strokeWidth/2, height / 2 -strokeWidth/2);
-		canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
+		//canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
 		return output;
 	}
 }

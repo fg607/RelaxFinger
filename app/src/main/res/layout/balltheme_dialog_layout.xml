@@ -46,7 +46,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/clover"
+            android:background="@drawable/color"
             android:clickable="true"
             >
             <ImageView
@@ -75,7 +75,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/windows"
+            android:background="@drawable/red"
             android:clickable="true"
             >
 

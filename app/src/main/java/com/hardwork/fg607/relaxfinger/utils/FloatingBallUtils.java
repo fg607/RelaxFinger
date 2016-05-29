@@ -27,6 +27,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
@@ -220,6 +221,10 @@ public class FloatingBallUtils {
 
     }
 
+    /**
+     * 使用原生home键返回桌面，存在5秒延迟问题
+     * @param service
+     */
     public static void keyHome(AccessibilityService service){
 
         service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
@@ -446,15 +451,21 @@ public class FloatingBallUtils {
 
     }
 
+    public static String saveBitmap(Bitmap bitmap,String fileName) throws IOException {
+
+        return  saveBitmap(bitmap,"/RelaxFinger",fileName);
+    }
+
     /**
      * 保存图标到sd卡
      * @param bitmap
      * @param fileName
      * @throws IOException
      */
-    public static String saveBitmap(Bitmap bitmap,String fileName) throws IOException {
+    public static String saveBitmap(Bitmap bitmap,String folder,String fileName) throws IOException {
 
-        String rootdir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/RelaxFinger";
+        String rootdir = Environment.getExternalStorageDirectory().getAbsolutePath()+
+                folder;
 
         File dir = new File(rootdir);
 
@@ -490,6 +501,34 @@ public class FloatingBallUtils {
 
         return file.getAbsolutePath();
     }
+
+    /**
+     * 通知媒体库更新文件
+     * @param context
+     * @param filePath 文件全路径
+     *
+     * */
+    public static void scanFile(Context context, String filePath) {
+        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        scanIntent.setData(Uri.fromFile(new File(filePath)));
+        context.sendBroadcast(scanIntent);
+    }
+
+
+
+    /**
+     * 通知媒体库更新文件夹
+     * @param context
+     * @param filePath 文件夹
+     *
+     * */
+    public  static void scanFolder(Context context, String filePath) {
+        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_MOUNTED);
+        scanIntent.setData(Uri.fromFile(new File(filePath)));
+        context.sendBroadcast(scanIntent);
+    }
+
+
 
     /**
      * 缩放图标
@@ -636,6 +675,7 @@ public class FloatingBallUtils {
         ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
         ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
         ToolInfo musicPrev = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_17_music_prev),"音乐上一曲");
+        ToolInfo screenShot = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_shot),"屏幕截图");
 
         if(Build.VERSION.SDK_INT<23){
 
@@ -647,6 +687,7 @@ public class FloatingBallUtils {
 
         toolList.add(flash);
         toolList.add(vibration);
+        toolList.add(screenShot);
         toolList.add(mute);
         toolList.add(music);
         toolList.add(musicNext);
@@ -692,6 +733,8 @@ public class FloatingBallUtils {
             case "音乐下一曲":
                 icon = context.getResources().getDrawable(R.drawable.switch_16_music_next);
                 break;
+            case "屏幕截图":
+                icon = context.getResources().getDrawable(R.drawable.screen_shot);
             default:
                 break;
 
@@ -734,6 +777,29 @@ public class FloatingBallUtils {
             case "音乐下一曲":
                 nextMusic();
                 break;
+            case "屏幕截图":
+                if(Build.VERSION.SDK_INT > 20){
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            try {
+                                Thread.sleep(600);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            context.startActivity(new Intent().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setClass(
+                                    context, ScreenshotActivity.class));
+                        }
+                    }).start();
+
+
+                }else {
+
+                    Toast.makeText(context,"截图功能适用于5.0以上系统！",Toast.LENGTH_SHORT).show();
+                }
             default:
                 break;
         }
@@ -1029,6 +1095,7 @@ public class FloatingBallUtils {
         }
 
     }
+
 
 
 }

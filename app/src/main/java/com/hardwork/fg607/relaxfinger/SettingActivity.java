@@ -290,6 +290,13 @@ public class SettingActivity extends AppCompatActivity{
 
         }
 
+        if (id == R.id.action_question) {
+
+            questionsAnswer();
+            return true;
+
+        }
+
         if(id == android.R.id.home){
 
             FragmentManager fm = getFragmentManager();
@@ -311,21 +318,46 @@ public class SettingActivity extends AppCompatActivity{
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("关于RelaxFinger");
-        dialog.setMessage("版本：v1.2.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setMessage("版本：v1.3.0\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.show();
+    }
+
+    public void questionsAnswer(){
+
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle("常见问题解答");
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setMessage("1.什么是自由模式：当切换到横屏或者弹出软键盘时会切换到自由模式，自由模式下" +
+                "悬浮球可以自由移动，点击为返回键，双击回到桌面，长按屏幕截图（可在设置界面取消长按截图）" +
+                "，其它手势不可用。\r\n" +
+                "2.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
+                "3.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
+                "4.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
+                "5.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。\r\n" +
+                "6.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
+                "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
+                "7.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
+                "，确保新图片名称依然是DIY.png即可。");
         dialog.show();
     }
 
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("RelaxFinger-1.2.3版本更新内容");
+        dialog.setTitle("RelaxFinger-1.3.0版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.添加自定义主题功能。\r\n" +
-                "2.快捷菜单增加打开wifi,蓝牙,响铃模式,音乐控制和手电筒等功能。\r\n" +
-                "3.修复横屏下点击截屏的问题。\r\n" +
-                "4.修复截屏黑边问题。\r\n" +
-                "5.修复主题名称不随主题改变的问题。");
+        dialog.setMessage("1.添加隐藏悬浮球到通知栏功能。\r\n" +
+                "2.添加手势震动反馈功能。\r\n" +
+                "3.添加自由模式下长按截屏开关。\r\n" +
+                "4.优化整体操作体验：优化自带主题及自定义主题，增加悬浮球触摸动画。\r\n" +
+                "5.双击手势为“无操作”时，可提高返回键响应速度。\r\n" +
+                "6.修复截屏不能在QQ及微信显示的问题。\r\n" +
+                "7.修复按下Home键后5秒内不能打开快捷应用的问题。\r\n" +
+                "8.修复主题名称不随主题改变的问题。");
         dialog.show();
 
     }

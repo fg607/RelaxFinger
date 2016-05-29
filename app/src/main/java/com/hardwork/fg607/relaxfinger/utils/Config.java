@@ -24,4 +24,9 @@ public class Config {
     public static final int CLOSE_MENU=17;
     public static final int REQUEST_PICK = 18;
     public static final int REQUEST_CLIP = 19;
+    public static final int RECOVER_FLOATBALL = 20;
+    public static final int POPUP_MENU_ANIMA = 21;
+    public static final int FEEDBACK_SWITCH = 22;
+    public static final int SHOTSCREEN_SWITCH = 23;
+    public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.showFloatBall";
 }

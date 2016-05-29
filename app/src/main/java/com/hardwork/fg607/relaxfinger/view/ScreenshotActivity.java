@@ -107,7 +107,9 @@ public class ScreenshotActivity extends Activity {
         String strDate = dateFormat.format(date);
 
         try {
-            FloatingBallUtils.saveBitmap(bitmap,strDate+".png");
+            String filePath = FloatingBallUtils.saveBitmap(bitmap,strDate+".png");
+
+            FloatingBallUtils.scanFile(this,filePath);
 
             Toast.makeText(this, "截图成功！", Toast.LENGTH_SHORT).show();
 

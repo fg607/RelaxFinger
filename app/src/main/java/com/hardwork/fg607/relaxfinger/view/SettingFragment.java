@@ -52,6 +52,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mAutoMoveSwitch;
     private SwitchPreference mAutoStartSwitch;
     private SwitchPreference mVibratorSwitch;
+    private SwitchPreference mShotscreenSwitch;
+    private SwitchPreference mFeedbackSwitch;
     private SwitchPreference mNotifySwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
@@ -152,6 +154,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mMoveSwitch.setOnPreferenceChangeListener(this);
         mVibratorSwitch = (SwitchPreference) findPreference("vibratorSwitch");
         mVibratorSwitch.setOnPreferenceChangeListener(this);
+        mFeedbackSwitch = (SwitchPreference) findPreference("feedbackSwitch");
+        mFeedbackSwitch.setOnPreferenceChangeListener(this);
+        mShotscreenSwitch = (SwitchPreference) findPreference("shotscreenSwitch");
+        mShotscreenSwitch.setOnPreferenceChangeListener(this);
         mToEdgeSwitch = (SwitchPreference) findPreference("toEdgeSwitch");
         mToEdgeSwitch.setOnPreferenceChangeListener(this);
         mLockScreenSwitch = (SwitchPreference) findPreference("lockScreenSwitch");
@@ -287,10 +293,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "默认":
                 imageView = mCheck1;
                 break;
-            case "四叶草":
+            case "彩虹":
                 imageView = mCheck2;
                 break;
-            case "窗口":
+            case "红色":
                 imageView = mCheck3;
                 break;
             case "苹果":
@@ -419,6 +425,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "vibratorSwitch":
                 vibratorChange((boolean) newValue);
                 break;
+            case "feedbackSwitch":
+                feedbackChange((boolean) newValue);
+                break;
+            case "shotscreenSwitch":
+                shotscreenChange((boolean) newValue);
+                break;
             case "toEdgeSwitch":
                 toEdgeChange((boolean) newValue);
                 break;
@@ -452,6 +464,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
 
         return true;
+    }
+
+    private void shotscreenChange(boolean newValue) {
+
+        mPreferences.put("shotscreenSwitch", newValue);
+
+        sendMsg(Config.SHOTSCREEN_SWITCH, "isShotscreen", newValue);
     }
 
 
@@ -503,6 +522,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mPreferences.put("vibratorSwitch", newValue);
 
         sendMsg(Config.VIBRATOR_SWITCH, "isVibrate", newValue);
+    }
+
+    private void feedbackChange(boolean newValue) {
+
+        mPreferences.put("feedbackSwitch", newValue);
+
+        sendMsg(Config.FEEDBACK_SWITCH, "isFeedback", newValue);
     }
 
     private void toEdgeChange(boolean newValue) {
@@ -621,10 +647,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 mThemeChoosed="默认";
                 break;
             case R.id.img2:
-                mThemeChoosed="四叶草";
+                mThemeChoosed="彩虹";
                 break;
             case R.id.img3:
-                mThemeChoosed="窗口";
+                mThemeChoosed="红色";
                 break;
             case R.id.img4:
                 mThemeChoosed="苹果";

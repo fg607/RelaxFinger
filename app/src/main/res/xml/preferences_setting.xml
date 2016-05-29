@@ -21,9 +21,16 @@
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
         android:key="vibratorSwitch"
-        android:summaryOff="关闭震动反馈"
-        android:summaryOn="开启震动反馈"
-        android:title="长按震动" />
+        android:summaryOff="震动反馈已关闭"
+        android:summaryOn="震动反馈已开启"
+        android:title="长按震动反馈" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="feedbackSwitch"
+        android:summaryOff="震动反馈已关闭"
+        android:summaryOn="震动反馈已开启"
+        android:title="手势震动反馈" />
 
 
     <com.jenzz.materialpreference.SwitchPreference
@@ -45,6 +52,13 @@
         android:summaryOff="锁屏功能关闭"
         android:summaryOn="锁屏功能已开启"
         android:title="开启锁屏" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="shotscreenSwitch"
+        android:summaryOff="长按截屏已关闭"
+        android:summaryOn="自由模式下长按截屏"
+        android:title="长按屏幕截图" />
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"

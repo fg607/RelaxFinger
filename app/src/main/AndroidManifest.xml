@@ -66,6 +66,7 @@
 
         <receiver android:name=".receiver.FloatBallReceiver">
             <intent-filter>
+                <action android:name="com.hardwork.fg607.showFloatBall" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>

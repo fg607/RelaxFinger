@@ -34,8 +34,10 @@ public class BlankActivity extends Activity {
                 intent.putExtra("what",Config.CLOSE_MENU);
                 intent.setClass(BlankActivity.this, FloatingBallService.class);
                 startService(intent);
+
             }
         });
+
 
 
     }
