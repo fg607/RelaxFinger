@@ -134,6 +134,7 @@ public class SettingActivity extends AppCompatActivity{
             getFragmentManager().beginTransaction().show(fragmentSetting).hide(fragmentGesture).hide(fragmentApp).commit();
         }*/
 
+        SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
 
         initAccessibility();
 
@@ -147,7 +148,7 @@ public class SettingActivity extends AppCompatActivity{
         if (fm.getBackStackEntryCount() > 1) {
 
             fm.popBackStack();
-            SettingActivity.this.setTitle("RelaxFinger");
+            SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         } else {
 
@@ -303,7 +304,7 @@ public class SettingActivity extends AppCompatActivity{
             if (fm.getBackStackEntryCount() > 1) {
 
                 fm.popBackStack();
-                SettingActivity.this.setTitle("RelaxFinger");
+                SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             } else {
 
@@ -317,7 +318,7 @@ public class SettingActivity extends AppCompatActivity{
     public void developerInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("关于RelaxFinger");
+        dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("版本：v1.3.0\r\n作者：fg607\r\n邮箱：fg607@sina.com");
@@ -347,7 +348,7 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("RelaxFinger-1.3.0版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.0版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("1.添加隐藏悬浮球到通知栏功能。\r\n" +

@@ -96,7 +96,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mClickCount;
     public static final long CLICK_SPACING_TIME = 100;//双击间隔时间
     private long mDoubleClickTime=CLICK_SPACING_TIME;
-    public static final long LONG_PRESS_TIME = 300;
+    public static final long LONG_PRESS_TIME = ViewConfiguration.getLongPressTimeout();
     public static final int MIN_BALL_ALPHA = 255;
     public static final int MAX_BALL_ALPHA = 10;
     public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(),30);
