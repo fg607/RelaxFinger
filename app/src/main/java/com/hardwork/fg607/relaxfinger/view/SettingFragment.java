@@ -20,6 +20,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;

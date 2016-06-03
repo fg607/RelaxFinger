@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.Config;
@@ -16,6 +17,7 @@ public class FloatBallReceiver extends BroadcastReceiver {
 
     private SharedPreferences sp;
     private Context mContext;
+
 
     public void onReceive(Context context, Intent intent) {
 
@@ -37,10 +39,9 @@ public class FloatBallReceiver extends BroadcastReceiver {
                 }
                 break;
             case Intent.ACTION_USER_PRESENT:
-                if(sp.getBoolean("floatSwitch",false)){
 
-                    sendMsg(Config.FLOAT_SWITCH,"ballstate",true);
-                }
+                sendMsg(Config.SCREEN_ON,"screenOn",true);
+
                 break;
             case Config.ACTION_SHOW_FLOATBALL:
                 if(sp.getBoolean("floatSwitch",false)){

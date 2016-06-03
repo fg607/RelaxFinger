@@ -9,6 +9,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,6 +20,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -30,6 +32,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,8 +43,11 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.animation.Animation;
 import android.view.animation.AnticipateInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -49,6 +55,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.rebound.BaseSpringSystem;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
+import com.facebook.rebound.SpringSystem;
+import com.facebook.rebound.SpringUtil;
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
@@ -68,6 +80,7 @@ import net.grandcentrix.tray.TrayAppPreferences;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -158,14 +171,43 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean mIsLandscape=false;
     private boolean mIsGestureFeedback = true;
     private boolean mIsShotscreen = true;
+    private boolean mIsHomePressed = false;
 
     private View mPopBackgroundView;
     private boolean mIsBackAdded= false;
 
+
+
+    private LinearLayout mHideLayout;
+    private LinearLayout.LayoutParams mHideParams;
     private TextView mHideBarView;
     private boolean mIsHideBarAdded = false;
     private boolean mCanShowHideBar = true;
     private WindowManager.LayoutParams mHideAreaParams=null;
+    private boolean mIsBallHiding = false;
+
+
+    private final BaseSpringSystem mSpringSystem = SpringSystem.create();
+    private final ExampleSpringListener mSpringListener = new ExampleSpringListener();
+    private FrameLayout mRootView;
+    private Spring mScaleSpring;
+
+    private class ExampleSpringListener extends SimpleSpringListener {
+
+        @Override
+        public void onSpringUpdate(Spring spring) {
+
+            float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1,1,0.8);
+
+            //if(!mCanmove){
+                mFloatImage.setScaleX(mappedValue);
+                mFloatImage.setScaleY(mappedValue);
+           // }
+        }
+
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -186,6 +228,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mIsShotscreen = mPreferences.getBoolean("shotscreenSwitch",true);
         mIsFloatRight = mPreferences.getBoolean("floatRight", true);
         mIsCanPopup = mPreferences.getBoolean("canPopup",true);
+        mIsBallHiding = mPreferences.getBoolean("hideState",false);
 
         mTag = 0;
         mIsAdd = false;
@@ -216,7 +259,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }
 
 
-
+        mScaleSpring = mSpringSystem.createSpring()
+        .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,5));
         /*
         mDetectThread = new DetectAppThread();
 
@@ -248,8 +292,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mIsLandscape = true;
             changeBallToFree();
 
-            mBallWmParams.x = DensityUtil.getScreenWidth(this)*3/4;
-            mBallWmParams.y = DensityUtil.getScreenHeight(this)-floatBallSize;
+            mBallWmParams.x = DensityUtil.getScreenWidth(this)-mBallWmParams.width;
+            mBallWmParams.y = DensityUtil.getScreenHeight(this)/2-mBallWmParams.width/2;
 
             if(mIsAdd){
 
@@ -370,7 +414,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         Notification notification = mBuilder.build();
 
-        notification.flags|= Notification.FLAG_AUTO_CANCEL;
+        notification.flags|= Notification.FLAG_NO_CLEAR;
 
         NotificationManager mNF = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
@@ -380,13 +424,37 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void hideToNotifyBar(){
 
+        mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+
         createShowNotification();
         closeFloatBall();
+
+
+        mIsBallHiding = true;
+
+        mPreferences.put("hideState",mIsBallHiding);
     }
 
     private void initFloatView() {
+
+        LinearLayout linearLayout =  new LinearLayout(getApplicationContext()) {
+
+            //home or recent button
+            public void onCloseSystemDialogs(String reason) {
+                //The Code Want to Perform.
+
+                if (reason != null && reason.equals("homekey")) {
+
+                    disableMenu();
+                }
+
+            }
+        };
+
+        linearLayout.setFocusable(true);
+
         LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        mBallView = li.inflate(R.layout.floatball, null);
+        mBallView = li.inflate(R.layout.floatball, linearLayout);
         mFloatImage = (Button) mBallView.findViewById(R.id.float_image);
         setBallTheme(mPreferences.getString("theme", "默认"));
         mTrackView = li.inflate(R.layout.track, null);
@@ -487,6 +555,18 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 case Config.NOTIFY_SWITCH:
                     setNotify(intent.getBooleanExtra("isNotify", true));
                     break;
+                case Config.SCREEN_ON:
+                    if(mPreferences.getBoolean("floatSwitch",false)){
+
+                        if(mIsBallHiding){
+
+                            createShowNotification();
+                        }else {
+
+                            setFloatState(true);
+                        }
+                    }
+                    break;
                 case Config.FLOAT_SWITCH:
                     setFloatState(intent.getBooleanExtra("ballstate", false));
                     break;
@@ -532,6 +612,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
         return super.onStartCommand(intent, flags, startId);
     }
 
+
+
     private void setShotscreen(boolean isShotscreen) {
 
         mIsShotscreen = isShotscreen;
@@ -544,11 +626,34 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void recoverFloatBall() {
 
-        mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
-        mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
-        //mCanmove =mPreferences.getBoolean("moveSwitch", false);
+        if(!mIsLandscape){
+
+            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+        }else {
+
+            mBallWmParams.x = DensityUtil.getScreenWidth(this)-mBallWmParams.width;
+            mBallWmParams.y = DensityUtil.getScreenHeight(this)/2-mBallWmParams.width/2;
+        }
+
+
         updateTrack();
         showFloatBall();
+
+        closeRecoverNotify();
+
+        mIsBallHiding = false;
+
+        mPreferences.put("hideState",mIsBallHiding);
+
+
+    }
+
+    private void closeRecoverNotify() {
+
+        NotificationManager mNF = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        mNF.cancel(R.string.app_name);
     }
 
     private void setBallHide(boolean hide) {
@@ -566,7 +671,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             if(mIsHideBarAdded){
 
-                mWindowManager.removeViewImmediate(mHideBarView);
+                mWindowManager.removeViewImmediate(mHideLayout);
                 mIsHideBarAdded = false;
             }
 
@@ -698,7 +803,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             if (mIsToEdge) {
 
-                moveToScreenEdge();
+                moveToScreenEdge(mBallWmParams.x);
             }
 
     }
@@ -708,9 +813,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
         if(ballstate){
             showFloatBall();
         }else {
+            if(mIsBallHiding){
+
+                closeRecoverNotify();
+            }
             hideTrack();
             closeFloatBall();
             closeMenu();
+
            /*
             if (mDetectThread!=null&& mDetectThread.isAlive()){
 
@@ -734,7 +844,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if (mIsToEdge) {
 
-            moveToScreenEdge();
+            moveToScreenEdge(mBallWmParams.x);
         }
     }
 
@@ -1046,7 +1156,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mBallWmParams.width = floatBallSize;
         mBallWmParams.height = floatBallSize;
-        mBallWmParams.format = PixelFormat.RGBA_8888;
+
+        mBallWmParams.format = PixelFormat.TRANSLUCENT;
 
         mZoomOutAnima = new ScaleAnimation(1f,0.9f,1f,0.9f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         mZoomOutAnima.setDuration(100);
@@ -1068,8 +1179,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mFloatImage.setPressed(true);
-                        mFloatImage.startAnimation(mZoomOutAnima);
+                        mScaleSpring.setEndValue(1);
+                      /*  mFloatImage.setPressed(true);
+                        mFloatImage.startAnimation(mZoomOutAnima);*/
                         mFloatImage.getBackground().setAlpha(255);
                         mTouchX = (int) event.getRawX();
                         mTouchY = (int) event.getRawY();
@@ -1107,7 +1219,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         //更新悬浮球位置，保存位置
                         if (mCanmove) {
 
-                            if(mCanShowHideBar){
+                            if(mCanShowHideBar&&!mIsHideBarAdded){
 
                                 showHideBar();
                             }
@@ -1141,12 +1253,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         break;
                     case MotionEvent.ACTION_UP:
                         if(mIsHideBarAdded){
-                            mWindowManager.removeView(mHideBarView);
-                            mIsHideBarAdded = false;
+
+                            closeHideBar();
                         }
                         mHandler.removeCallbacks(mLongPressedThread);
-                        mFloatImage.setPressed(false);
-                        mFloatImage.startAnimation(mZoomInAnima);
+                        mScaleSpring.setEndValue(0);
+                       /* mFloatImage.setPressed(false);
+                        mFloatImage.startAnimation(mZoomInAnima);*/
                         mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
                         mTag = 0;
@@ -1193,7 +1306,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                             if (mIsToEdge) {
 
-                                moveToScreenEdge();
+                                moveToScreenEdge(event.getRawX());
 
                             } else if(mIsSavePos) {
 
@@ -1291,6 +1404,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                         }
                         break;
+                    case MotionEvent.ACTION_CANCEL:
+                        break;
                 }
                 //如果拖动则返回false，否则返回true
                 if (mIsmoving == false) {
@@ -1302,52 +1417,102 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         });
 
+
+    }
+
+    private void closeHideBar() {
+
+        final TranslateAnimation animation = new TranslateAnimation(0,0,0,mHideAreaParams.height);
+        animation.setDuration(150);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                mWindowManager.removeView(mHideLayout);
+                mIsHideBarAdded = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mHideBarView.startAnimation(animation);
+    }
+
+
+    private void disableMenu() {
+
+        if(mIsMenuAdd){
+
+            closeMenu();
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                mIsHomePressed = true;
+                try {
+                    Thread.sleep(5000);
+
+                    mIsHomePressed = false;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    mIsHomePressed = false;
+                }
+
+
+            }
+        }).start();
     }
 
     private boolean checkInHideArea(){
 
-        return  mBallWmParams.y<=DensityUtil.dip2px(mContext,50)?true:false;
+        return  FloatingBallUtils.getStatusBarHeight(this)+mBallWmParams.y
+                +mBallWmParams.width>=FloatingBallUtils.getScreenHeight()
+                -mHideAreaParams.height?true:false;
     }
 
-    private void moveToScreenEdge() {
+    private void moveToScreenEdge(float startx) {
 
         if (mBallWmParams.x + mBallWmParams.width / 2 >= FloatingBallUtils.getScreenWidth() / 2) {
 
-            moveToScreenRight();
+            moveToScreenRight(startx);
         } else {
 
-            moveToScreenLeft();
+            moveToScreenLeft(startx);
         }
     }
 
-    private void moveToScreenLeft() {
+    private void moveToScreenLeft(float startx) {
 
-        new Thread(new Runnable() {
+        ValueAnimator mSlideToBoundaryAnim = ValueAnimator.ofFloat(startx, 0);
+
+        int maxDuration = 350;
+
+        mSlideToBoundaryAnim.setDuration((int)(startx*maxDuration/(FloatingBallUtils
+                .getScreenWidth()/2-mBallWmParams.width/2)));
+        mSlideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
+        mSlideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
             @Override
-            public void run() {
-
-                while (mBallWmParams.x != 0) {
-
-                    mBallWmParams.x -= 5;
-
-                    if (mBallWmParams.x < 0) {
-
-                        mBallWmParams.x = 0;
-                    }
-
-                    MyApplication.getMainThreadHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateViewPosition();
-                        }
-                    });
-
-                    try {
-                        Thread.sleep(2);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float currentValue = (Float) valueAnimator.getAnimatedValue();
+                mBallWmParams.x = (int) currentValue;
+                updateViewPosition();
+            }
+        });
+        mSlideToBoundaryAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
 
                 if(mIsSavePos){
 
@@ -1356,45 +1521,41 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 }
 
             }
-        }).start();
+        });
+        mSlideToBoundaryAnim.start();
+
     }
 
-    private void moveToScreenRight() {
+    private void moveToScreenRight(float startx) {
 
-        new Thread(new Runnable() {
+        ValueAnimator mSlideToBoundaryAnim = ValueAnimator.ofFloat(startx, FloatingBallUtils.getScreenWidth()
+        -mBallWmParams.width);
+
+        int maxDuration = 200;
+
+        mSlideToBoundaryAnim.setDuration((int)(startx*maxDuration/(FloatingBallUtils
+                .getScreenWidth()/2-mBallWmParams.width/2)));
+        mSlideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
+        mSlideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
             @Override
-            public void run() {
-
-                while (mBallWmParams.x != FloatingBallUtils.getScreenWidth() - mBallWmParams.width) {
-
-                    mBallWmParams.x += 5;
-
-                    if (mBallWmParams.x > FloatingBallUtils.getScreenWidth() - mBallWmParams.width) {
-
-                        mBallWmParams.x = FloatingBallUtils.getScreenWidth() - mBallWmParams.width;
-                    }
-                    MyApplication.getMainThreadHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateViewPosition();
-                        }
-                    });
-
-                    try {
-                        Thread.sleep(2);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float currentValue = (Float) valueAnimator.getAnimatedValue();
+                mBallWmParams.x = (int) currentValue;
+                updateViewPosition();
+            }
+        });
+        mSlideToBoundaryAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
                 if(mIsSavePos){
 
                     saveStates("ballWmParamsX", mBallWmParams.x);
                     saveStates("ballWmParamsY", mBallWmParams.y);
                 }
-
             }
-        }).start();
+        });
+        mSlideToBoundaryAnim.start();
 
     }
 
@@ -1479,14 +1640,24 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             mIsSpeedApp = true;
                         }*/
 
+                        if(!mIsHomePressed){
 
-                        popUpMenu();
+                            popUpMenu();
+
+                        }else {
+
+                            Toast.makeText(this,"系统原因，请在按下系统自带Home键5秒后再打开快捷菜单！",Toast.LENGTH_LONG).show();
+                        }
+
+
 
 
                     }else {
 
                         Toast.makeText(this,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
                     }
+
+
 
                 }else {
                     showAlertDialog();
@@ -1601,14 +1772,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mHideAreaParams.type = WindowManager.LayoutParams.TYPE_TOAST;
             }
 
-            mHideAreaParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+            mHideAreaParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
             mHideAreaParams.gravity = Gravity.LEFT | Gravity.TOP;
-
-            mHideAreaParams.x=0;
-            mHideAreaParams.y=0;
 
             mHideAreaParams.width = DensityUtil.getScreenWidth(this);
             mHideAreaParams.height = DensityUtil.dip2px(this,50);
+
+            mHideAreaParams.x=0;
+            mHideAreaParams.y=FloatingBallUtils.getScreenHeight()-mHideAreaParams.height-FloatingBallUtils.getStatusBarHeight(this);
+
+
             mHideAreaParams.format = PixelFormat.RGBA_8888;
         }
 
@@ -1619,14 +1792,31 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mHideBarView.setTextColor(Color.WHITE);
             mHideBarView.setTextSize(18);
             mHideBarView.setText("拖入此区域隐藏悬浮球");
-            mHideBarView.setBackgroundColor(Color.GREEN);
-            mHideBarView.getBackground().setAlpha(50);
+            mHideBarView.setBackgroundColor(Color.BLACK);
+            mHideBarView.getBackground().setAlpha(180);
             mHideBarView.setGravity(Gravity.CENTER);
         }
 
 
+        if(mHideLayout == null){
+
+            mHideLayout = new LinearLayout(this);
+            mHideParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+
+            mHideLayout.addView(mHideBarView,mHideParams);
+        }
+
+
+
         if(!mIsHideBarAdded){
-            mWindowManager.addView(mHideBarView,mHideAreaParams);
+
+            mWindowManager.addView(mHideLayout,mHideAreaParams);
+
+            final TranslateAnimation animation = new TranslateAnimation(0,0,mHideAreaParams.height,0);
+            animation.setDuration(150);
+            mHideBarView.startAnimation(animation);
+
             mIsHideBarAdded=true;
         }
 
@@ -1716,7 +1906,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private void showAlertDialog() {
 
-        Toast.makeText(this,"还没有设置快捷应用！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"还没有设置快捷菜单！",Toast.LENGTH_SHORT).show();
     }
 
     private void startSetUpActivity() {
@@ -1770,7 +1960,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
 
@@ -1793,7 +1983,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         if(mIsBallFree){
@@ -1816,7 +2006,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         chooseFunction(mCurrentFuncList.get(3));
@@ -1829,7 +2019,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         chooseFunction(mCurrentFuncList.get(4));
@@ -1842,7 +2032,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         if(mIsShowTeaching){
@@ -1860,7 +2050,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsGestureFeedback){
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         chooseFunction(mCurrentFuncList.get(6));
@@ -1907,7 +2097,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
         //弹出面板后延迟100ms开始播放功能键显示动画
-        mHandler.postDelayed(mShowPopMenuThread, 100);
+        //mHandler.postDelayed(mShowPopMenuThread, 100);
+        mHandler.post(mShowPopMenuThread);
 
 
     }
@@ -2243,6 +2434,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 public void onAnimationEnd(Animation animation) {
 
                     mWindowManager.removeView(mBallView);
+                    mScaleSpring.removeListener(mSpringListener);
                     mIsAdd = !mIsAdd;
 
                 }
@@ -2271,6 +2463,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
             animation.setDuration(200);
             animation.setFillAfter(false);
             mFloatImage.startAnimation(animation);
+
+            mScaleSpring.addListener(mSpringListener);
 
             mIsAdd = !mIsAdd;
         }

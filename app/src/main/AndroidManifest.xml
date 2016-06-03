@@ -104,9 +104,8 @@
             android:name=".view.BlankActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
-            android:theme="@style/MyDialogStyle"/>
-        <activity android:name=".view.ClipImageActivity"/>
-
+            android:theme="@style/MyDialogStyle" />
+        <activity android:name=".view.ClipImageActivity" />
     </application>
 
 </manifest>

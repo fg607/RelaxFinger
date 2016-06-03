@@ -537,7 +537,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 	//	canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);
 
 		//º”“ı”∞
-		final int shadercolor = 0x7f171717;
+		final int shadercolor = 0x00ffffff;
 		Paint mShaderPaint = new Paint();
 		mShaderPaint.setStyle(Paint.Style.STROKE);
 		mShaderPaint.setAntiAlias(true);
@@ -547,7 +547,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		mShaderPaint.setStrokeWidth(strokeWidth);
 		mShaderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		float mShaderRadius = Math.min( width / 2 - strokeWidth/2, height / 2 -strokeWidth/2);
-		//canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
+		canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
 		return output;
 	}
 }

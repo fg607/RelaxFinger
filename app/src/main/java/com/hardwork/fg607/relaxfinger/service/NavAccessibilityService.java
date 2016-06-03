@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.hardwork.fg607.relaxfinger.utils.Config;
@@ -38,10 +39,8 @@ public class NavAccessibilityService extends AccessibilityService {
 
                 if(Intent.ACTION_SCREEN_ON.equals(action)){
 
-                    if(sp.getBoolean("floatSwitch",false)){
+                    sendMsg(Config.SCREEN_ON, "screenOn", true);
 
-                        sendMsg(Config.FLOAT_SWITCH, "ballstate", true);
-                    }
 
                 }else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
 

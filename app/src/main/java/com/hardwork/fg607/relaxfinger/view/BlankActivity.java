@@ -5,9 +5,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.system.Os;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +20,9 @@ import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 
 public class BlankActivity extends Activity {
+
+    private Intent mIntent = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +35,25 @@ public class BlankActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent();
-                intent.putExtra("what",Config.CLOSE_MENU);
-                intent.setClass(BlankActivity.this, FloatingBallService.class);
-                startService(intent);
+                closeMenu();
 
             }
         });
 
 
 
+    }
+
+    private void closeMenu() {
+
+        if(mIntent == null){
+
+            mIntent = new Intent();
+            mIntent.putExtra("what", Config.CLOSE_MENU);
+            mIntent.setClass(BlankActivity.this, FloatingBallService.class);
+        }
+
+        startService(mIntent);
     }
 
     @Override
@@ -50,5 +64,13 @@ public class BlankActivity extends Activity {
             finish();
 
         }
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+
+        closeMenu();
     }
 }

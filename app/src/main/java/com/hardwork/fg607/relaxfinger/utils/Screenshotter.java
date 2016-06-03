@@ -111,6 +111,9 @@ public class Screenshotter implements ImageReader.OnImageAvailableListener {
     @Override
     public void onImageAvailable(ImageReader reader) {
         Image image = reader.acquireLatestImage();
+        if(image == null){
+            return;
+        }
         int width = image.getWidth();
         int height = image.getHeight();
         final Image.Plane[] planes = image.getPlanes();
