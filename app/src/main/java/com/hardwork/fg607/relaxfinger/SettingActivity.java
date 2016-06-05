@@ -323,7 +323,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.3.0\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.3.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -350,17 +350,15 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.3.0版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.添加隐藏悬浮球到通知栏功能。\r\n" +
-                "2.添加手势震动反馈功能。\r\n" +
-                "3.添加自由模式下长按截屏开关。\r\n" +
-                "4.优化整体操作体验：优化自带主题及自定义主题，增加悬浮球触摸动画。\r\n" +
-                "5.双击手势为“无操作”时，可提高返回键响应速度。\r\n" +
-                "6.修复截屏不能在QQ及微信显示的问题。\r\n" +
-                "7.修复按下Home键后5秒内不能打开快捷应用的问题。\r\n" +
-                "8.修复主题名称不随主题改变的问题。");
+        dialog.setMessage("1.快捷菜单添加系统应用及快捷方式。\r\n" +
+                "2.快捷菜单弹出时按下手机自带按键会自动关闭。\r\n" +
+                "3.优化悬浮球触摸和吸附屏幕边缘动画效果。\r\n" +
+                "4.优化隐藏区域显示效果，添加打开关闭动画。\r\n" +
+                "5.修复隐藏到通知栏后，屏幕重新点亮后失效的问题。\r\n" +
+                "6.修复部分6.0系统自定义主题不能显示的问题。\r\n");
         dialog.show();
 
     }

@@ -175,6 +175,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean mIsGestureFeedback = true;
     private boolean mIsShotscreen = true;
     private boolean mIsHomePressed = false;
+    private boolean mIsRecentPressed = false;
 
     private View mPopBackgroundView;
     private boolean mIsBackAdded= false;
@@ -445,11 +446,19 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             //home or recent button
             public void onCloseSystemDialogs(String reason) {
-                //The Code Want to Perform.
 
                 if (reason != null && reason.equals("homekey")) {
 
                     disableMenu();
+
+                }else if(reason != null && reason.equals("recentapps")){
+
+                    if(mIsMenuAdd){
+
+                        mIsRecentPressed = true;
+                        closeMenu();
+                    }
+
                 }
 
             }
@@ -1075,7 +1084,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             //if(mIsMenuAdd){
 
-                removePopBackground();
+                if(!mIsRecentPressed){
+
+                    removePopBackground();
+                }
+
                 mWindowManager.removeViewImmediate(mMenuView);
                // mIsMenuAdd= false;
                 clearCache();
@@ -1646,6 +1659,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         }*/
 
                         if(!mIsHomePressed){
+
+                            mIsRecentPressed = false;
 
                             popUpMenu();
 

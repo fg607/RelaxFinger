@@ -1,6 +1,8 @@
 # RelaxFinger
 一款简洁的虚拟按键助手
 
+[![Google Play](https://raw.githubusercontent.com/xdtianyu/CallerInfo/master/screenshots/en-play-badge.png)](https://play.google.com/store/apps/details?id=com.hardwork.fg607.relaxfinger)
+
 ###特点：
 - 采用安卓辅助功能开发，绿色安全。
 - 不需要获取root权限。
