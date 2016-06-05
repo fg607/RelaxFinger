@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -36,8 +37,10 @@ import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.adapter.AppAdapter;
 import com.hardwork.fg607.relaxfinger.adapter.MyPagerAdapter;
+import com.hardwork.fg607.relaxfinger.adapter.ShortcutAdapter;
 import com.hardwork.fg607.relaxfinger.adapter.ToolAdapter;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
+import com.hardwork.fg607.relaxfinger.model.ShortcutInfo;
 import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
@@ -81,6 +84,33 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     static ArrayList<AppInfo> appList;
     static ArrayList<ToolInfo> toolList;
 
+    static ArrayList<ShortcutInfo> shortcutList;
+
+    static {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                appList =  AppUtils.getLauncherAppInfos();
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                toolList = FloatingBallUtils.getToolInfos();
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                shortcutList = AppUtils.getShortcuts();
+            }
+        }).start();
+
+    }
+
 
     public AppSettingFragment() {
 
@@ -97,14 +127,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
         //initDialog();
         intView();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                appList =  AppUtils.getAppInfos();
-                toolList = FloatingBallUtils.getToolInfos();
-            }
-        }).start();
 
 
         return fragmentView;
@@ -133,6 +155,25 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mAppTextView1.setText(name);
                 mAppIcon1.setBackgroundResource(R.drawable.path_blue_oval);
                 mAppIcon1.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }else if(type==2){
+                Drawable drawable = AppUtils.getShortcutIcon(name);
+
+                if(drawable!=null){
+
+                    mAppTextView1.setText(name);
+
+                }else {
+
+                    mAppTextView1.setText("");
+
+                    mPreferences.put("app1","");
+
+                    sendMsg(Config.UPDATE_APP, "which", "1");
+                }
+
+                mAppIcon1.setBackground(null);
+                mAppIcon1.setImageDrawable(drawable);
+
             }
 
 
@@ -151,6 +192,23 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mAppTextView2.setText(name);
                 mAppIcon2.setBackgroundResource(R.drawable.path_blue_oval);
                 mAppIcon2.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }else if(type==2){
+                Drawable drawable = AppUtils.getShortcutIcon(name);
+
+                if(drawable!=null){
+
+                    mAppTextView2.setText(name);
+
+                }else {
+
+                    mAppTextView2.setText("");
+
+                    mPreferences.put("app2","");
+
+                    sendMsg(Config.UPDATE_APP, "which", "2");
+                }
+                mAppIcon2.setBackground(null);
+                mAppIcon2.setImageDrawable(AppUtils.getShortcutIcon(name));
             }
         }
 
@@ -168,6 +226,23 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mAppTextView3.setText(name);
                 mAppIcon3.setBackgroundResource(R.drawable.path_blue_oval);
                 mAppIcon3.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }else if(type==2){
+                Drawable drawable = AppUtils.getShortcutIcon(name);
+
+                if(drawable!=null){
+
+                    mAppTextView3.setText(name);
+
+                }else {
+
+                    mAppTextView3.setText("");
+
+                    mPreferences.put("app3","");
+
+                    sendMsg(Config.UPDATE_APP, "which", "3");
+                }
+                mAppIcon3.setBackground(null);
+                mAppIcon3.setImageDrawable(AppUtils.getShortcutIcon(name));
             }
         }
 
@@ -184,6 +259,23 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mAppTextView4.setText(name);
                 mAppIcon4.setBackgroundResource(R.drawable.path_blue_oval);
                 mAppIcon4.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }else if(type==2){
+                Drawable drawable = AppUtils.getShortcutIcon(name);
+
+                if(drawable!=null){
+
+                    mAppTextView4.setText(name);
+
+                }else {
+
+                    mAppTextView4.setText("");
+
+                    mPreferences.put("app4","");
+
+                    sendMsg(Config.UPDATE_APP, "which", "4");
+                }
+                mAppIcon4.setBackground(null);
+                mAppIcon4.setImageDrawable(AppUtils.getShortcutIcon(name));
             }
         }
 
@@ -200,6 +292,25 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mAppTextView5.setText(name);
                 mAppIcon5.setBackgroundResource(R.drawable.path_blue_oval);
                 mAppIcon5.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
+            }else if(type==2){
+                Drawable drawable = AppUtils.getShortcutIcon(name);
+
+                if(drawable!=null){
+
+                    mAppTextView5.setText(name);
+
+                }else {
+
+                    mAppTextView5.setText("");
+
+                    mPreferences.put("app5","");
+
+                    sendMsg(Config.UPDATE_APP, "which", "5");
+
+
+                }
+                mAppIcon5.setBackground(null);
+                mAppIcon5.setImageDrawable(AppUtils.getShortcutIcon(name));
             }
         }
 
@@ -212,39 +323,53 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         mFuncDialog.setDialogClickListener(new OnDialogClickListener() {
             @Override
-            public void onDialogClick(Intent intent) {
+            public void onDialogClick(final Intent intent) {
 
-                if (intent != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                    if (!intent.getStringExtra("name").equals("")) {
+                        if (intent != null) {
 
-                        mCurrentTextView.setText(intent.getStringExtra("name"));
-                        if (intent.getIntExtra("type", 0) == 1) {
-                            mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
+                            if (!intent.getStringExtra("name").equals("")) {
+
+                                mCurrentTextView.setText(intent.getStringExtra("name"));
+                                if (intent.getIntExtra("type", 0) == 1) {
+                                    mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
 
 
-                        } else {
-                            mCurrentIcon.setBackground(null);
+                                } else {
+                                    mCurrentIcon.setBackground(null);
+                                }
+
+                                mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
+                                if(intent.getIntExtra("type", 0) == 2){
+                                    mPreferences.put("app" + mCurrentApp, intent.getStringExtra("name"));
+                                    mPreferences.put("shortcutIntent" + mCurrentApp,intent.getStringExtra("package"));
+                                }else {
+                                    mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
+                                }
+
+
+
+                            } else {
+
+                                mCurrentTextView.setText(intent.getStringExtra("name"));
+                                mCurrentIcon.setBackground(null);
+                                mCurrentIcon.setImageDrawable(null);
+                                mPreferences.put("app" + mCurrentApp, "");
+
+                            }
+
+                            mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
+
+                            sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
+
                         }
-
-                        mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
-                        mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
-
-
-                    } else {
-
-                        mCurrentTextView.setText(intent.getStringExtra("name"));
-                        mCurrentIcon.setBackground(null);
-                        mCurrentIcon.setImageDrawable(null);
-                        mPreferences.put("app" + mCurrentApp, "");
-
                     }
+                });
 
-                    mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
 
-                    sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
-
-                }
 
             }
         });
@@ -302,24 +427,41 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    public void popupFunctionDialog(int type,String funcName){
+    public void popupFunctionDialog(final int type, final String funcName){
 
-        if(mFuncDialog ==null){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-            initDialog(funcName);
-        }
+                if(mFuncDialog ==null){
 
-
-        mFuncDialog.setCheckedFuncName(type,funcName);
-
-        if(mFuncDialog.getDialog()!=null){
-
-            mFuncDialog.getDialog().show();
+                    initDialog(funcName);
+                }
 
 
-        }else {
-            mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
-        }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        mFuncDialog.setCheckedFuncName(type,funcName);
+
+                        if(mFuncDialog.getDialog()!=null){
+
+                            mFuncDialog.getDialog().show();
+
+
+                        }else {
+                            mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
+                        }
+                    }
+                });
+
+
+            }
+        }).start();
+
+
+
 
     }
 
@@ -385,11 +527,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         TabLayout mTabs;
         private View mAppView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
         private View mButtonView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
-        private View mShotcutView;
+        private View mShortcutView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
 
         private MyPagerAdapter mPagerAdapter;
         private  AppAdapter adapter;
         private  ToolAdapter mToolAdapter;
+        private ShortcutAdapter mShortcutAdapter;
         private String mCheckdedFuncName;
         private OnDialogClickListener mClickListener;
         private int mType=0;
@@ -498,12 +641,68 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                     mViewPager.setCurrentItem(1);
                 }
 
+            }else if (mType==2){
+
+                if(mShortcutAdapter != null){
+
+                    mShortcutAdapter.setShortcutChecked(funcName);
+                    mShortcutAdapter.notifyDataSetChanged();
+                }
+
+                if(mViewPager!=null){
+                    mViewPager.setCurrentItem(2);
+                }
             }
 
 
         }
 
         private void initShotcutView() {
+
+            ListView mListView = (ListView) mShortcutView.findViewById(R.id.lv_app);
+
+            mShortcutAdapter= new ShortcutAdapter(getActivity());
+            mShortcutAdapter.setShortcutChecked(mCheckdedFuncName);
+
+            if(shortcutList==null){
+
+                mShortcutAdapter.addList(AppUtils.getShortcuts());
+
+            }else {
+
+                mShortcutAdapter.addList(shortcutList);
+            }
+
+
+            mListView.setAdapter(mShortcutAdapter);
+
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    Intent intent = new Intent();
+
+                    String name = shortcutList.get(i).getShortcutTitle();
+                    if (!name.equals(mCheckdedFuncName)) {
+
+                        mShortcutAdapter.setShortcutChecked(name);
+                        intent.putExtra("name", name);
+                        intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
+                        intent.putExtra("type",2);
+                        intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
+                    } else {
+                        mShortcutAdapter.setShortcutChecked("");
+                        intent.putExtra("name", "");
+                    }
+
+
+                    mClickListener.onDialogClick(intent);
+
+                    getDialog().hide();
+
+
+                }
+            });
 
         }
 
@@ -590,7 +789,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             if(appList==null){
 
-                adapter.addList(AppUtils.getAppInfos());
+                adapter.addList(AppUtils.getLauncherAppInfos());
 
             }else {
 
@@ -638,6 +837,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                 mPagerAdapter.addView(mAppView,"应用程序");
                 mPagerAdapter.addView(mButtonView,"快捷开关");
+                mPagerAdapter.addView(mShortcutView,"快捷方式");
             }
 
 

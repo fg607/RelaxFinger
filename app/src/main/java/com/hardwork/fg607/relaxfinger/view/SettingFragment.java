@@ -1,6 +1,7 @@
 package com.hardwork.fg607.relaxfinger.view;
 
 
+import android.Manifest;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -672,6 +673,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             mPreferences.put("theme",mThemeChoosed);
             mViewChoosed.setVisibility(View.INVISIBLE);
             mViewChoosed = setIconChoosed(mThemeChoosed);
+
+            FloatingBallUtils.checkPermissionGranted(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
 
             sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
 

@@ -7,6 +7,7 @@ package com.hardwork.fg607.relaxfinger.utils;
 
 import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
@@ -1092,6 +1093,21 @@ public class FloatingBallUtils {
 
             Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
 
+        }
+
+    }
+
+    public static void checkPermissionGranted(Activity activity, String permission) {
+
+
+        if(Build.VERSION.SDK_INT>22){
+
+            int grant = activity.checkSelfPermission(permission);
+
+            if (grant != PackageManager.PERMISSION_GRANTED) {
+                // We don't have permission so prompt the user
+                activity.requestPermissions(new String[]{permission}, 123);
+            }
         }
 
     }

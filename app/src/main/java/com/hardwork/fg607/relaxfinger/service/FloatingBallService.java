@@ -15,6 +15,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -70,6 +71,7 @@ import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
+import com.hardwork.fg607.relaxfinger.view.AppSettingFragment;
 import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 import com.ogaclejapan.arclayout.Arc;
@@ -78,6 +80,7 @@ import com.ogaclejapan.arclayout.ArcLayout;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -271,6 +274,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mSavedAppList= new ArrayList<>();*/
 
+        AppUtils.getShortcuts();
 
     }
 
@@ -735,6 +739,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mFloatImage.setBackground(getResources().getDrawable(R.drawable.iphone));
                 break;
             case "自定义":
+
                 if(FloatingBallUtils.isFileExist("/RelaxFinger/DIY.png")){
 
                     String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -2282,6 +2287,31 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 FloatingBallUtils.switchButton(name);
 
+            }else if(type==2){
+
+                String intent =  mPreferences.getString("shortcutIntent"+whichApp,"");
+                try {
+
+                    AppUtils.startActivity(intent);
+
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+
+                } catch (ActivityNotFoundException e){
+
+                    e.printStackTrace();
+
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+
+                }
             }
 
         }
@@ -2348,6 +2378,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }else if(type == 1){
 
             drawable = FloatingBallUtils.getSwitcherIcon(mPreferences.getString("app" + which, ""));
+        }else if( type == 2){
+
+            drawable = AppUtils.getShortcutIcon(mPreferences.getString("app" + which, ""));
         }
 
 
@@ -2357,7 +2390,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             if(view instanceof CircleImageView){
 
                 CircleImageView circleImageView = (CircleImageView)view;
-                if(type==0){
+                if(type==0 || type == 2){
 
                     circleImageView.setBackground(null);
 

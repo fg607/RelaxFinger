@@ -4,13 +4,16 @@ import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -19,8 +22,10 @@ import android.util.Log;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
+import com.hardwork.fg607.relaxfinger.model.ShortcutInfo;
 
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -32,6 +37,9 @@ public class AppUtils {
 
     public static Context context = MyApplication.getApplication();
     public static PackageManager pm = context.getPackageManager();
+
+    public static  ContentResolver cr = null;
+    public static  Uri shortcutUri = null;
 
     public static ArrayList<AppInfo> getAppInfos(){
 
@@ -49,18 +57,53 @@ public class AppUtils {
             if((ApplicationInfo.FLAG_SYSTEM & info.applicationInfo.flags) == 0){
 
                 icon = info.applicationInfo.loadIcon(pm);
-                name = info.applicationInfo.loadLabel(pm).toString();
-                packageName = info.packageName;
 
-                AppInfo appInfo = new AppInfo(icon,name,packageName);
+               if(icon != null){
 
-                list.add(appInfo);
+                   name = info.applicationInfo.loadLabel(pm).toString();
+                   packageName = info.packageName;
+
+                   AppInfo appInfo = new AppInfo(icon,name,packageName);
+
+                   list.add(appInfo);
+               }
+
             }
 
 
         }
 
         return list;
+    }
+
+    public static ArrayList<AppInfo> getLauncherAppInfos(){
+
+        ArrayList<AppInfo> list = new ArrayList<>();
+
+        Drawable icon;
+        String name;
+        String packageName;
+
+        Intent intent = new Intent();
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setAction(Intent.ACTION_MAIN);
+
+
+        List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(intent, 0);
+
+        for(ResolveInfo info:resolveInfoList){
+
+            icon = info.loadIcon(pm);
+            name = info.loadLabel(pm).toString();
+            packageName  = info.activityInfo.packageName;
+
+            AppInfo appInfo = new AppInfo(icon,name,packageName);
+
+            list.add(appInfo);
+        }
+
+        return list;
+
     }
 
     public static String getAppName(String packageName){
@@ -122,8 +165,15 @@ public class AppUtils {
 
         return false;
 
+    }
 
+    public static void startActivity(String intentUri) throws URISyntaxException,ActivityNotFoundException {
 
+        Intent intent = Intent.parseUri(intentUri,Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        context.startActivity(intent);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -345,5 +395,88 @@ public class AppUtils {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public static ArrayList<ShortcutInfo> getShortcuts(){
+
+
+        ArrayList<ShortcutInfo> list = new ArrayList<>();
+
+
+        if(cr == null){
+
+            cr = context.getContentResolver();
+        }
+
+        if(shortcutUri == null){
+
+            shortcutUri = ShortcutSuperUtils.getUriFromLauncher(context);
+        }
+
+        Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent" },
+                null, null, null);
+
+
+        if (c != null && c.getCount() > 0) {
+
+            String intent = null;
+            String title;
+            byte[] icon;
+
+            while(c.moveToNext()){
+                icon = c.getBlob(0);
+                title = c.getString(1);
+                intent = c.getString(2);
+
+
+                if(icon !=null && intent!=null){
+
+                    ShortcutInfo shortcutInfo = new ShortcutInfo(ImageUtils.Bytes2Drawable(icon),
+                            title,intent);
+
+                    list.add(shortcutInfo);
+                }
+
+            }
+
+        }
+
+        return list;
+
+    }
+
+    public static Drawable getShortcutIcon(String title){
+
+        Drawable drawable = null;
+
+        if(cr == null){
+
+            cr = context.getContentResolver();
+        }
+
+        if(shortcutUri == null){
+
+            shortcutUri = ShortcutSuperUtils.getUriFromLauncher(context);
+        }
+
+        Cursor c = cr.query(shortcutUri, new String[] {"icon"},
+                "title=?", new String[]{title}, null);
+
+        if (c != null && c.getCount() > 0) {
+
+            c.moveToFirst();
+
+            byte[] icon = c.getBlob(0);
+
+            if(icon != null && icon.length>0){
+
+                drawable = ImageUtils.Bytes2Drawable(icon);
+
+            }
+
+
+        }
+
+        return  drawable;
     }
 }

@@ -78,6 +78,7 @@ public class ChooseAppActivity extends Activity {
 
             }
         });
+
     }
 
 }

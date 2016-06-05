@@ -31,6 +31,7 @@ import com.hardwork.fg607.relaxfinger.view.SettingFragment;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.List;
+import java.util.jar.Manifest;
 
 public class SettingActivity extends AppCompatActivity{
 
@@ -101,6 +102,7 @@ public class SettingActivity extends AppCompatActivity{
 
 
                 if (mAppSettingFragment == null) {
+
 
                     mAppSettingFragment = new AppSettingFragment();
 
