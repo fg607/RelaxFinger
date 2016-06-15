@@ -275,8 +275,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mSavedAppList= new ArrayList<>();*/
 
-        AppUtils.getShortcuts();
-
     }
 
     @Override
@@ -456,6 +454,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     if(mIsMenuAdd){
 
                         mIsRecentPressed = true;
+                        mPreferences.put("addBackground",false);
                         closeMenu();
                     }
 
@@ -574,6 +573,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         if(mIsBallHiding){
 
                             createShowNotification();
+
                         }else {
 
                             setFloatState(true);
@@ -846,6 +846,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             stopSelf();
         }
     }
+
 
     private void setMove(boolean canmove) {
 
@@ -1647,9 +1648,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mCanmove = true;
                 break;
             case "快捷应用":
-                if(mAppNumber > 0){
 
-                    if(mIsCanPopup){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(mAppNumber > 0){
+
+                            if(mIsCanPopup){
 
                         /*if(!mIsSpeedApp){
 
@@ -1658,30 +1664,52 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             mIsSpeedApp = true;
                         }*/
 
-                        if(!mIsHomePressed){
+                                if(!mIsHomePressed){
 
-                            mIsRecentPressed = false;
+                                    mIsRecentPressed = false;
 
-                            popUpMenu();
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            popUpMenu();
+                                        }
+                                    });
+
+
+                                }else {
+
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            Toast.makeText(mContext,"系统原因，请在按下系统自带Home键5秒后再打开快捷菜单！",Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                                }
+
+
+
+
+                            }else {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        Toast.makeText(mContext,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+
+
 
                         }else {
-
-                            Toast.makeText(this,"系统原因，请在按下系统自带Home键5秒后再打开快捷菜单！",Toast.LENGTH_LONG).show();
+                            showAlertDialog();
                         }
-
-
-
-
-                    }else {
-
-                        Toast.makeText(this,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
                     }
-
-
-
-                }else {
-                    showAlertDialog();
-                }
+                }).start();
 
                 break;
             case "返回键":
@@ -2127,6 +2155,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         //AppUtils.startActivity(BlankActivity.class);
 
+        mPreferences.put("addBackground",true);
         final Intent intent = new Intent(this, BlankActivity.class);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -2156,6 +2185,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
     }
 
     private void removePopBackground(){
+
+        mPreferences.put("addBackground",false);
 
         final Intent intent = new Intent(this, BlankActivity.class);
 

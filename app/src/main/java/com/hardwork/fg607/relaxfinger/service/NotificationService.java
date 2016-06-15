@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
@@ -48,11 +49,14 @@ public class NotificationService extends NotificationListenerService {
 
     }
 
-    public  void sendMsg(int what,String name,boolean action) {
+
+    public  void sendMsg(int what, String name, boolean action) {
         Intent intent = new Intent();
         intent.putExtra("what",what);
         intent.putExtra(name, action);
         intent.setClass(this, FloatingBallService.class);
         startService(intent);
     }
+
+
 }

@@ -30,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -81,35 +82,10 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     private FunctionDialog mFuncDialog;
     private Activity mActivity;
 
-    static ArrayList<AppInfo> appList;
-    static ArrayList<ToolInfo> toolList;
+    static ArrayList<AppInfo> appList = null;
+    static ArrayList<ToolInfo> toolList = null;
+    static ArrayList<ShortcutInfo> shortcutList = null;
 
-    static ArrayList<ShortcutInfo> shortcutList;
-
-    static {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                appList =  AppUtils.getLauncherAppInfos();
-            }
-        }).start();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                toolList = FloatingBallUtils.getToolInfos();
-            }
-        }).start();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                shortcutList = AppUtils.getShortcuts();
-            }
-        }).start();
-
-    }
 
 
     public AppSettingFragment() {
@@ -325,50 +301,42 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             @Override
             public void onDialogClick(final Intent intent) {
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                if (intent != null) {
 
-                        if (intent != null) {
+                    if (!intent.getStringExtra("name").equals("")) {
 
-                            if (!intent.getStringExtra("name").equals("")) {
-
-                                mCurrentTextView.setText(intent.getStringExtra("name"));
-                                if (intent.getIntExtra("type", 0) == 1) {
-                                    mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
+                        mCurrentTextView.setText(intent.getStringExtra("name"));
+                        if (intent.getIntExtra("type", 0) == 1) {
+                            mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
 
 
-                                } else {
-                                    mCurrentIcon.setBackground(null);
-                                }
-
-                                mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
-                                if(intent.getIntExtra("type", 0) == 2){
-                                    mPreferences.put("app" + mCurrentApp, intent.getStringExtra("name"));
-                                    mPreferences.put("shortcutIntent" + mCurrentApp,intent.getStringExtra("package"));
-                                }else {
-                                    mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
-                                }
-
-
-
-                            } else {
-
-                                mCurrentTextView.setText(intent.getStringExtra("name"));
-                                mCurrentIcon.setBackground(null);
-                                mCurrentIcon.setImageDrawable(null);
-                                mPreferences.put("app" + mCurrentApp, "");
-
-                            }
-
-                            mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
-
-                            sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
-
+                        } else {
+                            mCurrentIcon.setBackground(null);
                         }
-                    }
-                });
 
+                        mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
+                        if (intent.getIntExtra("type", 0) == 2) {
+                            mPreferences.put("app" + mCurrentApp, intent.getStringExtra("name"));
+                            mPreferences.put("shortcutIntent" + mCurrentApp, intent.getStringExtra("package"));
+                        } else {
+                            mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
+                        }
+
+
+                    } else {
+
+                        mCurrentTextView.setText(intent.getStringExtra("name"));
+                        mCurrentIcon.setBackground(null);
+                        mCurrentIcon.setImageDrawable(null);
+                        mPreferences.put("app" + mCurrentApp, "");
+
+                    }
+
+                    mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
+
+                    sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
+
+                }
 
 
             }
@@ -427,41 +395,37 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    public void popupFunctionDialog(final int type, final String funcName){
+    public void popupFunctionDialog(final int type, final String funcName) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-                if(mFuncDialog ==null){
+                if (mFuncDialog == null) {
 
                     initDialog(funcName);
                 }
-
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        mFuncDialog.setCheckedFuncName(type,funcName);
+                        mFuncDialog.setCheckedFuncName(type, funcName);
 
-                        if(mFuncDialog.getDialog()!=null){
+                        if (mFuncDialog.getDialog() != null) {
 
                             mFuncDialog.getDialog().show();
 
 
-                        }else {
+                        } else {
                             mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
                         }
+
                     }
                 });
 
-
             }
         }).start();
-
-
-
 
     }
 
@@ -659,106 +623,231 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         private void initShotcutView() {
 
-            ListView mListView = (ListView) mShortcutView.findViewById(R.id.lv_app);
+            final ListView listView = (ListView) mShortcutView.findViewById(R.id.lv_app);
+
+            final ProgressBar loading = (ProgressBar) mShortcutView.findViewById(R.id.loading);
 
             mShortcutAdapter= new ShortcutAdapter(getActivity());
             mShortcutAdapter.setShortcutChecked(mCheckdedFuncName);
 
             if(shortcutList==null){
 
-                mShortcutAdapter.addList(AppUtils.getShortcuts());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        shortcutList = AppUtils.getShortcuts();
+
+                        mShortcutAdapter.addList(shortcutList);
+
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                listView.setAdapter(mShortcutAdapter);
+
+                                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                        Intent intent = new Intent();
+
+                                        String name = shortcutList.get(i).getShortcutTitle();
+                                        if (!name.equals(mCheckdedFuncName)) {
+
+                                            mShortcutAdapter.setShortcutChecked(name);
+                                            intent.putExtra("name", name);
+                                            intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
+                                            intent.putExtra("type",2);
+                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
+                                        } else {
+                                            mShortcutAdapter.setShortcutChecked("");
+                                            intent.putExtra("name", "");
+                                        }
+
+
+                                        mClickListener.onDialogClick(intent);
+
+                                        getDialog().hide();
+
+
+                                    }
+                                });
+
+                                loading.setVisibility(View.GONE);
+                                listView.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+
+
+                    }
+                }).start();
+
 
             }else {
 
                 mShortcutAdapter.addList(shortcutList);
+
+                listView.setAdapter(mShortcutAdapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        Intent intent = new Intent();
+
+                        String name = shortcutList.get(i).getShortcutTitle();
+                        if (!name.equals(mCheckdedFuncName)) {
+
+                            mShortcutAdapter.setShortcutChecked(name);
+                            intent.putExtra("name", name);
+                            intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
+                            intent.putExtra("type",2);
+                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
+                        } else {
+                            mShortcutAdapter.setShortcutChecked("");
+                            intent.putExtra("name", "");
+                        }
+
+
+                        mClickListener.onDialogClick(intent);
+
+                        getDialog().hide();
+
+
+                    }
+                });
+
+                loading.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
             }
 
 
-            mListView.setAdapter(mShortcutAdapter);
-
-            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                    Intent intent = new Intent();
-
-                    String name = shortcutList.get(i).getShortcutTitle();
-                    if (!name.equals(mCheckdedFuncName)) {
-
-                        mShortcutAdapter.setShortcutChecked(name);
-                        intent.putExtra("name", name);
-                        intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
-                        intent.putExtra("type",2);
-                        intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
-                    } else {
-                        mShortcutAdapter.setShortcutChecked("");
-                        intent.putExtra("name", "");
-                    }
-
-
-                    mClickListener.onDialogClick(intent);
-
-                    getDialog().hide();
-
-
-                }
-            });
 
         }
 
         private void initButtonView() {
 
             //mButtonView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
-            ListView mListView = (ListView) mButtonView.findViewById(R.id.lv_app);
+            final ListView listView = (ListView) mButtonView.findViewById(R.id.lv_app);
+
+            final ProgressBar loading = (ProgressBar) mButtonView.findViewById(R.id.loading);
 
             mToolAdapter= new ToolAdapter(getActivity());
             mToolAdapter.setToolChecked(mCheckdedFuncName);
+
             if(toolList==null){
 
-                mToolAdapter.addList(FloatingBallUtils.getToolInfos());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        toolList = FloatingBallUtils.getToolInfos();
+
+                        mToolAdapter.addList(toolList);
+
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                listView.setAdapter(mToolAdapter);
+
+                                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                        Intent intent = new Intent();
+
+                                        String name = toolList.get(i).getToolName();
+
+                                        if (!name.equals(mCheckdedFuncName)) {
+
+                                            if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
+
+                                                checkPermissionGranted(Manifest.permission.CAMERA);
+                                            }
+
+
+                                            mToolAdapter.setToolChecked(name);
+                                            intent.putExtra("name", name);
+                                            intent.putExtra("package", name);
+                                            intent.putExtra("type",1);
+                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
+                                        } else {
+                                            mToolAdapter.setToolChecked("");
+                                            intent.putExtra("name", "");
+                                        }
+
+
+                                        mClickListener.onDialogClick(intent);
+
+                                        getDialog().hide();
+
+
+                                    }
+                                });
+
+                                loading.setVisibility(View.GONE);
+                                listView.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+
+
+                    }
+                }).start();
 
             }else {
 
                 mToolAdapter.addList(toolList);
-            }
+
+                listView.setAdapter(mToolAdapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        Intent intent = new Intent();
+
+                        String name = toolList.get(i).getToolName();
+
+                        if (!name.equals(mCheckdedFuncName)) {
+
+                            if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
+
+                                checkPermissionGranted(Manifest.permission.CAMERA);
+                            }
 
 
-            mListView.setAdapter(mToolAdapter);
-
-            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                    Intent intent = new Intent();
-
-                    String name = toolList.get(i).getToolName();
-
-                    if (!name.equals(mCheckdedFuncName)) {
-
-                        if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
-
-                            checkPermissionGranted(Manifest.permission.CAMERA);
+                            mToolAdapter.setToolChecked(name);
+                            intent.putExtra("name", name);
+                            intent.putExtra("package", name);
+                            intent.putExtra("type",1);
+                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
+                        } else {
+                            mToolAdapter.setToolChecked("");
+                            intent.putExtra("name", "");
                         }
 
 
-                        mToolAdapter.setToolChecked(name);
-                        intent.putExtra("name", name);
-                        intent.putExtra("package", name);
-                        intent.putExtra("type",1);
-                        intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
-                    } else {
-                        mToolAdapter.setToolChecked("");
-                        intent.putExtra("name", "");
+                        mClickListener.onDialogClick(intent);
+
+                        getDialog().hide();
+
+
                     }
+                });
 
 
-                    mClickListener.onDialogClick(intent);
+                loading.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
+            }
 
-                    getDialog().hide();
 
 
-                }
-            });
 
         }
 
@@ -782,50 +871,108 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             //mAppView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
 
-            ListView mListView = (ListView) mAppView.findViewById(R.id.lv_app);
+            final ListView listView = (ListView) mAppView.findViewById(R.id.lv_app);
+
+            final ProgressBar loading = (ProgressBar) mAppView.findViewById(R.id.loading);
+
+
 
             adapter= new AppAdapter(getActivity());
             adapter.setAppChecked(mCheckdedFuncName);
 
             if(appList==null){
 
-                adapter.addList(AppUtils.getLauncherAppInfos());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        appList = AppUtils.getLauncherAppInfos();
+
+                        adapter.addList(appList);
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                listView.setAdapter(adapter);
+
+                                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                        Intent intent = new Intent();
+
+                                        String name = appList.get(i).getAppName();
+                                        if (!name.equals(mCheckdedFuncName)) {
+
+                                            adapter.setAppChecked(name);
+                                            intent.putExtra("name", name);
+                                            intent.putExtra("package", appList.get(i).getAppPackage());
+                                            intent.putExtra("type",0);
+                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
+                                        } else {
+                                            adapter.setAppChecked("");
+                                            intent.putExtra("name", "");
+                                        }
+
+
+                                        mClickListener.onDialogClick(intent);
+
+                                        getDialog().hide();
+
+
+                                    }
+                                });
+
+                                loading.setVisibility(View.GONE);
+                                listView.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+
+                    }
+                }).start();
+
+
 
             }else {
 
                 adapter.addList(appList);
+
+                listView.setAdapter(adapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        Intent intent = new Intent();
+
+                        String name = appList.get(i).getAppName();
+                        if (!name.equals(mCheckdedFuncName)) {
+
+                            adapter.setAppChecked(name);
+                            intent.putExtra("name", name);
+                            intent.putExtra("package", appList.get(i).getAppPackage());
+                            intent.putExtra("type",0);
+                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
+                        } else {
+                            adapter.setAppChecked("");
+                            intent.putExtra("name", "");
+                        }
+
+
+                        mClickListener.onDialogClick(intent);
+
+                        getDialog().hide();
+
+
+                    }
+                });
+
+                loading.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
             }
 
-
-            mListView.setAdapter(adapter);
-
-            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                    Intent intent = new Intent();
-
-                    String name = appList.get(i).getAppName();
-                    if (!name.equals(mCheckdedFuncName)) {
-
-                        adapter.setAppChecked(name);
-                        intent.putExtra("name", name);
-                        intent.putExtra("package", appList.get(i).getAppPackage());
-                        intent.putExtra("type",0);
-                        intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
-                    } else {
-                        adapter.setAppChecked("");
-                        intent.putExtra("name", "");
-                    }
-
-
-                    mClickListener.onDialogClick(intent);
-
-                    getDialog().hide();
-
-
-                }
-            });
         }
 
 

@@ -45,7 +45,6 @@ public class NavAccessibilityService extends AccessibilityService {
                 }else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
 
                     sendMsg(Config.FLOAT_SWITCH, "ballstate", false);
-
                 }
             }
         };
@@ -64,14 +63,6 @@ public class NavAccessibilityService extends AccessibilityService {
     public void onInterrupt() {
 
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        flags = START_STICKY;
-        return super.onStartCommand(intent, flags, startId);
-    }
-
 
     @Override
     public void onDestroy() {
