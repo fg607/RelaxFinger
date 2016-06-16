@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qamaster.android.dialog.LoginDialogPasswordAuthView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/qamaster_login_dialog_password_auth_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical" >
+
+            <include layout="@layout/qamaster_header_normal" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/qamaster_dialog_bg"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical" >
+
+                    <EditText
+                        android:id="@+id/qamaster_login_email_edit"
+                        style="@style/qamaster_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="@string/qamaster_login_username_hint"
+                        android:inputType="text|textEmailAddress"
+                        android:textColorHint="@color/qamaster_input_hint"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/qamaster_login_password_edit"
+                        style="@style/qamaster_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:hint="@string/qamaster_login_password_hint"
+                        android:inputType="text|textAutoComplete|textNoSuggestions|textPassword"
+                        android:textColorHint="@color/qamaster_input_hint"
+                        android:textStyle="bold"
+                        android:typeface="monospace" />
+
+                    <com.qamaster.android.ui.MontserratButton
+                        android:id="@+id/qamaster_login_btn_login"
+                        style="@style/qamaster_button"
+                        android:layout_width="match_parent"
+                        android:background="@drawable/qamaster_button"
+                        android:text="@string/qamaster_login_login_button"
+                        android:textAllCaps="true"
+                        android:textColor="@color/qamaster_button_text" />
+                </LinearLayout>
+
+                <include layout="@layout/qamaster_login_error_box" />
+            </FrameLayout>
+
+            <include layout="@layout/qamaster_dialog_footer" />
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/qamaster_login_loading_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/qamaster_transparent"
+        android:visibility="gone" >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="10dp" />
+    </FrameLayout>
+
+</com.qamaster.android.dialog.LoginDialogPasswordAuthView>

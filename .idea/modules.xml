@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RelaxFinger.iml" filepath="$PROJECT_DIR$/RelaxFinger.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qAMasterSDK/qAMasterSDK.iml" filepath="$PROJECT_DIR$/qAMasterSDK/qAMasterSDK.iml" />
     </modules>
   </component>
 </project>

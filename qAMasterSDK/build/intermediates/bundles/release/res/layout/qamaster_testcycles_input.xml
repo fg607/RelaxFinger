@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_bg"
+        android:gravity="center_vertical|left"
+        android:orientation="vertical"
+        android:paddingBottom="16dp" >
+
+        <include layout="@layout/qamaster_testcycles_header" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/qamaster_subheader_bg"
+            android:gravity="center_vertical|left"
+            android:text="@string/qamaster_test_cycles_manual"
+            android:textColor="@color/qamaster_subheader_text"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/qamaster_test_cycles_manual_edit"
+            style="@style/qamaster_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="0dp"
+            android:hint="@string/qamaster_test_cycle_hint"
+            android:inputType="number"
+            android:textColorHint="@color/qamaster_input_hint"
+            android:textStyle="bold" >
+
+            <requestFocus />
+        </EditText>
+
+        <com.qamaster.android.ui.MontserratButton
+            android:id="@+id/qamaster_test_cycles_select_cycle_btn"
+            style="@style/qamaster_button"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/qamaster_button"
+            android:text="@string/qamaster_test_cycles_select"
+            android:textAllCaps="true"
+            android:textColor="@color/qamaster_button_text" />
+    </LinearLayout>
+
+</ScrollView>

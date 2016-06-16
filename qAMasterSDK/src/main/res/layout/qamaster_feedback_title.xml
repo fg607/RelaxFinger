@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="16dp"
+    tools:showIn="@layout/qamaster_feedback" >
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/qamaster_rate_this_application"
+        android:textColor="@color/qamaster_dialog_panel_header"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@color/qamaster_dialog_panel_bg"
+        android:text="@string/qamaster_feedback_no_rating_store"
+        android:textColor="@color/qamaster_dialog_panel_text"
+        android:textSize="12sp" />
+
+</RelativeLayout>

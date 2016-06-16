@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/qamaster_dialog_bg"
+        android:orientation="vertical" >
+
+        <include layout="@layout/qamaster_problem_header" />
+
+        <include layout="@layout/qamaster_problem_sub_header" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/qamaster_dialog_bg" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:baselineAligned="false"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp" >
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/qamaster_dialog_divider" />
+                </LinearLayout>
+
+                <com.qamaster.android.ui.HorizontalList
+                    android:id="@+id/qamaster_problem_horizontal_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/qamaster_dialog_panel_bg"
+                    android:minHeight="@dimen/qamaster_screenshot_height"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:baselineAligned="false"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp" >
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/qamaster_dialog_divider" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <include layout="@layout/qamaster_problem_description" />
+    </LinearLayout>
+
+    <com.qamaster.android.ui.AwesomeFontTextView
+        android:id="@+id/qamaster_report_add_screenshot"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/qamaster_circle_button"
+        android:gravity="center"
+        android:text="@string/qamaster_add_screenshot_icon"
+        android:textColor="@color/qamaster_button_text"
+        android:textSize="21dp"
+        tools:ignore="SpUsage" />
+
+</FrameLayout>

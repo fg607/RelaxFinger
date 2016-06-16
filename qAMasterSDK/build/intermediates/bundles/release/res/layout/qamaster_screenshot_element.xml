@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qamaster.android.ui.ScreenshotElementView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/qamaster_transparent" >
+
+    <FrameLayout
+        android:id="@+id/qamaster_screenshot_container"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/qamaster_screenshot_height" >
+
+        <include layout="@layout/qamaster_screenshot_loader" />
+
+        <com.qamaster.android.ui.util.ScreenshotImageView
+            android:id="@+id/qamaster_screenshot_small"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+
+        <com.qamaster.android.ui.util.ScreenshotImageView
+            android:id="@+id/qamaster_screenshot_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/qamaster_screenshot_label"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/qamaster_screenshot_thumbnail_edit_button_height"
+            android:layout_gravity="bottom|center"
+            android:background="@drawable/qamaster_button"
+            android:gravity="center"
+            android:text="@string/qamaster_edit_screenshot_short"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/qamaster_screenshot_thumbnail_overlay" />
+    </FrameLayout>
+
+    <com.qamaster.android.ui.AwesomeFontTextView
+        android:id="@+id/qamaster_gallery_next"
+        android:layout_width="32dp"
+        android:layout_height="@dimen/qamaster_screenshot_height"
+        android:gravity="center"
+        android:text="@string/qamaster_next_screenshot_icon"
+        android:textColor="@color/qamaster_blue"
+        android:textSize="28dp"
+        tools:ignore="SpUsage" />
+
+</com.qamaster.android.ui.ScreenshotElementView>

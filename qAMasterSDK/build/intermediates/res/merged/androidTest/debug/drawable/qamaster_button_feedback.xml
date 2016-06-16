@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_enabled="true" android:state_pressed="false"><shape android:shape="rectangle">
+            <solid android:color="@color/qamaster_button_feedback_bg" />
+
+            <corners android:radius="2dp" />
+        </shape></item>
+    <item android:state_enabled="true" android:state_pressed="true"><shape android:shape="rectangle">
+            <solid android:color="@color/qamaster_button_feedback_bg_pressed" />
+
+            <corners android:radius="2dp" />
+        </shape></item>
+    <item android:state_enabled="false" android:state_pressed="false"><shape android:shape="rectangle">
+            <solid android:color="@color/qamaster_button_feedback_bg_disabled" />
+
+            <corners android:radius="2dp" />
+        </shape></item>
+    <item android:state_enabled="false" android:state_pressed="true"><shape android:shape="rectangle">
+            <solid android:color="@color/qamaster_button_feedback_bg_disabled" />
+
+            <corners android:radius="2dp" />
+        </shape></item>
+
+</selector>

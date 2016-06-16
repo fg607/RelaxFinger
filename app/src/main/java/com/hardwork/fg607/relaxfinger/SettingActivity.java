@@ -32,6 +32,8 @@ import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.List;
 import java.util.jar.Manifest;
+import com.testin.agent.TestinAgent;
+import com.testin.agent.TestinAgentConfig;
 
 public class SettingActivity extends AppCompatActivity{
 
@@ -53,11 +55,14 @@ public class SettingActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mPreferences = FloatingBallUtils.getMultiProcessPreferences();
+
+        initTestinAgent();
+
         setContentView(R.layout.activity_setting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPreferences = FloatingBallUtils.getMultiProcessPreferences();
         mIsShowTeaching = mPreferences.getBoolean("showTeaching", true);
 
         mSettingFragment.setGestureSettingClickListener(new SettingFragment.OnSettingClickListener() {
@@ -139,6 +144,50 @@ public class SettingActivity extends AppCompatActivity{
         SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
 
         initAccessibility();
+
+    }
+
+    private void initTestinAgent() {
+
+        boolean isOpenCatchCrash = mPreferences.getBoolean("testinSwitch",true);
+
+
+        if(isOpenCatchCrash){
+
+              /*初始化崩溃收集工具*/
+            TestinAgentConfig config = new TestinAgentConfig.Builder(this)
+
+                    .withAppKey("94e6633d3b9de4a08bda7d20791b9729")
+
+                    .withAppChannel("")   // 发布应用的渠道,如果已经在 Manifest 中配置则此处可略
+
+                    .withUserInfo("普通用户")   // 用户信息-崩溃分析根据用户记录崩溃信息
+
+                    .withDebugModel(true)   // 输出更多SDK的debug信息
+
+                    .withErrorActivity(true)   // 发生崩溃时采集Activity信息
+
+                    .withCollectNDKCrash(true)   // 收集NDK崩溃信息
+
+                    .withOpenCrash(true)   // 收集崩溃信息开关
+
+                    .withOpenEx(true)   // 是否收集异常信息
+
+                    .withReportOnlyWifi(false)   // 仅在 WiFi 下上报崩溃信息
+
+                    .withReportOnBack(true)   // 当APP在后台运行时,是否采集信息
+
+                    .withQAMaster(true)   // 是否收集摇一摇反馈
+
+                    .withCloseOption(false)   // 是否在摇一摇菜单展示‘关闭摇一摇选项’
+
+                    .withLogCat(true)   // 是否系统操作信息
+
+                    .build();
+
+            TestinAgent.init(config);
+        }
+
 
     }
 
@@ -323,7 +372,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.3.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.3.1.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -350,7 +399,7 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.3.1版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.1.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("1.快捷菜单添加系统应用及快捷方式。\r\n" +
@@ -359,7 +408,10 @@ public class SettingActivity extends AppCompatActivity{
                 "4.优化隐藏区域显示效果，添加打开关闭动画。\r\n" +
                 "5.修复隐藏到通知栏后，屏幕重新点亮后失效的问题。\r\n" +
                 "6.修复部分6.0系统自定义主题不能显示的问题。\r\n" +
-                "7.优化应用运行流畅度。");
+                "7.优化应用运行流畅度。\r\n" +
+                "8.修复版本1.3.1亮屏后悬浮球没有自动启动的问题。\r\n" +
+                "9.修复版本1.3.1在安装部分启动器时导致选择快捷菜单FC的问题。\r\n" +
+                "10.添加异常捕获反馈开关。");
         dialog.show();
 
     }

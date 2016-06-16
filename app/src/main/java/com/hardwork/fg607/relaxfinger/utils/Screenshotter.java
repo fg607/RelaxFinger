@@ -110,7 +110,18 @@ public class Screenshotter implements ImageReader.OnImageAvailableListener {
 
     @Override
     public void onImageAvailable(ImageReader reader) {
-        Image image = reader.acquireLatestImage();
+
+        Image image = null;
+
+        try {
+            image = reader.acquireLatestImage();
+
+        }catch (UnsupportedOperationException e){
+
+            e.printStackTrace();
+            return;
+        }
+
         if(image == null){
             return;
         }

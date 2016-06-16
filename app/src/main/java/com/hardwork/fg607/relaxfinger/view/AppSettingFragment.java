@@ -384,6 +384,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         }
 
         int type = mPreferences.getInt("type"+mCurrentApp,0);
+
         popupFunctionDialog(type,mAppName);
 
     }
@@ -636,7 +637,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                     @Override
                     public void run() {
 
-                        shortcutList = AppUtils.getShortcuts();
+                        try {
+
+                            shortcutList = AppUtils.getShortcuts();
+
+                        }catch (SecurityException e){
+
+                            e.printStackTrace();
+
+                            shortcutList = new ArrayList<ShortcutInfo>();
+                        }
+
 
                         mShortcutAdapter.addList(shortcutList);
 

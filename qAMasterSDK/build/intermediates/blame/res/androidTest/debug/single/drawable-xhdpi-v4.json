@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_ic_warn.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_ic_warn.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_on_focused_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_on_focused_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_off_focused_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_off_focused_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_off_pressed_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_off_pressed_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_star_normal.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_star_normal.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_on_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_on_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_avatar.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_avatar.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_star_active.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_star_active.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_on_pressed_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_on_pressed_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_btn_check_off_holo_dark.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_btn_check_off_holo_dark.png"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/qamaster_star_pressed.png",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/qamaster_star_pressed.png"
+    }
+]

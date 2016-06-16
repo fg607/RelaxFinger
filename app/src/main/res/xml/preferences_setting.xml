@@ -99,5 +99,12 @@
         android:key="appSetting"
         android:title="快捷菜单设置"/>
 
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="TestinAgentSwitch"
+        android:summaryOff="异常报告已关闭"
+        android:summaryOn="异常报告已开启"
+        android:title="异常捕获反馈" />
+
 
 </PreferenceScreen>

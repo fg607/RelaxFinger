@@ -37,6 +37,8 @@ import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
+import com.testin.agent.TestinAgent;
+import com.testin.agent.TestinAgentConfig;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
@@ -57,6 +59,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mShotscreenSwitch;
     private SwitchPreference mFeedbackSwitch;
     private SwitchPreference mNotifySwitch;
+    private SwitchPreference mTestinAgentSwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
     private com.jenzz.materialpreference.Preference mFloatBallTheme;
@@ -170,6 +173,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mNotifySwitch.setOnPreferenceChangeListener(this);
         mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
         mAutoStartSwitch.setOnPreferenceChangeListener(this);
+        mTestinAgentSwitch = (SwitchPreference) findPreference("TestinAgentSwitch");
+        mTestinAgentSwitch.setOnPreferenceChangeListener(this);
         mGestureSetting = (com.jenzz.materialpreference.Preference) findPreference("gestureSetting");
         mGestureSetting.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -459,6 +464,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "autoStartSwitch":
                 autoStartChange((boolean) newValue);
                 break;
+            case "TestinAgentSwitch":
+                exceptionCatchChange((boolean) newValue);
+                break;
             default:
                 break;
 
@@ -466,6 +474,11 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
 
         return true;
+    }
+
+    private void exceptionCatchChange(boolean newValue) {
+
+        mPreferences.put("testinSwitch", newValue);
     }
 
     private void shotscreenChange(boolean newValue) {

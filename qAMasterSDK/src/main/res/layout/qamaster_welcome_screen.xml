@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qamaster.android.ui.WelcomeScreenView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/qamaster_welcome_screen_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/qamaster_beta_dialog_header_background"
+        android:orientation="vertical" >
+
+        <com.qamaster.android.ui.MontserratTextView
+            android:id="@+id/qamaster_forgot_passcode_action_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center_vertical"
+            android:text="@string/qamaster_welcome_screen_header"
+            android:textColor="@color/qamaster_beta_title"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/qamaster_paleGrey" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_bg"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/qamaster_welcome_screen_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:textColor="@color/qamaster_welcome_content_text"
+                tools:text="@string/qamaster_welcome_screen_temp_text" />
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/qamaster_dialog_bg"
+            android:orientation="vertical" >
+
+            <com.qamaster.android.ui.MontserratButton
+                android:id="@+id/qamaster_welcome_screen_confirm_btn"
+                style="@style/qamaster_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/qamaster_button"
+                android:text="@string/qamaster_welcome_screen_confirm" />
+        </LinearLayout>
+    </LinearLayout>
+
+</com.qamaster.android.ui.WelcomeScreenView>

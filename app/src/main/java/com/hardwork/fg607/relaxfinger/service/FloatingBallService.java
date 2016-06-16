@@ -568,7 +568,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     setNotify(intent.getBooleanExtra("isNotify", true));
                     break;
                 case Config.SCREEN_ON:
-                    if(mPreferences.getBoolean("floatSwitch",false)){
+                    if(mPreferences.getBoolean("floatSwitch",true)){
 
                         if(mIsBallHiding){
 
@@ -1693,20 +1693,30 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
                             }else {
-                                mHandler.post(new Runnable() {
+                                /*mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
 
                                         Toast.makeText(mContext,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
                                     }
-                                });
+                                });*/
+
+                                Toast.makeText(mContext,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
 
                             }
 
 
 
                         }else {
-                            showAlertDialog();
+
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    showAlertDialog();
+                                }
+                            });
+
                         }
                     }
                 }).start();

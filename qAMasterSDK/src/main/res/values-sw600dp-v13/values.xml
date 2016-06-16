@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <eat-comment />
+
+    <dimen name="qamaster_dialog_horizontal_margin">120dp</dimen>
+    <dimen name="qamaster_dialog_vertical_margin">40dp</dimen>
+
+</resources>

@@ -397,7 +397,7 @@ public class AppUtils {
         }
     }
 
-    public static ArrayList<ShortcutInfo> getShortcuts(){
+    public static ArrayList<ShortcutInfo> getShortcuts() throws SecurityException{
 
 
         ArrayList<ShortcutInfo> list = new ArrayList<>();
@@ -413,8 +413,9 @@ public class AppUtils {
             shortcutUri = ShortcutSuperUtils.getUriFromLauncher(context);
         }
 
+
         Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent" },
-                null, null, null);
+                    null, null, null);
 
 
         if (c != null && c.getCount() > 0) {
