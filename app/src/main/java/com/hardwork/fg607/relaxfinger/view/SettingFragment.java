@@ -313,6 +313,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 imageView = mCheck5;
                 break;
             default:
+                imageView = mCheck1;
                 break;
         }
 
@@ -683,8 +684,26 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
         if(!isDIY){
 
-            mPreferences.put("theme",mThemeChoosed);
-            mViewChoosed.setVisibility(View.INVISIBLE);
+            if(mPreferences==null){
+
+                mPreferences = FloatingBallUtils.getMultiProcessPreferences();
+            }
+
+            if(mPreferences != null){
+
+                mPreferences.put("theme",mThemeChoosed);
+            }
+
+
+            if(mViewChoosed == null){
+
+                mViewChoosed = setIconChoosed(mPreferences.getString("theme","默认"));
+            }
+            if(mViewChoosed != null){
+
+                mViewChoosed.setVisibility(View.INVISIBLE);
+            }
+
             mViewChoosed = setIconChoosed(mThemeChoosed);
 
             FloatingBallUtils.checkPermissionGranted(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);

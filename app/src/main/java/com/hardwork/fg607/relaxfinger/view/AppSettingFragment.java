@@ -15,6 +15,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -501,6 +502,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         private String mCheckdedFuncName;
         private OnDialogClickListener mClickListener;
         private int mType=0;
+        private Handler mHandler;
 
         static FunctionDialog newInstance(String checkedName) {
 
@@ -518,6 +520,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mCheckdedFuncName = getArguments().getString("checkedName");
+            mHandler = new Handler();
 
         }
 
@@ -652,7 +655,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                         mShortcutAdapter.addList(shortcutList);
 
 
-                        getActivity().runOnUiThread(new Runnable() {
+                        mHandler.post(new Runnable() {
                             @Override
                             public void run() {
 
@@ -760,7 +763,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                         mToolAdapter.addList(toolList);
 
 
-                        getActivity().runOnUiThread(new Runnable() {
+                        mHandler.post(new Runnable() {
                             @Override
                             public void run() {
 
@@ -901,7 +904,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         adapter.addList(appList);
 
-                        getActivity().runOnUiThread(new Runnable() {
+                        mHandler.post(new Runnable() {
                             @Override
                             public void run() {
 
