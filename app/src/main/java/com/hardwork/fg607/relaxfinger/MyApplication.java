@@ -4,10 +4,13 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.orm.SugarApp;
+import com.orm.SugarContext;
+
 /**
  * Created by fg607 on 16-1-23.
  */
-public class MyApplication extends Application {
+public class MyApplication extends SugarApp {
     private static MyApplication mInstance;
     /** 主线程ID */
     private static int mMainTheadId;
@@ -27,7 +30,6 @@ public class MyApplication extends Application {
         mMainThreadHandler = new Handler();
         mMainLooper = getMainLooper();
         mInstance = this;
-
 
         //mMainThread.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
     }

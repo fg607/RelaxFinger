@@ -1,11 +1,14 @@
 package com.hardwork.fg607.relaxfinger.model;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+
+import java.io.Serializable;
 
 /**
  * Created by fg607 on 15-11-26.
  */
-public class AppInfo {
+public class AppInfo{
     private Drawable appIcon;
     private String appName;
     private String appPackage;

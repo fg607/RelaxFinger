@@ -21,6 +21,7 @@ public class AppAdapter extends BaseAdapter {
     private ArrayList<AppInfo> mAppList;
     private Context mContext;
     private String mChoosedAppName;
+    private ArrayList<String> mChoosedNameList;
 
     public AppAdapter(Context context){
         this.mContext = context;
@@ -35,6 +36,13 @@ public class AppAdapter extends BaseAdapter {
     public void setAppChecked(String name){
 
         this.mChoosedAppName = name;
+        notifyDataSetChanged();
+
+    }
+
+    public void setAppChecked(ArrayList<String> choosedNameList){
+
+        this.mChoosedNameList = choosedNameList;
         notifyDataSetChanged();
 
     }
@@ -67,6 +75,7 @@ public class AppAdapter extends BaseAdapter {
         if(view == null){
 
             view1 = View.inflate(mContext, R.layout.choosekey_item, null);
+
         }else {
 
             view1 = view;
@@ -77,14 +86,22 @@ public class AppAdapter extends BaseAdapter {
         checkBox = (CheckBox) view1.findViewById(R.id.checkbox);
         icon.setImageDrawable(mAppList.get(i).getAppIcon());
         name.setText(mAppList.get(i).getAppName());
-        if(mAppList.get(i).getAppName().equals(mChoosedAppName)){
+
+        if(mChoosedNameList.contains(mAppList.get(i).getAppName())){
+
+            checkBox.setChecked(true);
+        }else {
+
+            checkBox.setChecked(false);
+        }
+       /* if(mAppList.get(i).getAppName().equals(mChoosedAppName)){
 
             checkBox.setChecked(true);
         }
         else {
 
             checkBox.setChecked(false);
-        }
+        }*/
 
         return view1;
     }

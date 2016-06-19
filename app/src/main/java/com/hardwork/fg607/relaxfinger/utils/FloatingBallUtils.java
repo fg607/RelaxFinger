@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -41,11 +42,13 @@ import android.util.Log;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
+import com.hardwork.fg607.relaxfinger.model.AppInfo;
 import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
@@ -60,11 +63,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.StreamCorruptedException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -82,6 +89,9 @@ public class FloatingBallUtils {
     public static  WifiManager mWifiManager = null;
     public static TelephonyManager mTelephonyManager = null;
     public static ConnectivityManager mConnectivityManager = null;
+    public static PowerManager mPowerManager = null;
+    public static PowerManager.WakeLock mWakeLock = null;
+   // public static boolean mIsKeepScreenOn = false;
     public static Method mMethod = null;
     public static  Camera mCamera = null;
     public static boolean iRotationOpen = false;
@@ -677,6 +687,7 @@ public class FloatingBallUtils {
         ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
         ToolInfo musicPrev = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_17_music_prev),"音乐上一曲");
         ToolInfo screenShot = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_shot),"屏幕截图");
+        ToolInfo screenOn = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_on),"屏幕常亮");
 
         if(Build.VERSION.SDK_INT<23){
 
@@ -686,6 +697,7 @@ public class FloatingBallUtils {
             toolList.add(rotation);
         }
 
+        toolList.add(screenOn);
         toolList.add(flash);
         toolList.add(vibration);
         toolList.add(screenShot);
@@ -736,6 +748,8 @@ public class FloatingBallUtils {
                 break;
             case "屏幕截图":
                 icon = context.getResources().getDrawable(R.drawable.screen_shot);
+            case "屏幕常亮":
+                icon = context.getResources().getDrawable(R.drawable.screen_on);
             default:
                 break;
 
@@ -801,6 +815,10 @@ public class FloatingBallUtils {
 
                     Toast.makeText(context,"截图功能适用于5.0以上系统！",Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case "屏幕常亮":
+                switchKeepScreenOn();
+                break;
             default:
                 break;
         }
@@ -1111,6 +1129,92 @@ public class FloatingBallUtils {
         }
 
     }
+
+    public static void switchKeepScreenOn(){
+
+        if(mWakeLock == null){
+
+            if(mPowerManager == null){
+
+                mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            }
+
+            mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "RelaxFinger");
+
+        }
+
+        if(!mWakeLock.isHeld()){
+
+            mWakeLock.acquire();
+
+            Toast.makeText(context,"屏幕常亮已开启！",Toast.LENGTH_SHORT).show();
+
+        }else {
+
+            mWakeLock.release();
+
+            Toast.makeText(context,"屏幕常亮已关闭！",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public static Bitmap createCombinationImage(ArrayList<Bitmap> bitmaps){
+
+        Bitmap bitmap = null;
+
+        CombinationImageView combinationImageView = new CombinationImageView(context);
+
+        for (Bitmap bit:bitmaps) {
+
+            combinationImageView.addImageView(bit);
+        }
+
+        bitmap = combinationImageView.getCombinationImage(100,100);
+
+        return bitmap;
+    }
+
+    public static byte[] serialize(Object object){
+        try {
+            ByteArrayOutputStream mem_out = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(mem_out);
+
+            out.writeObject(object);
+
+            out.close();
+            mem_out.close();
+
+            byte[] bytes =  mem_out.toByteArray();
+            return bytes;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static Object deserialize(byte[] bytes){
+        try {
+            ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
+            ObjectInputStream in = new ObjectInputStream(mem_in);
+
+            Object object = in.readObject();
+
+            in.close();
+            mem_in.close();
+
+            return object;
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }   catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 
 
 

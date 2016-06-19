@@ -37,6 +37,7 @@ import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
+import com.orm.SugarRecord;
 import com.testin.agent.TestinAgent;
 import com.testin.agent.TestinAgentConfig;
 
@@ -60,6 +61,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mFeedbackSwitch;
     private SwitchPreference mNotifySwitch;
     private SwitchPreference mTestinAgentSwitch;
+    private SwitchPreference mAutoHideSwitch;
+    private SwitchPreference mHideAreaSwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
     private com.jenzz.materialpreference.Preference mFloatBallTheme;
@@ -93,6 +96,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS MENU_DATA_SUGAR (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, WHICH_MENU TEXT, NAME TEXT, TYPE TEXT, ACTION TEXT)");
 
         addPreferencesFromResource(R.xml.preferences_setting);
 
@@ -173,8 +179,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mNotifySwitch.setOnPreferenceChangeListener(this);
         mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
         mAutoStartSwitch.setOnPreferenceChangeListener(this);
-        mTestinAgentSwitch = (SwitchPreference) findPreference("TestinAgentSwitch");
+        mTestinAgentSwitch = (SwitchPreference) findPreference("testinAgentSwitch");
         mTestinAgentSwitch.setOnPreferenceChangeListener(this);
+        mAutoHideSwitch = (SwitchPreference) findPreference("autoHideSwitch");
+        mAutoHideSwitch.setOnPreferenceChangeListener(this);
+        mHideAreaSwitch = (SwitchPreference) findPreference("hideAreaSwitch");
+        mHideAreaSwitch.setOnPreferenceChangeListener(this);
         mGestureSetting = (com.jenzz.materialpreference.Preference) findPreference("gestureSetting");
         mGestureSetting.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -465,8 +475,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "autoStartSwitch":
                 autoStartChange((boolean) newValue);
                 break;
-            case "TestinAgentSwitch":
+            case "testinAgentSwitch":
                 exceptionCatchChange((boolean) newValue);
+                break;
+            case "autoHideSwitch":
+                autoHideChange((boolean) newValue);
+                break;
+            case "hideAreaSwitch":
+                hideAreaChange((boolean) newValue);
                 break;
             default:
                 break;
@@ -475,6 +491,16 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
 
         return true;
+    }
+
+    private void hideAreaChange(boolean newValue) {
+
+        mPreferences.put("hideAreaSwitch",newValue);
+    }
+
+    private void autoHideChange(boolean newValue) {
+
+        mPreferences.put("autoHideSwitch",newValue);
     }
 
     private void exceptionCatchChange(boolean newValue) {

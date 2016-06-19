@@ -74,6 +74,20 @@
         android:summaryOn="悬浮球随开机启动"
         android:title="开机启动" />
 
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="false"
+        android:key="autoHideSwitch"
+        android:summaryOff="横屏隐藏已关闭"
+        android:summaryOn="横屏隐藏已开启"
+        android:title="横屏自动隐藏" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="true"
+        android:key="hideAreaSwitch"
+        android:summaryOff="隐藏区域已关闭"
+        android:summaryOn="隐藏区域已开启"
+        android:title="显示隐藏区域" />
+
 
     <com.jenzz.materialpreference.Preference
         android:key="floatBallTheme"
@@ -101,7 +115,7 @@
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
-        android:key="TestinAgentSwitch"
+        android:key="testinAgentSwitch"
         android:summaryOff="异常报告已关闭"
         android:summaryOn="异常报告已开启"
         android:title="异常捕获反馈" />

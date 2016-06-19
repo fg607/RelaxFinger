@@ -21,19 +21,17 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,15 +40,17 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnticipateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -65,13 +65,14 @@ import com.facebook.rebound.SpringUtil;
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
+import com.hardwork.fg607.relaxfinger.adapter.MenuFolderAdapter;
+import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.utils.AnimatorUtils;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
-import com.hardwork.fg607.relaxfinger.view.AppSettingFragment;
 import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 import com.ogaclejapan.arclayout.Arc;
@@ -83,6 +84,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -94,8 +96,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private WindowManager.LayoutParams mMenuWmParams = null;
     private WindowManager.LayoutParams mTrackWmParams = null;
     private WindowManager.LayoutParams mPopBackWmParams = null;
+    private WindowManager.LayoutParams mMenuFolderWmParams = null;
     private View mBallView;
     private View mMenuView;
+    private View mMenuFolderView;
+    private GridView mGridView;
+    private CardView mCardView;
+    private boolean mIsFolderAdded = false;
+    private MenuFolderAdapter mMenuFolderAdapter;
     private int mOldOffsetX, mOldOffsetY, mNewOffsetX, mNewOffsetY;
     private int mTag;
     private Context mContext = MyApplication.getApplication();
@@ -180,6 +188,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private View mPopBackgroundView;
     private boolean mIsBackAdded= false;
 
+    private DecelerateInterpolator polator = null;
+    private ValueAnimator.AnimatorUpdateListener animatorUpdateListener = null;
+    private AnimatorListenerAdapter animatorListenerAdapter = null;
+
 
 
     private LinearLayout mHideLayout;
@@ -254,7 +266,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
         loadFunction();
 
         initPopBackground();
+
         setUpFloatMenuView();
+
+        initMenuFolderView();
 
 
         if(mPreferences.getBoolean("notifySwitch",true)){
@@ -277,6 +292,44 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     }
 
+    private void initMenuFolderView() {
+
+        LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        mMenuFolderView = li.inflate(R.layout.menu_folder, null);
+
+        mGridView = (GridView) mMenuFolderView.findViewById(R.id.grid_view);
+
+        mCardView = (CardView) mMenuFolderView.findViewById(R.id.card_view);
+
+        mMenuFolderAdapter = new MenuFolderAdapter(this);
+
+
+        mMenuFolderWmParams = new WindowManager.LayoutParams();
+
+        if (Build.VERSION.SDK_INT < 19) {
+
+            mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+
+        } else {
+
+            mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        }
+
+        mMenuFolderWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mMenuFolderWmParams.gravity = Gravity.LEFT | Gravity.TOP;
+
+        mMenuFolderWmParams.width = DensityUtil.getScreenWidth(this)*2/3;
+        mMenuFolderWmParams.height = DensityUtil.getScreenHeight(this)/3;
+
+        mMenuFolderWmParams.x =  DensityUtil.getScreenWidth(this)/6;
+        mMenuFolderWmParams.y = DensityUtil.getScreenHeight(this)/2;
+
+        mMenuFolderWmParams.format = PixelFormat.RGBA_8888;
+
+
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -288,6 +341,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mIsLandscape = false;
             changeBallToOrigin();
 
+            if(mPreferences.getBoolean("autoHideSwitch",false)){
+
+                recoverFloatBall();
+            }
+
+
 
         }
         else if (orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -295,13 +354,23 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mIsLandscape = true;
             changeBallToFree();
 
-            mBallWmParams.x = DensityUtil.getScreenWidth(this)-mBallWmParams.width;
-            mBallWmParams.y = DensityUtil.getScreenHeight(this)/2-mBallWmParams.width/2;
+            if (mPreferences.getBoolean("autoHideSwitch", false)) {
 
-            if(mIsAdd){
+                hideToNotifyBar();
 
-                mWindowManager.updateViewLayout(mBallView,mBallWmParams);
+            } else {
+
+                mBallWmParams.x = DensityUtil.getScreenWidth(this) - mBallWmParams.width;
+                mBallWmParams.y = DensityUtil.getScreenHeight(this) / 2 - mBallWmParams.width / 2;
+
+                if (mIsAdd) {
+
+                    mWindowManager.updateViewLayout(mBallView, mBallWmParams);
+                }
+
             }
+
+
         }
     }
 
@@ -1196,6 +1265,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     mOldOffsetY = mBallWmParams.y;
                 }
 
+                boolean isShowHideBar = mPreferences.getBoolean("hideAreaSwitch",true);
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         mScaleSpring.setEndValue(1);
@@ -1238,9 +1309,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         //更新悬浮球位置，保存位置
                         if (mCanmove) {
 
-                            if(mCanShowHideBar&&!mIsHideBarAdded){
 
-                                showHideBar();
+                            if(isShowHideBar){
+
+                                //mLongPressing用来判断是否为移动，而非点击
+                                if(!mLongPressing&&mCanShowHideBar&&!mIsHideBarAdded){
+
+                                    showHideBar();
+                                }
+
                             }
 
 
@@ -1310,7 +1387,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         if (mCanmove) {
 
 
-                            if(checkInHideArea()){
+                            if(mIsHideBarAdded&&checkInHideArea()){
 
                                 hideToNotifyBar();
 
@@ -1554,26 +1631,40 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mSlideToBoundaryAnim.setDuration((int)(startx*maxDuration/(FloatingBallUtils
                 .getScreenWidth()/2-mBallWmParams.width/2)));
-        mSlideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
-        mSlideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        if(polator == null){
 
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                float currentValue = (Float) valueAnimator.getAnimatedValue();
-                mBallWmParams.x = (int) currentValue;
-                updateViewPosition();
-            }
-        });
-        mSlideToBoundaryAnim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(mIsSavePos){
+            polator = new DecelerateInterpolator();
+        }
+        mSlideToBoundaryAnim.setInterpolator(polator);
 
-                    saveStates("ballWmParamsX", mBallWmParams.x);
-                    saveStates("ballWmParamsY", mBallWmParams.y);
+        if(animatorUpdateListener == null){
+
+            animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float currentValue = (Float) valueAnimator.getAnimatedValue();
+                    mBallWmParams.x = (int) currentValue;
+                    updateViewPosition();
                 }
-            }
-        });
+            };
+        }
+        mSlideToBoundaryAnim.addUpdateListener(animatorUpdateListener);
+
+        if(animatorListenerAdapter == null){
+
+            animatorListenerAdapter = new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if(mIsSavePos){
+
+                        saveStates("ballWmParamsX", mBallWmParams.x);
+                        saveStates("ballWmParamsY", mBallWmParams.y);
+                    }
+                }
+            };
+        }
+        mSlideToBoundaryAnim.addListener(animatorListenerAdapter);
         mSlideToBoundaryAnim.start();
 
     }
@@ -1693,15 +1784,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
                             }else {
-                                /*mHandler.post(new Runnable() {
+
+                                mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
 
                                         Toast.makeText(mContext,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
                                     }
-                                });*/
-
-                                Toast.makeText(mContext,"空间不足，上下移动悬浮球再试！",Toast.LENGTH_SHORT).show();
+                                });
 
                             }
 
@@ -2322,10 +2412,77 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void menuClick(String whichApp) {
 
+        List<MenuDataSugar> menuDatalist = MenuDataSugar.findWithQuery(MenuDataSugar.class,"select * from MENU_DATA_SUGAR" +
+                " where WHICH_MENU='"+whichApp+"'");
 
-       // if(mIsSpeedApp){
 
-        String name = mPreferences.getString("app"+whichApp,"");
+        int size = menuDatalist.size();
+
+        if(size==1){
+
+            MenuDataSugar dataSugar = menuDatalist.get(0);
+
+            int type = dataSugar.getType();
+            String action = dataSugar.getAction();
+            String name = dataSugar.getName();
+
+
+            if(type==0){
+
+                boolean isOpen = AppUtils.startApplication(action);
+
+                if(!isOpen){
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+                }
+            }else if(type==1){
+
+                FloatingBallUtils.switchButton(name);
+
+            }else if(type==2){
+
+                try {
+
+                    AppUtils.startActivity(action);
+
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+
+                } catch (ActivityNotFoundException e){
+
+                    e.printStackTrace();
+
+                    Toast.makeText(this,"应用程序已卸载！",Toast.LENGTH_SHORT).show();
+
+                    mPreferences.put("app"+whichApp,"");
+                    updateMenuIcons(whichApp);
+
+                }
+            }
+
+
+            closeMenu();
+
+
+        }else if(size>1) {
+
+
+            showMenuFolder(menuDatalist);
+
+
+        }
+
+
+
+        // if(mIsSpeedApp){
+
+     /*   String name = mPreferences.getString("app"+whichApp,"");
         int type = mPreferences.getInt("type"+whichApp,0);
 
         if(name != ""){
@@ -2370,7 +2527,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 }
             }
 
-        }
+        }*/
 
         /*}else {
 
@@ -2398,10 +2555,48 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
         }*/
-        
 
 
-        closeMenu();
+    }
+
+    private void showMenuFolder(List<MenuDataSugar> menuDataList) {
+
+        if (!mIsFolderAdded) {
+
+            mMenuFolderAdapter.setMenuDataList(menuDataList);
+
+            mGridView.setAdapter(mMenuFolderAdapter);
+
+            mMenuView.setVisibility(View.INVISIBLE);
+
+            mWindowManager.addView(mMenuFolderView, mMenuFolderWmParams);
+
+            ScaleAnimation animation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+                    0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+
+            animation.setDuration(200);
+
+            AlphaAnimation animation1 = new AlphaAnimation(0.1f,1.0f);
+
+            animation1.setDuration(200);
+
+            AnimationSet animationSet = new AnimationSet(true);
+
+            animationSet.addAnimation(animation);
+
+            animationSet.addAnimation(animation1);
+
+            animationSet.setFillAfter(true);
+            animationSet.setFillEnabled(true);
+
+            mCardView.setAnimation(animationSet);
+
+            animationSet.start();
+
+           // mCardView.startAnimation(animationSet);
+
+            mIsFolderAdded = true;
+        }
 
     }
 
@@ -2422,10 +2617,73 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void updateViewIcon(View view, String which) {
 
-
         Drawable drawable = null;
 
-        int type = mPreferences.getInt("type"+which,0);
+        int type = -1;
+
+        List<MenuDataSugar> menuDatalist = MenuDataSugar.findWithQuery(MenuDataSugar.class,"select * from MENU_DATA_SUGAR" +
+                " where WHICH_MENU='"+which+"'");
+
+        int size = menuDatalist.size();
+
+        if(size==1){
+
+            MenuDataSugar dataSugar = menuDatalist.get(0);
+
+            type = dataSugar.getType();
+
+            if(type == 0){
+
+                drawable = AppUtils.getAppIcon(dataSugar.getAction());
+
+                Log.i("drawable",dataSugar.getName());
+
+            }else if(type == 1){
+
+                drawable = FloatingBallUtils.getSwitcherIcon(dataSugar.getName());
+
+            }else if( type == 2){
+
+                drawable = AppUtils.getShortcutIcon(dataSugar.getName());
+            }
+
+
+        }else if(size>1) {
+
+
+            ArrayList<Bitmap> list = new ArrayList<Bitmap>();
+
+            for (MenuDataSugar dataSugar : menuDatalist) {
+
+                switch (dataSugar.getType()) {
+
+                    case 0:
+                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getAppIcon(dataSugar.getAction())));
+                        break;
+                    case 1:
+                        list.add(ImageUtils.drawable2Bitmap(FloatingBallUtils.getSwitcherIcon(dataSugar.getName())));
+                        break;
+                    case 2:
+                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getShortcutIcon(dataSugar.getName())));
+                        break;
+                    default:
+                        break;
+                }
+
+                if (list.size() >= 9) {
+
+                    break;
+                }
+
+
+            }
+
+            Bitmap bi = FloatingBallUtils.createCombinationImage(list);
+
+            drawable = ImageUtils.bitmap2Drawable(bi);
+        }
+
+      /*  int type = mPreferences.getInt("type"+which,0);
 
         if(type == 0){
 
@@ -2437,7 +2695,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }else if( type == 2){
 
             drawable = AppUtils.getShortcutIcon(mPreferences.getString("app" + which, ""));
-        }
+        }*/
 
 
 
@@ -2453,6 +2711,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 }else if(type==1){
 
                     circleImageView.setBackgroundResource(R.drawable.path_blue_oval);
+
+                }else if(type == -1){
+
+                    circleImageView.setBackgroundResource(R.drawable.path_folder_oval);
                 }
                 circleImageView.setImageDrawable(drawable);
                 circleImageView.setClickable(true);
@@ -2488,6 +2750,57 @@ public class FloatingBallService extends Service implements View.OnClickListener
      * 关闭功能键面板
      */
     private void closeMenu() {
+
+        if(mIsFolderAdded){
+
+            ScaleAnimation animation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+                    0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+
+            animation.setDuration(200);
+
+
+            AlphaAnimation animation1 = new AlphaAnimation(1.0f,0.1f);
+
+            animation1.setDuration(200);
+
+            AnimationSet animationSet = new AnimationSet(true);
+
+            animationSet.addAnimation(animation);
+
+            animationSet.addAnimation(animation1);
+
+            animationSet.setFillAfter(true);
+            animationSet.setFillEnabled(true);
+
+            animationSet.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                    mWindowManager.removeViewImmediate(mMenuFolderView);
+
+                    mIsFolderAdded = false;
+
+                    mMenuView.setVisibility(View.VISIBLE);
+
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mCardView.startAnimation(animationSet);
+
+
+        }
 
         if(mIsMenuAdd){
 

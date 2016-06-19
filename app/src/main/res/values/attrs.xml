@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CombinationImageView">
+        <attr name="first_image_src" format="reference"/>
+        <attr name="second_image_src" format="reference"/>
+        <attr name="third_image_src" format="reference"/>
+        <attr name="fourth_image_src" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="Themes">
+
+        <attr name="combinationImageView" format="reference"/>
+    </declare-styleable>
+
+</resources>

@@ -5,10 +5,12 @@ import android.graphics.drawable.Drawable;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 
+import java.io.Serializable;
+
 /**
  * Created by fg607 on 16-6-4.
  */
-public class ShortcutInfo {
+public class ShortcutInfo{
 
     private Drawable shortcutIcon;
     private String shortcutTitle;

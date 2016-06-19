@@ -22,6 +22,7 @@ public class ToolAdapter extends BaseAdapter {
     private ArrayList<ToolInfo> mToolList;
     private Context mContext;
     private String mChoosedToolName;
+    private ArrayList<String> mChoosedNameList;
 
     public ToolAdapter(Context context){
         this.mContext = context;
@@ -36,6 +37,13 @@ public class ToolAdapter extends BaseAdapter {
     public void setToolChecked(String name){
 
         this.mChoosedToolName = name;
+        notifyDataSetChanged();
+
+    }
+
+    public void setToolChecked(ArrayList<String> choosedNameList){
+
+        this.mChoosedNameList = choosedNameList;
         notifyDataSetChanged();
 
     }
@@ -79,14 +87,22 @@ public class ToolAdapter extends BaseAdapter {
         icon.setBackgroundResource(R.drawable.path_blue_oval);
         icon.setImageDrawable(mToolList.get(i).getToolIcon());
         name.setText(mToolList.get(i).getToolName());
-        if(mToolList.get(i).getToolName().equals(mChoosedToolName)){
+
+        if(mChoosedNameList.contains(mToolList.get(i).getToolName())){
+
+            checkBox.setChecked(true);
+        }else {
+
+            checkBox.setChecked(false);
+        }
+      /*  if(mToolList.get(i).getToolName().equals(mChoosedToolName)){
 
             checkBox.setChecked(true);
         }
         else {
 
             checkBox.setChecked(false);
-        }
+        }*/
 
         return view1;
     }
