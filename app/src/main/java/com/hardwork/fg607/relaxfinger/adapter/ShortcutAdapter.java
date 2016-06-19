@@ -44,7 +44,7 @@ public class ShortcutAdapter extends BaseAdapter {
     public void setShortcutChecked(ArrayList<String> choosedNameList){
 
         this.mChoosedNameList = choosedNameList;
-        notifyDataSetChanged();
+       // notifyDataSetChanged();
 
     }
 

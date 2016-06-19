@@ -48,6 +48,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
@@ -188,12 +189,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private View mPopBackgroundView;
     private boolean mIsBackAdded= false;
 
-    private DecelerateInterpolator polator = null;
-    private ValueAnimator.AnimatorUpdateListener animatorUpdateListener = null;
-    private AnimatorListenerAdapter animatorListenerAdapter = null;
-
-
-
     private LinearLayout mHideLayout;
     private LinearLayout.LayoutParams mHideParams;
     private TextView mHideBarView;
@@ -299,6 +294,27 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mMenuFolderView = li.inflate(R.layout.menu_folder, null);
 
         mGridView = (GridView) mMenuFolderView.findViewById(R.id.grid_view);
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                MenuDataSugar menuDataSugar = (MenuDataSugar) view.getTag();
+
+
+                try {
+
+                    menuDataSugar.click();
+
+                    closeMenu();
+
+                } catch (URISyntaxException e) {
+
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         mCardView = (CardView) mMenuFolderView.findViewById(R.id.card_view);
 
@@ -1153,14 +1169,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
         public void run() {
 
             //if(mIsMenuAdd){
-
+/*
                 if(!mIsRecentPressed){
 
                     removePopBackground();
-                }
+                }*/
 
                 mWindowManager.removeViewImmediate(mMenuView);
-               // mIsMenuAdd= false;
+                mIsMenuAdd= false;
                 clearCache();
 
            // }
@@ -1348,6 +1364,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mTouchY = mCurrentY;
                         break;
                     case MotionEvent.ACTION_UP:
+
                         if(mIsHideBarAdded){
 
                             closeHideBar();
@@ -1631,41 +1648,30 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mSlideToBoundaryAnim.setDuration((int)(startx*maxDuration/(FloatingBallUtils
                 .getScreenWidth()/2-mBallWmParams.width/2)));
-        if(polator == null){
+        mSlideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
+        mSlideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-            polator = new DecelerateInterpolator();
-        }
-        mSlideToBoundaryAnim.setInterpolator(polator);
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float currentValue = (Float) valueAnimator.getAnimatedValue();
+                mBallWmParams.x = (int) currentValue;
+                updateViewPosition();
+            }
 
-        if(animatorUpdateListener == null){
+        });
+        mSlideToBoundaryAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
 
-            animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+                if(mIsSavePos){
 
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    float currentValue = (Float) valueAnimator.getAnimatedValue();
-                    mBallWmParams.x = (int) currentValue;
-                    updateViewPosition();
+                    saveStates("ballWmParamsX", mBallWmParams.x);
+                    saveStates("ballWmParamsY", mBallWmParams.y);
                 }
-            };
-        }
-        mSlideToBoundaryAnim.addUpdateListener(animatorUpdateListener);
-
-        if(animatorListenerAdapter == null){
-
-            animatorListenerAdapter = new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if(mIsSavePos){
-
-                        saveStates("ballWmParamsX", mBallWmParams.x);
-                        saveStates("ballWmParamsY", mBallWmParams.y);
-                    }
-                }
-            };
-        }
-        mSlideToBoundaryAnim.addListener(animatorListenerAdapter);
+            }
+        });
         mSlideToBoundaryAnim.start();
+
 
     }
 
@@ -2234,7 +2240,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(!mIsMenuAdd){
 
-
             addPopBackground();
             mWindowManager.addView(mMenuView, mMenuWmParams);
             mIsMenuAdd = true;
@@ -2422,10 +2427,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             MenuDataSugar dataSugar = menuDatalist.get(0);
 
-            int type = dataSugar.getType();
+            try {
+                dataSugar.click();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+
+            /*int type = dataSugar.getType();
             String action = dataSugar.getAction();
             String name = dataSugar.getName();
-
 
             if(type==0){
 
@@ -2464,7 +2474,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     updateMenuIcons(whichApp);
 
                 }
-            }
+            }*/
 
 
             closeMenu();
@@ -2636,8 +2646,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 drawable = AppUtils.getAppIcon(dataSugar.getAction());
 
-                Log.i("drawable",dataSugar.getName());
-
             }else if(type == 1){
 
                 drawable = FloatingBallUtils.getSwitcherIcon(dataSugar.getName());
@@ -2751,6 +2759,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
      */
     private void closeMenu() {
 
+
+        if(mIsMenuAdd){
+
+            //mIsMenuAdd=false;
+
+            hideMenu();
+
+            mHandler.postDelayed(mHidePopMenuThread,500);
+        }
+
         if(mIsFolderAdded){
 
             ScaleAnimation animation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
@@ -2782,11 +2800,20 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 @Override
                 public void onAnimationEnd(Animation animation) {
 
-                    mWindowManager.removeViewImmediate(mMenuFolderView);
+                    if(mIsFolderAdded){
 
-                    mIsFolderAdded = false;
+                        mWindowManager.removeViewImmediate(mMenuFolderView);
+                        mIsFolderAdded = false;
+                    }
 
-                    mMenuView.setVisibility(View.VISIBLE);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            mMenuView.setVisibility(View.VISIBLE);
+                        }
+                    },200);
+
 
 
                 }
@@ -2802,14 +2829,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         }
 
-        if(mIsMenuAdd){
 
-            mIsMenuAdd=false;
 
-            hideMenu();
+        if(!mIsRecentPressed&&mPreferences.getBoolean("addBackground",false)){
 
-            mHandler.postDelayed(mHidePopMenuThread,500);
+            removePopBackground();
         }
+
+
 
         /*if(mIsRunMenuOpen){
 

@@ -43,8 +43,7 @@ public class AppAdapter extends BaseAdapter {
     public void setAppChecked(ArrayList<String> choosedNameList){
 
         this.mChoosedNameList = choosedNameList;
-        notifyDataSetChanged();
-
+        //notifyDataSetChanged();
     }
 
     @Override

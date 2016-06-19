@@ -96,6 +96,8 @@ public class MenuFolderAdapter extends BaseAdapter {
 
         name.setText(mMenuDataList.get(position).getName());
 
+        view.setTag(mMenuDataList.get(position));
+
         return view;
     }
 }

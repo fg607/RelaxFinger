@@ -692,7 +692,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         private View mButtonView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
         private View mShortcutView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
 
-        private  ArrayList<String> mChoosedNameList;
+        private  ArrayList<String> mMenuNameList;
         private MyPagerAdapter mPagerAdapter;
         private  AppAdapter adapter;
         private  ToolAdapter mToolAdapter;
@@ -719,7 +719,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            mChoosedNameList = getArguments().getStringArrayList("checkedName");
+            mMenuNameList = getArguments().getStringArrayList("checkedName");
            // mCheckdedFuncName = getArguments().getString("checkedName");
             mHandler = new Handler();
 
@@ -793,77 +793,57 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
           //  mCheckdedFuncName = funcName;
 
             mType = type;
-            mChoosedNameList = choosedNameList;
+            mMenuNameList = choosedNameList;
 
             int size = choosedNameList.size();
 
-            if(size > 1){
+            if (adapter != null) {
 
-                if(adapter!=null){
+                adapter.setAppChecked(mMenuNameList);
+                adapter.notifyDataSetChanged();
+            }
 
-                    adapter.setAppChecked(mChoosedNameList);
-                    adapter.notifyDataSetChanged();
-                }
+            if (mToolAdapter != null) {
 
-                if(mToolAdapter != null){
+                mToolAdapter.setToolChecked(mMenuNameList);
+                mToolAdapter.notifyDataSetChanged();
+            }
 
-                    mToolAdapter.setToolChecked(mChoosedNameList);
-                    mToolAdapter.notifyDataSetChanged();
-                }
+            if (mShortcutAdapter != null) {
 
-                if(mShortcutAdapter != null){
+                mShortcutAdapter.setShortcutChecked(mMenuNameList);
+                mShortcutAdapter.notifyDataSetChanged();
+            }
 
-                    mShortcutAdapter.setShortcutChecked(mChoosedNameList);
-                    mShortcutAdapter.notifyDataSetChanged();
-                }
+            if (mViewPager != null) {
+                mViewPager.setCurrentItem(0);
+            }
 
-                if(mViewPager!=null){
-                    mViewPager.setCurrentItem(0);
-                }
-            }else if(size==1){
 
-                if(mType==0){
+            if (size == 1) {
 
-                    if(adapter!=null){
+                if (mType == 0) {
 
-                        adapter.setAppChecked(mChoosedNameList);
-                        adapter.notifyDataSetChanged();
-                    }
 
-                    if(mViewPager!=null){
+                    if (mViewPager != null) {
                         mViewPager.setCurrentItem(0);
                     }
 
 
-                }else if(mType==1){
+                } else if (mType == 1) {
 
-                    if(mToolAdapter != null){
 
-                        mToolAdapter.setToolChecked(mChoosedNameList);
-                        mToolAdapter.notifyDataSetChanged();
-                    }
-
-                    if(mViewPager!=null){
+                    if (mViewPager != null) {
                         mViewPager.setCurrentItem(1);
                     }
 
-                }else if (mType==2){
+                } else if (mType == 2) {
 
-                    if(mShortcutAdapter != null){
-
-                        mShortcutAdapter.setShortcutChecked(mChoosedNameList);
-                        mShortcutAdapter.notifyDataSetChanged();
-                    }
-
-                    if(mViewPager!=null){
+                    if (mViewPager != null) {
                         mViewPager.setCurrentItem(2);
                     }
                 }
             }
-
-
-
-
 
 
 
@@ -876,7 +856,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             final ProgressBar loading = (ProgressBar) mShortcutView.findViewById(R.id.loading);
 
             mShortcutAdapter= new ShortcutAdapter(getActivity());
-            mShortcutAdapter.setShortcutChecked(mChoosedNameList);
+            mShortcutAdapter.setShortcutChecked(mMenuNameList);
 
             if(shortcutList==null){
 
@@ -922,11 +902,18 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                                     name,2,shortcutList.get(i).getShortcutIntent());
 
                                             currentMenuMap.put(name,data);
+
+                                            mMenuNameList.add(name);
                                             //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(name);
+                                            mMenuNameList.remove(name);
                                         }
+
+                                        mShortcutAdapter.setShortcutChecked(mMenuNameList);
+
+
                                         /*Intent intent = new Intent();
 
                                         String name = shortcutList.get(i).getShortcutTitle();
@@ -985,11 +972,15 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                     name,2,shortcutList.get(i).getShortcutIntent());
 
                             currentMenuMap.put(name,data);
+                            mMenuNameList.add(name);
                             //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(name);
+                            mMenuNameList.remove(name);
                         }
+
+                        mShortcutAdapter.setShortcutChecked(mMenuNameList);
                        /* Intent intent = new Intent();
 
                         String name = shortcutList.get(i).getShortcutTitle();
@@ -1030,7 +1021,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             final ProgressBar loading = (ProgressBar) mButtonView.findViewById(R.id.loading);
 
             mToolAdapter= new ToolAdapter(getActivity());
-            mToolAdapter.setToolChecked(mChoosedNameList);
+            mToolAdapter.setToolChecked(mMenuNameList);
 
             if(toolList==null){
 
@@ -1066,11 +1057,15 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                                     name,1,name);
 
                                             currentMenuMap.put(name,data);
+                                            mMenuNameList.add(name);
                                             //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(name);
+                                            mMenuNameList.remove(name);
                                         }
+
+                                        mToolAdapter.setToolChecked(mMenuNameList);
                                     /*    Intent intent = new Intent();
 
                                         String name = toolList.get(i).getToolName();
@@ -1135,11 +1130,14 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                     name,1,name);
 
                             currentMenuMap.put(name,data);
+                            mMenuNameList.add(name);
                             //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(name);
+                            mMenuNameList.remove(name);
                         }
+                        mToolAdapter.setToolChecked(mMenuNameList);
                         /*Intent intent = new Intent();
 
                         String name = toolList.get(i).getToolName();
@@ -1208,7 +1206,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
 
             adapter= new AppAdapter(getActivity());
-            adapter.setAppChecked(mChoosedNameList);
+            adapter.setAppChecked(mMenuNameList);
 
             if(appList==null){
 
@@ -1243,11 +1241,19 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                                     name,0,appList.get(i).getAppPackage());
 
                                             currentMenuMap.put(name,data);
+
+                                            mMenuNameList.add(name);
+
+
                                             //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(name);
+
+                                            mMenuNameList.remove(name);
                                         }
+
+                                        adapter.setAppChecked(mMenuNameList);
 
 
                                         /*Intent intent = new Intent();
@@ -1308,11 +1314,16 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                     name,0,appList.get(i).getAppPackage());
 
                             currentMenuMap.put(name,data);
+                            mMenuNameList.add(name);
+
                             //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(name);
+                            mMenuNameList.remove(name);
                         }
+
+                        adapter.setAppChecked(mMenuNameList);
 
                       /*  Intent intent = new Intent();
 

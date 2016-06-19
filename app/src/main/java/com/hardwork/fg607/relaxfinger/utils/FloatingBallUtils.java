@@ -748,8 +748,10 @@ public class FloatingBallUtils {
                 break;
             case "屏幕截图":
                 icon = context.getResources().getDrawable(R.drawable.screen_shot);
+                break;
             case "屏幕常亮":
                 icon = context.getResources().getDrawable(R.drawable.screen_on);
+                break;
             default:
                 break;
 
@@ -763,34 +765,92 @@ public class FloatingBallUtils {
         switch (name){
 
             case "WIFI":
-                switchWifi();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        switchWifi();
+                    }
+                }).start();
+
                 break;
             case "移动数据":
                 switchMoblieData();
                 break;
             case "蓝牙":
-                switchBluetooth();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        switchBluetooth();
+                    }
+                }).start();
+
                 break;
             case "手电筒":
-                switchFlashlight();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchFlashlight();
+                    }
+                }).start();
+
                 break;
             case "震动/声音":
-                vibrationMode();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vibrationMode();
+                    }
+                }).start();
+
                 break;
             case "静音/声音":
-                muteMode();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        muteMode();
+                    }
+                }).start();
+
                 break;
             case "屏幕旋转":
-                switchRotation();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchRotation();
+                    }
+                }).start();
+
                 break;
             case "音乐开关":
-                switchMusic();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchMusic();
+                    }
+                }).start();
+
                 break;
             case "音乐上一曲":
-                prevMusic();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        prevMusic();
+                    }
+                }).start();
+
                 break;
             case "音乐下一曲":
-                nextMusic();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        nextMusic();
+                    }
+                }).start();
+
                 break;
             case "屏幕截图":
                 if(Build.VERSION.SDK_INT > 20){
@@ -817,7 +877,14 @@ public class FloatingBallUtils {
                 }
                 break;
             case "屏幕常亮":
-                switchKeepScreenOn();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        switchKeepScreenOn();
+                    }
+                }).start();
+
                 break;
             default:
                 break;
@@ -919,17 +986,37 @@ public class FloatingBallUtils {
 
                 //打开
                 Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 1);
-                Toast.makeText(context,"屏幕旋转已启用",Toast.LENGTH_SHORT).show();
+                MyApplication.getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(context,"屏幕旋转已启用",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
 
             } else if (gravity == 1) {
 
                 //关闭
                 Settings.System.putInt(resolver, Settings.System.ACCELEROMETER_ROTATION, 0);
-                Toast.makeText(context,"屏幕旋转已关闭",Toast.LENGTH_SHORT).show();
+               MyApplication.getMainThreadHandler().post(new Runnable() {
+                   @Override
+                   public void run() {
+                       Toast.makeText(context,"屏幕旋转已关闭",Toast.LENGTH_SHORT).show();
+                   }
+               });
+
             }
         }else {
 
-            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+                }
+            });
+
 
         }
 
@@ -944,11 +1031,24 @@ public class FloatingBallUtils {
         if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            Toast.makeText(context,"静音模式已启用",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"静音模式已启用",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }else {
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
 
@@ -966,11 +1066,23 @@ public class FloatingBallUtils {
         if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_VIBRATE){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-            Toast.makeText(context,"震动模式已启用",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"震动模式已启用",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }else {
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"普通模式已启用",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
 
@@ -995,11 +1107,25 @@ public class FloatingBallUtils {
                 parameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                 mCamera.setParameters(parameter);
 
+                MyApplication.getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context,"手电筒已打开",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             } else {
                 parameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                 mCamera.setParameters(parameter);
                 mCamera.release();
                 mCamera = null;
+
+                MyApplication.getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context,"手电筒已关闭",Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }else {
 
@@ -1051,7 +1177,14 @@ public class FloatingBallUtils {
 
         }else {
 
-            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
 
@@ -1109,7 +1242,14 @@ public class FloatingBallUtils {
 
         }else {
 
-            Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
 
         }
 
@@ -1147,13 +1287,25 @@ public class FloatingBallUtils {
 
             mWakeLock.acquire();
 
-            Toast.makeText(context,"屏幕常亮已开启！",Toast.LENGTH_SHORT).show();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"屏幕常亮已开启！",Toast.LENGTH_SHORT).show();
+                }
+            });
+
 
         }else {
 
             mWakeLock.release();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"屏幕常亮已关闭！",Toast.LENGTH_SHORT).show();
+                }
+            });
 
-            Toast.makeText(context,"屏幕常亮已关闭！",Toast.LENGTH_SHORT).show();
+
         }
 
     }

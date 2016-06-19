@@ -44,7 +44,7 @@ public class ToolAdapter extends BaseAdapter {
     public void setToolChecked(ArrayList<String> choosedNameList){
 
         this.mChoosedNameList = choosedNameList;
-        notifyDataSetChanged();
+       // notifyDataSetChanged();
 
     }
 
