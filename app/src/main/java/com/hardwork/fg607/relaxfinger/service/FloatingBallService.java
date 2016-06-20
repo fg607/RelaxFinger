@@ -1479,7 +1479,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             }
 
 
-                            setUpFloatMenuView();
+                            //setUpFloatMenuView();
 
                             mPreferences.getBoolean("moveSwitch",false);
                             if(!mPreferences.getBoolean("moveSwitch",false) && mIsSavePos){
