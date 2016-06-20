@@ -1,17 +1,8 @@
 package com.hardwork.fg607.relaxfinger.view;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.system.Os;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -27,7 +18,6 @@ public class BlankActivity extends Activity {
     private Intent mIntent = null;
     private boolean mIsNew = true;
     private TrayAppPreferences mPreferences;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +59,6 @@ public class BlankActivity extends Activity {
         if(intent.getBooleanExtra("finish",false)){
 
             finish();
-
         }
     }
 
@@ -87,7 +76,6 @@ public class BlankActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
         mIsNew = false;
     }
 

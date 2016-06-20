@@ -372,7 +372,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.3.1.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.3.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -399,19 +399,18 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.3.1.1版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.2版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.快捷菜单添加系统应用及快捷方式。\r\n" +
-                "2.快捷菜单弹出时按下手机自带按键会自动关闭。\r\n" +
-                "3.优化悬浮球触摸和吸附屏幕边缘动画效果。\r\n" +
-                "4.优化隐藏区域显示效果，添加打开关闭动画。\r\n" +
-                "5.修复隐藏到通知栏后，屏幕重新点亮后失效的问题。\r\n" +
-                "6.修复部分6.0系统自定义主题不能显示的问题。\r\n" +
-                "7.优化应用运行流畅度。\r\n" +
-                "8.修复版本1.3.1亮屏后悬浮球没有自动启动的问题。\r\n" +
-                "9.修复版本1.3.1在安装部分启动器时导致选择快捷菜单FC的问题。\r\n" +
-                "10.添加异常捕获反馈开关。");
+        dialog.setMessage("1.添加快捷文件夹(妈妈再也不用担心快捷菜单不够用啦！)。\r\n" +
+                "2.添加横屏自动隐藏开关。\r\n" +
+                "3.添加显示隐藏区域开关。\r\n" +
+                "4.添加屏幕常亮功能。\r\n" +
+                "5.解决部分快捷开关卡顿问题。\r\n" +
+                "6.修复点击悬浮球出现隐藏区域的问题。\r\n" +
+                "7.优化悬浮球移动流畅度。\r\n" +
+                "8.优化悬浮球滑动流畅度。\r\n" +
+                "9.优化操作响应速度。");
         dialog.show();
 
     }
