@@ -109,6 +109,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mTag;
     private Context mContext = MyApplication.getApplication();
     private FrameLayout mMenuLayout;
+    private boolean mReverseMenu=false;
     private Button mFloatImage;
     private boolean mIsmoving = false;
     private boolean mCanmove = false;
@@ -1394,7 +1395,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mFloatImage.startAnimation(mZoomInAnima);
                         mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
-                        mTag = 0;
+                       // mTag = 0;
 
                         hideTrack();
                        // mNewOffsetX = mBallWmParams.x;
@@ -1444,9 +1445,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 saveStates("ballWmParamsX", mBallWmParams.x);
                                 saveStates("ballWmParamsY", mBallWmParams.y);
-                            }
-
-                            if(mIsSavePos){
 
                                 if(mBallWmParams.x + mBallWmParams.width/2 >= FloatingBallUtils.getScreenWidth()/2){
 
@@ -1456,9 +1454,36 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                     mIsFloatRight = false;
                                 }
 
+                                if(mIsFloatRight!=mPreferences.getBoolean("floatRight",true)){
+
+                                    reverseMenu();
+                                }
+
+
                                 saveStates("floatRight",mIsFloatRight);
+
+
                             }
 
+                          /*  if(mIsSavePos){
+
+                                if(mBallWmParams.x + mBallWmParams.width/2 >= FloatingBallUtils.getScreenWidth()/2){
+
+                                    mIsFloatRight = true;
+                                }else {
+
+                                    mIsFloatRight = false;
+                                }
+
+                                if(mIsFloatRight!=mPreferences.getBoolean("floatRight",true)){
+
+                                    reverseMenu();
+                                }
+
+
+                                saveStates("floatRight",mIsFloatRight);
+                            }
+*/
 
                             if(mIsSavePos){
 
@@ -1480,6 +1505,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
                             //setUpFloatMenuView();
+
+
 
                             mPreferences.getBoolean("moveSwitch",false);
                             if(!mPreferences.getBoolean("moveSwitch",false) && mIsSavePos){
@@ -1536,8 +1563,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                         }
                         break;
-                    case MotionEvent.ACTION_CANCEL:
-                        break;
                 }
                 //如果拖动则返回false，否则返回true
                 if (mIsmoving == false) {
@@ -1549,6 +1574,37 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         });
 
+
+    }
+
+    private void reverseMenu() {
+
+        LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        if(mIsFloatRight){
+            mMenuView = li.inflate(R.layout.popup, null);
+        }else {
+            mMenuView = li.inflate(R.layout.popup_left, null);
+        }
+
+        mMenuLayout = (FrameLayout) mMenuView.findViewById(R.id.menu_layout);
+
+        mMenuLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeMenu();
+            }
+        });
+        updateMenuIcons();
+        mArcLayout = (ArcLayout) mMenuView.findViewById(R.id.arc_layout);
+        mFab = (Button) mMenuView.findViewById(R.id.fab);
+
+
+        for (int i = 0, size = mArcLayout.getChildCount(); i < size; i++) {
+            mArcLayout.getChildAt(i).setOnClickListener(this);
+        }
+
+        mFab.setOnClickListener(this);
 
     }
 
@@ -1618,10 +1674,23 @@ public class FloatingBallService extends Service implements View.OnClickListener
         if (mBallWmParams.x + mBallWmParams.width / 2 >= FloatingBallUtils.getScreenWidth() / 2) {
 
             moveToScreenRight(startx);
+            mIsFloatRight = true;
+
         } else {
 
+            mIsFloatRight = false;
             moveToScreenLeft(startx);
         }
+
+        if(mIsFloatRight != mPreferences.getBoolean("floatRight",true)){
+
+            mReverseMenu = true;
+        }else{
+
+            mReverseMenu = false;
+        }
+
+        saveStates("floatRight",mIsFloatRight);
     }
 
     private void moveToScreenLeft(float startx) {
@@ -1650,6 +1719,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     saveStates("ballWmParamsX", mBallWmParams.x);
                     saveStates("ballWmParamsY", mBallWmParams.y);
+                }
+
+                if(mReverseMenu){
+
+                    reverseMenu();
+
+                    mReverseMenu = false;
                 }
 
             }
@@ -1686,6 +1762,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     saveStates("ballWmParamsX", mBallWmParams.x);
                     saveStates("ballWmParamsY", mBallWmParams.y);
+                }
+
+                if(mReverseMenu){
+
+                    reverseMenu();
+
+                    mReverseMenu = false;
                 }
             }
         });
