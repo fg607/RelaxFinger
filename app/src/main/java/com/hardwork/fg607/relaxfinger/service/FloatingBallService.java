@@ -67,6 +67,7 @@ import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.adapter.MenuFolderAdapter;
+import com.hardwork.fg607.relaxfinger.model.ItemClickListener;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.utils.AnimatorUtils;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
@@ -297,30 +298,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mGridView = (GridView) mMenuFolderView.findViewById(R.id.grid_view);
 
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                MenuDataSugar menuDataSugar = (MenuDataSugar) view.getTag();
-
-
-                try {
-
-                    menuDataSugar.click();
-
-                    closeMenu();
-
-                } catch (URISyntaxException e) {
-
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
         mCardView = (CardView) mMenuFolderView.findViewById(R.id.card_view);
 
-        mMenuFolderAdapter = new MenuFolderAdapter(this);
+        mMenuFolderAdapter = new MenuFolderAdapter(this, new ItemClickListener() {
+            @Override
+            public void itemClick() {
+
+                closeMenu();
+            }
+        });
 
 
         mMenuFolderWmParams = new WindowManager.LayoutParams();
@@ -334,7 +320,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
         }
 
-        mMenuFolderWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mMenuFolderWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
         mMenuFolderWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mMenuFolderWmParams.width = DensityUtil.getScreenWidth(this)*2/3;
@@ -2682,6 +2668,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mMenuView.setVisibility(View.INVISIBLE);
 
             mWindowManager.addView(mMenuFolderView, mMenuFolderWmParams);
+
 
             ScaleAnimation animation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
                     0.5f,Animation.RELATIVE_TO_SELF,0.5f);

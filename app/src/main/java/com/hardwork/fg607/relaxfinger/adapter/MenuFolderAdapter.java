@@ -10,10 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hardwork.fg607.relaxfinger.R;
+import com.hardwork.fg607.relaxfinger.model.ItemClickListener;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +27,12 @@ public class MenuFolderAdapter extends BaseAdapter {
     private Context mContext;
     private List<MenuDataSugar> mMenuDataList;
 
-    public MenuFolderAdapter(Context context){
+    private ItemClickListener mItemClickListener;
+
+    public MenuFolderAdapter(Context context,ItemClickListener listener){
 
         this.mContext = context;
+        this.mItemClickListener = listener;
     }
 
     public void setMenuDataList(List<MenuDataSugar> list){
@@ -52,7 +57,7 @@ public class MenuFolderAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         ImageView icon;
         TextView name;
@@ -96,7 +101,23 @@ public class MenuFolderAdapter extends BaseAdapter {
 
         name.setText(mMenuDataList.get(position).getName());
 
-        view.setTag(mMenuDataList.get(position));
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    mMenuDataList.get(position).click();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+
+                if(mItemClickListener!=null){
+
+                    mItemClickListener.itemClick();
+                }
+
+            }
+        });
 
         return view;
     }
