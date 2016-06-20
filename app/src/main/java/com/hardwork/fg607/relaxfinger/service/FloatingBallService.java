@@ -144,7 +144,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private NavAccessibilityService mAccessibilityService;
     private AccessibilityManager mAccessibilityManger;
     private List<AccessibilityServiceInfo> mList;
-    private int mTouchX, mTouchY, mCurrentX, mCurrentY;
+    private int mInitX,mInitY;
+    private float mTouchX, mTouchY, mCurrentX, mCurrentY;
     private ImageView mTeachArrow;
     private ImageView mTeachHand;
     private TextView mTeachText;
@@ -1175,9 +1176,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     removePopBackground();
                 }*/
 
+            if(mIsMenuAdd){
+
                 mWindowManager.removeViewImmediate(mMenuView);
                 mIsMenuAdd= false;
                 clearCache();
+            }
 
            // }
 
@@ -1276,10 +1280,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             public boolean onTouch(View v, MotionEvent event) {
 
-                if (mTag == 0) {
+             /*   if (mTag == 0) {
                     mOldOffsetX = mBallWmParams.x;
                     mOldOffsetY = mBallWmParams.y;
-                }
+                }*/
 
                 boolean isShowHideBar = mPreferences.getBoolean("hideAreaSwitch",true);
 
@@ -1289,8 +1293,10 @@ public class FloatingBallService extends Service implements View.OnClickListener
                       /*  mFloatImage.setPressed(true);
                         mFloatImage.startAnimation(mZoomOutAnima);*/
                         mFloatImage.getBackground().setAlpha(255);
-                        mTouchX = (int) event.getRawX();
-                        mTouchY = (int) event.getRawY();
+                        mTouchX = event.getRawX();
+                        mTouchY = event.getRawY();
+                        mInitX = mBallWmParams.x;
+                        mInitY = mBallWmParams.y;
                         mClickCount++;
                         mPreClickTime = System.currentTimeMillis();
 
@@ -1306,17 +1312,24 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mIsmoving = false;
                             showTrack();
 
+                        mOldOffsetX = mBallWmParams.x;
+                        mOldOffsetY = mBallWmParams.y;
+
+                        mNewOffsetX = 0;
+                        mNewOffsetY = 0;
+
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        mCurrentX = (int) event.getRawX();
-                        mCurrentY = (int) event.getRawY();
+                        mCurrentX =  event.getRawX();
+                        mCurrentY =  event.getRawY();
                         mIsmoving = true;
-                        mTag = 1;
-                        mBallWmParams.x += (int) (mCurrentX - mTouchX);
-                        mBallWmParams.y += (int) (mCurrentY - mTouchY);
+                        //mTag = 1;
 
-                            //滑动量大于50像素取消长按事件
-                            if (Math.abs(mOldOffsetX - mBallWmParams.x) > 50 || Math.abs(mOldOffsetY - mBallWmParams.y) > 50) {
+                        mNewOffsetX = (int)(mCurrentX-mTouchX);
+                        mNewOffsetY = (int)(mCurrentY-mTouchY);
+
+                        //滑动量大于50像素取消长按事件
+                            if (Math.abs(mNewOffsetX) > 50 || Math.abs(mNewOffsetY) > 50) {
                                 //取消注册的长按事件
                                 mHandler.removeCallbacks(mLongPressedThread);
                                 mLongPressing = false;
@@ -1324,6 +1337,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                         //更新悬浮球位置，保存位置
                         if (mCanmove) {
+
+                            mBallWmParams.x = mInitX + mNewOffsetX;
+                            mBallWmParams.y = mInitY + mNewOffsetY;
 
 
                             if(isShowHideBar){
@@ -1344,24 +1360,27 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 mBallWmParams.y = FloatingBallUtils.getScreenHeight() - mBallWmParams.height;
                             }
+
                             updateViewPosition();
 
 
                         } else {
 
-                            mTrackWmParams.x += (int) (mCurrentX - mTouchX) / 2;
-                            mTrackWmParams.y += (int) (mCurrentY - mTouchY) / 2;
 
-                            if (Math.abs(mTrackWmParams.x - (mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2))) < 200
+                            mTrackWmParams.x = mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2) + mNewOffsetX / 2;
+                            mTrackWmParams.y = mOldOffsetY + (mBallWmParams.height / 2 - floatBallSize * 3 / 5 / 2) + mNewOffsetY / 2;
+
+                            updateTrackPositon();
+
+                            /*if (Math.abs(mTrackWmParams.x - (mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2))) < 200
                                     && Math.abs(mTrackWmParams.y - (mOldOffsetY + (mBallWmParams.height / 2 - floatBallSize * 3 / 5 / 2))) < 200) {
 
                                 updateTrackPositon();
-                            }
-
+                            }*/
 
                         }
-                        mTouchX = mCurrentX;
-                        mTouchY = mCurrentY;
+                       // mTouchX = mCurrentX;
+                        //mTouchY = mCurrentY;
                         break;
                     case MotionEvent.ACTION_UP:
 
@@ -1371,18 +1390,18 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         }
                         mHandler.removeCallbacks(mLongPressedThread);
                         mScaleSpring.setEndValue(0);
-                       /* mFloatImage.setPressed(false);
-                        mFloatImage.startAnimation(mZoomInAnima);*/
+                        mFloatImage.setPressed(false);
+                        mFloatImage.startAnimation(mZoomInAnima);
                         mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
                         mTag = 0;
 
                         hideTrack();
-                        mNewOffsetX = mBallWmParams.x;
-                        mNewOffsetY = mBallWmParams.y;
+                       // mNewOffsetX = mBallWmParams.x;
+                      //  mNewOffsetY = mBallWmParams.y;
 
                         // 滑动偏移量小于40像素，判定为点击悬浮球
-                        if (Math.abs(mOldOffsetX - mNewOffsetX) <= 40 && Math.abs(mOldOffsetY - mNewOffsetY) <= 40) {
+                        if (Math.abs(mNewOffsetX) <= 40 && Math.abs(mNewOffsetY) <= 40) {
 
 
                             if (System.currentTimeMillis() - mPreClickTime <= LONG_PRESS_TIME) {
@@ -1482,28 +1501,28 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             if (!mLongPressing) {
 
                                 //Y轴滑动偏移量大于40像素并且Y轴滑动偏移量比X轴偏移量多出20像素时判定为向上滑动
-                                if ((mOldOffsetY - mNewOffsetY) - Math.abs(mOldOffsetX - mNewOffsetX) > 20 && (mOldOffsetY - mNewOffsetY) > 40) {
+                                if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) < -40) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipUp();
 
                                 }
                                 //向下滑动
-                                else if ((mNewOffsetY - mOldOffsetY) - Math.abs(mOldOffsetX - mNewOffsetX) > 20 && (mNewOffsetY - mOldOffsetY) > 40) {
+                                else if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) > 40) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipDown();
 
                                 }
                                 //向左滑动
-                                else if ((mOldOffsetX - mNewOffsetX) - Math.abs(mOldOffsetY - mNewOffsetY) > 20 && (mOldOffsetX - mNewOffsetX) > 40) {
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 20 && (mNewOffsetX) < -40) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipLeft();
 
                                 }
                                 //向右滑动
-                                else if ((mNewOffsetX - mOldOffsetX) - Math.abs(mOldOffsetY - mNewOffsetY) > 10 && (mNewOffsetX - mOldOffsetX) > 10) {
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 10 && (mNewOffsetX) > 10) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipRight();
@@ -1513,7 +1532,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                             }
 
-                            onClearOffset();
+                            //onClearOffset();
 
                         }
                         break;

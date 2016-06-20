@@ -13,4 +13,5 @@
     <color name="popbackground">#49000000</color>
     <color name="white">#a7ffffff</color>
     <color name="blue">#9c14b3df</color>
+    <color name="folder">#dc0f4c5c</color>
 </resources>

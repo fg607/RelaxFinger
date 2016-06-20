@@ -15,7 +15,7 @@
       app:cardCornerRadius="5dp"
       android:layout_centerInParent="true"
       android:layout_marginTop="5dp"
-      app:cardBackgroundColor="@color/blue">
+      app:cardBackgroundColor="@color/folder">
 
     <GridView
         android:id="@+id/grid_view"

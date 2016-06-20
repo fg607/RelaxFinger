@@ -4,7 +4,7 @@
     <layer-list>
       <item>
         <shape android:shape="oval">
-          <solid android:color="@color/blue"/>
+          <solid android:color="@color/folder"/>
         </shape>
       </item>
       <item>
@@ -16,7 +16,7 @@
   </item>
   <item>
     <shape android:shape="oval">
-      <solid android:color="@color/blue"/>
+      <solid android:color="@color/folder"/>
     </shape>
   </item>
 </selector>

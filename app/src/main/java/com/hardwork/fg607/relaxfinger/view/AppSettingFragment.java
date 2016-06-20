@@ -420,7 +420,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             Bitmap bi = FloatingBallUtils.createCombinationImage(list);
 
-            imageView.setBackground(new ColorDrawable(this.getResources().getColor(R.color.blue)));
+            imageView.setBackground(new ColorDrawable(this.getResources().getColor(R.color.folder)));
             imageView.setImageBitmap(bi);
 
         }
