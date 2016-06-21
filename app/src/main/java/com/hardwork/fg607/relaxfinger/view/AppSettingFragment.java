@@ -98,7 +98,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     private HashMap<String,Object> menu3Map = new HashMap<String, Object>();
     private HashMap<String,Object> menu4Map = new HashMap<String, Object>();
     private HashMap<String,Object> menu5Map = new HashMap<String, Object>();
-    private ArrayList<String> mChoosedNameList = new ArrayList<>();
+    private ArrayList<String> mChoosedList = new ArrayList<>();
     static HashMap<String,Object> currentMenuMap = null;
 
     static ArrayList<AppInfo> appList = null;
@@ -138,19 +138,19 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             switch (menuData.getWhichMenu()){
 
                 case "1":
-                    menu1Map.put(menuData.getName(),menuData);
+                    menu1Map.put(menuData.getAction(),menuData);
                     break;
                 case "2":
-                    menu2Map.put(menuData.getName(),menuData);
+                    menu2Map.put(menuData.getAction(),menuData);
                     break;
                 case "3":
-                    menu3Map.put(menuData.getName(),menuData);
+                    menu3Map.put(menuData.getAction(),menuData);
                     break;
                 case "4":
-                    menu4Map.put(menuData.getName(),menuData);
+                    menu4Map.put(menuData.getAction(),menuData);
                     break;
                 case "5":
-                    menu5Map.put(menuData.getName(),menuData);
+                    menu5Map.put(menuData.getAction(),menuData);
                     break;
                 default:
                     break;
@@ -398,6 +398,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 int type = dataSugar.getType();
 
                 Drawable drawable = null;
+
                 switch (type){
 
                     case 0:
@@ -472,15 +473,17 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
     }
 
-    private void initDialog(ArrayList<String> choosedNameList) {
+    private void initDialog(ArrayList<String> choosedMenuList) {
 
-        mFuncDialog = FunctionDialog.newInstance(choosedNameList);
+        mFuncDialog = FunctionDialog.newInstance(choosedMenuList);
 
         mFuncDialog.setDialogClickListener(new OnDialogClickListener() {
             @Override
             public void onDialogClick(final Intent intent) {
 
-                if (intent != null) {
+                generateMenu();
+
+               /* if (intent != null) {
 
                     if (!intent.getStringExtra("name").equals("")) {
 
@@ -518,7 +521,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 }else {
 
                     generateMenu();
-                }
+                }*/
 
 
             }
@@ -575,11 +578,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         int type = 0;
         //popupFunctionDialog(type,mAppName);
 
-        mChoosedNameList.clear();
+        mChoosedList.clear();
 
-        for(String name:currentMenuMap.keySet()){
+        for(String action:currentMenuMap.keySet()){
 
-            mChoosedNameList.add(name);
+            mChoosedList.add(action);
         }
 
         if(currentMenuMap.size()==1){
@@ -588,7 +591,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             type = menuDataSugar.getType();
         }
 
-        popupFunctionDialog(type,mChoosedNameList);
+        popupFunctionDialog(type,mChoosedList);
 
     }
 
@@ -599,7 +602,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    public void popupFunctionDialog(final int type, final ArrayList<String> choosedNameList) {
+    public void popupFunctionDialog(final int type, final ArrayList<String> choosedMenuList) {
 
         new Thread(new Runnable() {
             @Override
@@ -607,14 +610,14 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                 if (mFuncDialog == null) {
 
-                    initDialog(choosedNameList);
+                    initDialog(choosedMenuList);
                 }
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        mFuncDialog.setCheckedFuncName(type, choosedNameList);
+                        mFuncDialog.setCheckedFuncName(type, choosedMenuList);
 
                         if (mFuncDialog.getDialog() != null) {
 
@@ -694,11 +697,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         ViewPager mViewPager;
         @Bind(R.id.tabs)
         TabLayout mTabs;
-        private View mAppView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
-        private View mButtonView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
-        private View mShortcutView = View.inflate(MyApplication.getApplication(),R.layout.activity_choose_app,null);
+        private static View mAppView = null;
+        private static View mButtonView = null;
+        private static View mShortcutView = null;
 
-        private  ArrayList<String> mMenuNameList;
+        private  ArrayList<String> mMenuChoosedList;
         private MyPagerAdapter mPagerAdapter;
         private  AppAdapter adapter;
         private  ToolAdapter mToolAdapter;
@@ -708,12 +711,30 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         private int mType=0;
         private Handler mHandler;
 
-        static FunctionDialog newInstance(ArrayList<String> choosedNameList) {
+        static FunctionDialog newInstance(ArrayList<String> choosedMenuList) {
 
             FunctionDialog f = new FunctionDialog();
 
+            Context context = MyApplication.getApplication();
+
+            if(mAppView==null){
+
+                mAppView = View.inflate(context,R.layout.activity_choose_app,null);
+            }
+
+            if(mButtonView==null){
+
+                mButtonView = View.inflate(context,R.layout.activity_choose_app,null);
+            }
+
+            if(mShortcutView == null){
+
+                mShortcutView = View.inflate(context,R.layout.activity_choose_app,null);
+            }
+
+
             Bundle args = new Bundle();
-            args.putStringArrayList("checkedName",choosedNameList);
+            args.putStringArrayList("checkedName",choosedMenuList);
            // args.putString("checkedName", checkedName);
             f.setArguments(args);
 
@@ -725,7 +746,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            mMenuNameList = getArguments().getStringArrayList("checkedName");
+            mMenuChoosedList = getArguments().getStringArrayList("checkedName");
            // mCheckdedFuncName = getArguments().getString("checkedName");
             mHandler = new Handler();
 
@@ -794,30 +815,30 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             mClickListener = listener;
         }
-        private void setCheckedFuncName(int type,ArrayList<String> choosedNameList){
+        private void setCheckedFuncName(int type,ArrayList<String> choosedMenuList){
 
           //  mCheckdedFuncName = funcName;
 
             mType = type;
-            mMenuNameList = choosedNameList;
+            mMenuChoosedList = choosedMenuList;
 
-            int size = choosedNameList.size();
+            int size = choosedMenuList.size();
 
             if (adapter != null) {
 
-                adapter.setAppChecked(mMenuNameList);
+                adapter.setAppChecked(mMenuChoosedList);
                 adapter.notifyDataSetChanged();
             }
 
             if (mToolAdapter != null) {
 
-                mToolAdapter.setToolChecked(mMenuNameList);
+                mToolAdapter.setToolChecked(mMenuChoosedList);
                 mToolAdapter.notifyDataSetChanged();
             }
 
             if (mShortcutAdapter != null) {
 
-                mShortcutAdapter.setShortcutChecked(mMenuNameList);
+                mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
                 mShortcutAdapter.notifyDataSetChanged();
             }
 
@@ -862,7 +883,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             final ProgressBar loading = (ProgressBar) mShortcutView.findViewById(R.id.loading);
 
             mShortcutAdapter= new ShortcutAdapter(getActivity());
-            mShortcutAdapter.setShortcutChecked(mMenuNameList);
+            mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
 
             if(shortcutList==null){
 
@@ -902,22 +923,24 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                                         String name = textView.getText().toString();
 
+                                        String action = shortcutList.get(i).getShortcutIntent();
+
                                         if(checkBox.isChecked()){
 
                                             MenuDataSugar data = new MenuDataSugar(mCurrentApp,
-                                                    name,2,shortcutList.get(i).getShortcutIntent());
+                                                    name,2,action);
 
-                                            currentMenuMap.put(name,data);
+                                            currentMenuMap.put(action,data);
 
-                                            mMenuNameList.add(name);
+                                            mMenuChoosedList.add(action);
                                             //menuList.add(appList.get(i));
                                         }else {
 
-                                            currentMenuMap.remove(name);
-                                            mMenuNameList.remove(name);
+                                            currentMenuMap.remove(action);
+                                            mMenuChoosedList.remove(action);
                                         }
 
-                                        mShortcutAdapter.setShortcutChecked(mMenuNameList);
+                                        mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
 
 
                                         /*Intent intent = new Intent();
@@ -972,21 +995,23 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         String name = textView.getText().toString();
 
+                        String action = shortcutList.get(i).getShortcutIntent();
+
                         if(checkBox.isChecked()){
 
                             MenuDataSugar data = new MenuDataSugar(mCurrentApp,
-                                    name,2,shortcutList.get(i).getShortcutIntent());
+                                    name,2,action);
 
-                            currentMenuMap.put(name,data);
-                            mMenuNameList.add(name);
+                            currentMenuMap.put(action,data);
+                            mMenuChoosedList.add(action);
                             //menuList.add(appList.get(i));
                         }else {
 
-                            currentMenuMap.remove(name);
-                            mMenuNameList.remove(name);
+                            currentMenuMap.remove(action);
+                            mMenuChoosedList.remove(action);
                         }
 
-                        mShortcutAdapter.setShortcutChecked(mMenuNameList);
+                        mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
                        /* Intent intent = new Intent();
 
                         String name = shortcutList.get(i).getShortcutTitle();
@@ -1027,7 +1052,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             final ProgressBar loading = (ProgressBar) mButtonView.findViewById(R.id.loading);
 
             mToolAdapter= new ToolAdapter(getActivity());
-            mToolAdapter.setToolChecked(mMenuNameList);
+            mToolAdapter.setToolChecked(mMenuChoosedList);
 
             if(toolList==null){
 
@@ -1063,15 +1088,15 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                                     name,1,name);
 
                                             currentMenuMap.put(name,data);
-                                            mMenuNameList.add(name);
+                                            mMenuChoosedList.add(name);
                                             //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(name);
-                                            mMenuNameList.remove(name);
+                                            mMenuChoosedList.remove(name);
                                         }
 
-                                        mToolAdapter.setToolChecked(mMenuNameList);
+                                        mToolAdapter.setToolChecked(mMenuChoosedList);
                                     /*    Intent intent = new Intent();
 
                                         String name = toolList.get(i).getToolName();
@@ -1136,14 +1161,14 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                     name,1,name);
 
                             currentMenuMap.put(name,data);
-                            mMenuNameList.add(name);
+                            mMenuChoosedList.add(name);
                             //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(name);
-                            mMenuNameList.remove(name);
+                            mMenuChoosedList.remove(name);
                         }
-                        mToolAdapter.setToolChecked(mMenuNameList);
+                        mToolAdapter.setToolChecked(mMenuChoosedList);
                         /*Intent intent = new Intent();
 
                         String name = toolList.get(i).getToolName();
@@ -1212,7 +1237,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
 
             adapter= new AppAdapter(getActivity());
-            adapter.setAppChecked(mMenuNameList);
+            adapter.setAppChecked(mMenuChoosedList);
 
             if(appList==null){
 
@@ -1241,25 +1266,27 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                                         String name = textView.getText().toString();
 
+                                        String action = appList.get(i).getAppPackage();
+
                                         if(checkBox.isChecked()){
 
                                             MenuDataSugar data = new MenuDataSugar(mCurrentApp,
-                                                    name,0,appList.get(i).getAppPackage());
+                                                    name,0,action);
 
-                                            currentMenuMap.put(name,data);
+                                            currentMenuMap.put(action,data);
 
-                                            mMenuNameList.add(name);
+                                            mMenuChoosedList.add(action);
 
 
                                             //menuList.add(appList.get(i));
                                         }else {
 
-                                            currentMenuMap.remove(name);
+                                            currentMenuMap.remove(action);
 
-                                            mMenuNameList.remove(name);
+                                            mMenuChoosedList.remove(action);
                                         }
 
-                                        adapter.setAppChecked(mMenuNameList);
+                                        adapter.setAppChecked(mMenuChoosedList);
 
 
                                         /*Intent intent = new Intent();
@@ -1314,22 +1341,24 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         String name = textView.getText().toString();
 
+                        String action = appList.get(i).getAppPackage();
+
                         if(checkBox.isChecked()){
 
                             MenuDataSugar data = new MenuDataSugar(mCurrentApp,
-                                    name,0,appList.get(i).getAppPackage());
+                                    name,0,action);
 
-                            currentMenuMap.put(name,data);
-                            mMenuNameList.add(name);
+                            currentMenuMap.put(action,data);
+                            mMenuChoosedList.add(action);
 
                             //menuList.add(appList.get(i));
                         }else {
 
-                            currentMenuMap.remove(name);
-                            mMenuNameList.remove(name);
+                            currentMenuMap.remove(action);
+                            mMenuChoosedList.remove(action);
                         }
 
-                        adapter.setAppChecked(mMenuNameList);
+                        adapter.setAppChecked(mMenuChoosedList);
 
                       /*  Intent intent = new Intent();
 

@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
@@ -27,13 +28,12 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.view.AppSettingFragment;
 import com.hardwork.fg607.relaxfinger.view.GestureFragment;
 import com.hardwork.fg607.relaxfinger.view.SettingFragment;
+import com.testin.agent.TestinAgent;
+import com.testin.agent.TestinAgentConfig;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.List;
-import java.util.jar.Manifest;
-import com.testin.agent.TestinAgent;
-import com.testin.agent.TestinAgentConfig;
 
 public class SettingActivity extends AppCompatActivity{
 
@@ -218,6 +218,8 @@ public class SettingActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
 
+        TestinAgent.onResume(this);
+
         if(mPreferences.getInt("versionCode",0)< AppUtils.getVersionCode(this)){
 
             showUpdateInfo();
@@ -232,11 +234,19 @@ public class SettingActivity extends AppCompatActivity{
         checkAccessibility();
 
 
-
-
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        TestinAgent.onPause(this);
+    }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        TestinAgent.onDispatchTouchEvent(this, event);
+        return super.dispatchTouchEvent(event);
+    }
 
     private void checkAccessibility() {
 
@@ -414,5 +424,9 @@ public class SettingActivity extends AppCompatActivity{
         dialog.show();
 
     }
+
+
+
+
 
 }

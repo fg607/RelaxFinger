@@ -86,7 +86,7 @@ public class AppAdapter extends BaseAdapter {
         icon.setImageDrawable(mAppList.get(i).getAppIcon());
         name.setText(mAppList.get(i).getAppName());
 
-        if(mChoosedNameList.contains(mAppList.get(i).getAppName())){
+        if(mChoosedNameList.contains(mAppList.get(i).getAppPackage())){
 
             checkBox.setChecked(true);
         }else {

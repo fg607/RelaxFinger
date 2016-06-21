@@ -1908,9 +1908,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 break;
             case "返回键":
+                closeMenu();
                 FloatingBallUtils.keyBack(mAccessibilityService.instance);
                 break;
             case "Home键":
+                closeMenu();
                 FloatingBallUtils.keyHome(this);
                 break;
             case "最近任务键":

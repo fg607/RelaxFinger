@@ -526,7 +526,15 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     private void openNotificationAccess() {
 
-        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+        try{
+
+            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+
+        }catch (ActivityNotFoundException e){
+
+            e.printStackTrace();
+        }
+
     }
 
     private boolean isNotifyEnabled() {

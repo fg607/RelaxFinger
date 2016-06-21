@@ -87,7 +87,7 @@ public class ShortcutAdapter extends BaseAdapter {
         icon.setImageDrawable(mShortcutList.get(i).getShortcutIcon());
         name.setText(mShortcutList.get(i).getShortcutTitle());
 
-        if(mChoosedNameList.contains(mShortcutList.get(i).getShortcutTitle())){
+        if(mChoosedNameList.contains(mShortcutList.get(i).getShortcutIntent())){
 
             checkBox.setChecked(true);
         }else {
