@@ -16,12 +16,12 @@
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_dialog_button.xml"
     },
     {
-        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_background.xml",
-        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_background.xml"
-    },
-    {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_report_feedback_circle.xml",
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_report_feedback_circle.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_background.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_background.xml"
     },
     {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_avatar_mask.xml",

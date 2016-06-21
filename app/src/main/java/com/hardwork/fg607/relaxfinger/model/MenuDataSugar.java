@@ -1,5 +1,7 @@
 package com.hardwork.fg607.relaxfinger.model;
 
+import android.content.ActivityNotFoundException;
+
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.orm.SugarRecord;
@@ -43,7 +45,7 @@ public class MenuDataSugar extends SugarRecord{
         return action;
     }
 
-    public void click() throws URISyntaxException {
+    public void click() throws URISyntaxException,ActivityNotFoundException{
 
         switch (type){
 

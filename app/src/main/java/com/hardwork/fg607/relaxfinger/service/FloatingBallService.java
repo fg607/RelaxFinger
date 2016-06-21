@@ -1401,7 +1401,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                 mHandler.postDelayed(mClickPressedThread, mDoubleClickTime);
                             }
 
-                            onClearOffset();//清楚滑动偏移量
+                           // onClearOffset();//清楚滑动偏移量
+
                         } else if (mCanmove) {
 
                             mClickCount = 0;
@@ -2519,6 +2520,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 dataSugar.click();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
+            }catch (ActivityNotFoundException e){
+                e.printStackTrace();
+                Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
+                MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + dataSugar.getName()+"'");
+
+                updateMenuIcons(whichApp);
             }
 
             /*int type = dataSugar.getType();
@@ -2755,16 +2762,25 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 switch (dataSugar.getType()) {
 
                     case 0:
-                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getAppIcon(dataSugar.getAction())));
+                        drawable = AppUtils.getAppIcon(dataSugar.getAction());
                         break;
                     case 1:
-                        list.add(ImageUtils.drawable2Bitmap(FloatingBallUtils.getSwitcherIcon(dataSugar.getName())));
+                        drawable = FloatingBallUtils.getSwitcherIcon(dataSugar.getName());
                         break;
                     case 2:
-                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getShortcutIcon(dataSugar.getName())));
+                        drawable = AppUtils.getShortcutIcon(dataSugar.getName());
                         break;
                     default:
                         break;
+                }
+
+                if(drawable!=null){
+
+                    list.add(ImageUtils.drawable2Bitmap(drawable));
+
+                }else {
+
+                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + dataSugar.getName()+"'");
                 }
 
                 if (list.size() >= 9) {

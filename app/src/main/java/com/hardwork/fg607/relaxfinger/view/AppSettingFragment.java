@@ -397,19 +397,25 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                 int type = dataSugar.getType();
 
+                Drawable drawable = null;
                 switch (type){
 
                     case 0:
-                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getAppIcon(dataSugar.getAction())));
+                        drawable = AppUtils.getAppIcon(dataSugar.getAction());
                         break;
                     case 1:
-                        list.add(ImageUtils.drawable2Bitmap(FloatingBallUtils.getSwitcherIcon(dataSugar.getName())));
+                        drawable = FloatingBallUtils.getSwitcherIcon(dataSugar.getName());
                         break;
                     case 2:
-                        list.add(ImageUtils.drawable2Bitmap(AppUtils.getShortcutIcon(dataSugar.getName())));
+                        drawable = AppUtils.getShortcutIcon(dataSugar.getName());
                         break;
                     default:
                         break;
+                }
+
+                if(drawable!=null){
+
+                    list.add(ImageUtils.drawable2Bitmap(drawable));
                 }
 
                 if(list.size()>=9){

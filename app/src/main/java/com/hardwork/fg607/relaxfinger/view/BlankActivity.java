@@ -19,9 +19,12 @@ public class BlankActivity extends Activity {
     private boolean mIsNew = true;
     private TrayAppPreferences mPreferences;
 
+    public static BlankActivity instance = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         setContentView(R.layout.activity_blank);
 
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();

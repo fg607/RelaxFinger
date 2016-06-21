@@ -1,5 +1,6 @@
 package com.hardwork.fg607.relaxfinger.adapter;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.model.ItemClickListener;
@@ -93,7 +95,7 @@ public class MenuFolderAdapter extends BaseAdapter {
                 icon.setImageDrawable(FloatingBallUtils.getSwitcherIcon(menuDataSugar.getName()));
                 break;
             case 2:
-                icon.setImageDrawable(AppUtils.getShortcutIcon(menuDataSugar.getAction()));
+                icon.setImageDrawable(AppUtils.getShortcutIcon(menuDataSugar.getName()));
                 break;
             default:
                 break;
@@ -107,8 +109,15 @@ public class MenuFolderAdapter extends BaseAdapter {
 
                 try {
                     mMenuDataList.get(position).click();
+
                 } catch (URISyntaxException e) {
+
                     e.printStackTrace();
+
+                }catch (ActivityNotFoundException e){
+                    e.printStackTrace();
+                    Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
+                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + mMenuDataList.get(position).getName()+"'");
                 }
 
                 if(mItemClickListener!=null){

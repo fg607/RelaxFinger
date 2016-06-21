@@ -17,12 +17,17 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
+import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
 import com.hardwork.fg607.relaxfinger.model.ShortcutInfo;
+import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
@@ -154,16 +159,23 @@ public class AppUtils {
 
     }
 
-    public static boolean startApplication(String packageName){
+    public static boolean startApplication(String packageName) throws ActivityNotFoundException{
 
         PackageManager pm = context.getPackageManager();
         Intent intent = pm.getLaunchIntentForPackage(packageName);
-        if(intent!=null){
+
+        if (intent != null) {
+
             context.startActivity(intent);
+
             return true;
+
+        }else {
+
+            throw new  ActivityNotFoundException();
         }
 
-        return false;
+
 
     }
 
@@ -173,7 +185,14 @@ public class AppUtils {
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        context.startActivity(intent);
+        if(intent!= null){
+
+            context.startActivity(intent);
+        }else {
+
+            throw new  ActivityNotFoundException();
+        }
+
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
