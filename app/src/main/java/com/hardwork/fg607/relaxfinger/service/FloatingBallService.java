@@ -898,7 +898,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void setFloatState(boolean ballstate) {
 
         if(ballstate){
-            showFloatBall();
+
+            if(!mIsBallHiding){
+
+                showFloatBall();
+            }else {
+
+                hideToNotifyBar();
+            }
+
         }else {
             if(mIsBallHiding){
 

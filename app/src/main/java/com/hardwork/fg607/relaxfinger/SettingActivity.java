@@ -382,7 +382,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.3.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.3.2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -409,7 +409,7 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.3.2版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.2.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("1.添加快捷文件夹(妈妈再也不用担心快捷菜单不够用啦！)。\r\n" +
@@ -420,7 +420,9 @@ public class SettingActivity extends AppCompatActivity{
                 "6.修复点击悬浮球出现隐藏区域的问题。\r\n" +
                 "7.优化悬浮球移动流畅度。\r\n" +
                 "8.优化悬浮球滑动流畅度。\r\n" +
-                "9.优化操作响应速度。");
+                "9.优化操作响应速度。。\r\n" +
+                "10.修复1.3.2选择快捷菜单FC问题。\r\n" +
+                "11.修复隐藏到状态栏后再次打开设置界面自动出现的问题。");
         dialog.show();
 
     }

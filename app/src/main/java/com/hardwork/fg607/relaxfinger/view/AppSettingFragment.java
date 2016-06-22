@@ -616,7 +616,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             mFuncDialog.getDialog().show();
 
         } else {
-            
+
             mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
         }
 
@@ -816,35 +816,28 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             mType = type;
             mMenuChoosedList = choosedMenuList;
 
+            if (adapter != null) {
+
+                adapter.setAppChecked(mMenuChoosedList);
+            }
+
+            if (mToolAdapter != null) {
+
+                mToolAdapter.setToolChecked(mMenuChoosedList);
+            }
+
+            if (mShortcutAdapter != null) {
+
+                mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
+            }
 
             if (mType == -1) {
-
-                if (adapter != null) {
-
-                    adapter.setAppChecked(mMenuChoosedList);
-                }
-
-                if (mToolAdapter != null) {
-
-                    mToolAdapter.setToolChecked(mMenuChoosedList);
-                }
-
-                if (mShortcutAdapter != null) {
-
-                    mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-                }
 
                 if (mViewPager != null) {
                     mViewPager.setCurrentItem(0);
                 }
 
             } else if (mType == 0) {
-
-                if (adapter != null) {
-
-                    adapter.setAppChecked(mMenuChoosedList);
-                }
-
 
                 if (mViewPager != null) {
                     mViewPager.setCurrentItem(0);
@@ -853,22 +846,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             } else if (mType == 1) {
 
-
-                if (mToolAdapter != null) {
-
-                    mToolAdapter.setToolChecked(mMenuChoosedList);
-                }
-
                 if (mViewPager != null) {
                     mViewPager.setCurrentItem(1);
                 }
 
             } else if (mType == 2) {
-
-                if (mShortcutAdapter != null) {
-
-                    mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-                }
 
                 if (mViewPager != null) {
                     mViewPager.setCurrentItem(2);
@@ -878,22 +860,16 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             MyApplication.getMainThreadHandler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if(mType==-1){
 
+                    if(adapter!= null){
                         adapter.notifyDataSetChanged();
+                    }
 
+                    if(mToolAdapter!=null){
                         mToolAdapter.notifyDataSetChanged();
+                    }
 
-                        mShortcutAdapter.notifyDataSetChanged();
-
-                    }else if(mType == 0){
-
-                        adapter.notifyDataSetChanged();
-
-                    }else if (mType == 1){
-
-                        mToolAdapter.notifyDataSetChanged();
-                    }else if(mType == 2){
+                    if(mShortcutAdapter!=null){
 
                         mShortcutAdapter.notifyDataSetChanged();
                     }
