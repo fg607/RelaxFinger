@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger.adapter;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -85,21 +86,30 @@ public class MenuFolderAdapter extends BaseAdapter {
         MenuDataSugar menuDataSugar = mMenuDataList.get(position);
         int type = menuDataSugar.getType();
 
+        Drawable drawable = null;
+
         switch (type){
 
             case 0:
-                icon.setImageDrawable(AppUtils.getAppIcon(menuDataSugar.getAction()));
+                drawable = AppUtils.getAppIcon(menuDataSugar.getAction());
                 break;
             case 1:
                 icon.setBackgroundResource(R.drawable.path_blue_oval);
-                icon.setImageDrawable(FloatingBallUtils.getSwitcherIcon(menuDataSugar.getName()));
+                drawable = FloatingBallUtils.getSwitcherIcon(menuDataSugar.getName());
                 break;
             case 2:
-                icon.setImageDrawable(AppUtils.getShortcutIcon(menuDataSugar.getName()));
+                drawable = AppUtils.getShortcutIcon(menuDataSugar.getName());
                 break;
             default:
                 break;
         }
+
+        if(drawable == null){
+
+            MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + mMenuDataList.get(position).getAction()+"'");
+        }
+
+        icon.setImageDrawable(drawable);
 
         name.setText(mMenuDataList.get(position).getName());
 
@@ -117,7 +127,7 @@ public class MenuFolderAdapter extends BaseAdapter {
                 }catch (ActivityNotFoundException e){
                     e.printStackTrace();
                     Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
-                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + mMenuDataList.get(position).getName()+"'");
+                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + mMenuDataList.get(position).getAction()+"'");
                 }
 
                 if(mItemClickListener!=null){

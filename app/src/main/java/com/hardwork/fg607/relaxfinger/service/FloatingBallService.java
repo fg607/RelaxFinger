@@ -2514,6 +2514,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         int size = menuDatalist.size();
 
+        if(size == 0){
+
+            Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
+            updateMenuIcons(whichApp);
+
+            return;
+        }
+
         if(size==1){
 
             MenuDataSugar dataSugar = menuDatalist.get(0);
@@ -2522,10 +2530,14 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 dataSugar.click();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
+                Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
+                MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + dataSugar.getAction()+"'");
+
+                updateMenuIcons(whichApp);
             }catch (ActivityNotFoundException e){
                 e.printStackTrace();
                 Toast.makeText(mContext,"找不到该应用程序！",Toast.LENGTH_SHORT).show();
-                MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + dataSugar.getName()+"'");
+                MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + dataSugar.getAction()+"'");
 
                 updateMenuIcons(whichApp);
             }
@@ -2782,7 +2794,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                 }else {
 
-                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where NAME='" + dataSugar.getName()+"'");
+                    MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + dataSugar.getAction()+"'");
                 }
 
                 if (list.size() >= 9) {
