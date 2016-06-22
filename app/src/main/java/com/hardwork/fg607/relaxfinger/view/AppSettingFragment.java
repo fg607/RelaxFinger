@@ -573,10 +573,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 break;
         }
 
-        //int type = mPreferences.getInt("type"+mCurrentApp,0);
-
-        int type = 0;
-        //popupFunctionDialog(type,mAppName);
+        int type = -1;
 
         mChoosedList.clear();
 
@@ -591,7 +588,9 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             type = menuDataSugar.getType();
         }
 
+
         popupFunctionDialog(type,mChoosedList);
+
 
     }
 
@@ -604,35 +603,22 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
     public void popupFunctionDialog(final int type, final ArrayList<String> choosedMenuList) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                if (mFuncDialog == null) {
+        if (mFuncDialog == null) {
 
-                    initDialog(choosedMenuList);
-                }
+            initDialog(choosedMenuList);
+        }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+        mFuncDialog.setCheckedFuncName(type,choosedMenuList);
 
-                        mFuncDialog.setCheckedFuncName(type, choosedMenuList);
+        if (mFuncDialog.getDialog() != null) {
 
-                        if (mFuncDialog.getDialog() != null) {
+            mFuncDialog.getDialog().show();
 
-                            mFuncDialog.getDialog().show();
-
-
-                        } else {
-                            mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
-                        }
-
-                    }
-                });
-
-            }
-        }).start();
+        } else {
+            
+            mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
+        }
 
     }
 
@@ -697,9 +683,10 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         ViewPager mViewPager;
         @Bind(R.id.tabs)
         TabLayout mTabs;
-        private static View mAppView = null;
-        private static View mButtonView = null;
-        private static View mShortcutView = null;
+
+        static   View mAppView = null;
+        static   View mButtonView = null;
+        static   View mShortcutView = null;
 
         private  ArrayList<String> mMenuChoosedList;
         private MyPagerAdapter mPagerAdapter;
@@ -710,35 +697,28 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         private OnDialogClickListener mClickListener;
         private int mType=0;
         private Handler mHandler;
+        private View mDialogView;
+
+        private static FunctionDialog mInstance=null;
 
         static FunctionDialog newInstance(ArrayList<String> choosedMenuList) {
 
-            FunctionDialog f = new FunctionDialog();
+            if(mInstance==null){
 
-            Context context = MyApplication.getApplication();
+                FunctionDialog f = new FunctionDialog();
 
-            if(mAppView==null){
+                Bundle args = new Bundle();
+                args.putStringArrayList("checkedName", choosedMenuList);
+                f.setArguments(args);
 
-                mAppView = View.inflate(context,R.layout.activity_choose_app,null);
-            }
+                return f;
 
-            if(mButtonView==null){
+            }else {
 
-                mButtonView = View.inflate(context,R.layout.activity_choose_app,null);
-            }
-
-            if(mShortcutView == null){
-
-                mShortcutView = View.inflate(context,R.layout.activity_choose_app,null);
+                return mInstance;
             }
 
 
-            Bundle args = new Bundle();
-            args.putStringArrayList("checkedName",choosedMenuList);
-           // args.putString("checkedName", checkedName);
-            f.setArguments(args);
-
-            return f;
         }
 
 
@@ -750,10 +730,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
            // mCheckdedFuncName = getArguments().getString("checkedName");
             mHandler = new Handler();
 
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View view = inflater.inflate(R.layout.function_dialog_layout, null);
 
@@ -766,6 +742,24 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             setupViewPager();
 
+            mDialogView= view;
+
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.function_dialog_layout, null);
+
+            ButterKnife.bind(this, view);
+
+            initAppView();
+
+            initButtonView();
+            initShotcutView();
+
+            setupViewPager();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BottomDialog);
 
@@ -815,69 +809,108 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             mClickListener = listener;
         }
-        private void setCheckedFuncName(int type,ArrayList<String> choosedMenuList){
 
-          //  mCheckdedFuncName = funcName;
+        private void setCheckedFuncName(int type, ArrayList<String> choosedMenuList) {
+
 
             mType = type;
             mMenuChoosedList = choosedMenuList;
 
-            int size = choosedMenuList.size();
 
-            if (adapter != null) {
+            if (mType == -1) {
 
-                adapter.setAppChecked(mMenuChoosedList);
-                adapter.notifyDataSetChanged();
-            }
+                if (adapter != null) {
 
-            if (mToolAdapter != null) {
+                    adapter.setAppChecked(mMenuChoosedList);
+                }
 
-                mToolAdapter.setToolChecked(mMenuChoosedList);
-                mToolAdapter.notifyDataSetChanged();
-            }
+                if (mToolAdapter != null) {
 
-            if (mShortcutAdapter != null) {
+                    mToolAdapter.setToolChecked(mMenuChoosedList);
+                }
 
-                mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-                mShortcutAdapter.notifyDataSetChanged();
-            }
+                if (mShortcutAdapter != null) {
 
-            if (mViewPager != null) {
-                mViewPager.setCurrentItem(0);
-            }
+                    mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
+                }
 
+                if (mViewPager != null) {
+                    mViewPager.setCurrentItem(0);
+                }
 
-            if (size == 1) {
+            } else if (mType == 0) {
 
-                if (mType == 0) {
+                if (adapter != null) {
 
-
-                    if (mViewPager != null) {
-                        mViewPager.setCurrentItem(0);
-                    }
+                    adapter.setAppChecked(mMenuChoosedList);
+                }
 
 
-                } else if (mType == 1) {
+                if (mViewPager != null) {
+                    mViewPager.setCurrentItem(0);
+                }
 
 
-                    if (mViewPager != null) {
-                        mViewPager.setCurrentItem(1);
-                    }
+            } else if (mType == 1) {
 
-                } else if (mType == 2) {
 
-                    if (mViewPager != null) {
-                        mViewPager.setCurrentItem(2);
-                    }
+                if (mToolAdapter != null) {
+
+                    mToolAdapter.setToolChecked(mMenuChoosedList);
+                }
+
+                if (mViewPager != null) {
+                    mViewPager.setCurrentItem(1);
+                }
+
+            } else if (mType == 2) {
+
+                if (mShortcutAdapter != null) {
+
+                    mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
+                }
+
+                if (mViewPager != null) {
+                    mViewPager.setCurrentItem(2);
                 }
             }
 
+            MyApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(mType==-1){
 
+                        adapter.notifyDataSetChanged();
+
+                        mToolAdapter.notifyDataSetChanged();
+
+                        mShortcutAdapter.notifyDataSetChanged();
+
+                    }else if(mType == 0){
+
+                        adapter.notifyDataSetChanged();
+
+                    }else if (mType == 1){
+
+                        mToolAdapter.notifyDataSetChanged();
+                    }else if(mType == 2){
+
+                        mShortcutAdapter.notifyDataSetChanged();
+                    }
+
+                }
+            },40);
 
         }
 
+
+
         private void initShotcutView() {
 
+            if(mShortcutView==null){
+
+                mShortcutView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            }
             final ListView listView = (ListView) mShortcutView.findViewById(R.id.lv_app);
 
             final ProgressBar loading = (ProgressBar) mShortcutView.findViewById(R.id.loading);
@@ -1046,7 +1079,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         private void initButtonView() {
 
-            //mButtonView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            if(mButtonView==null){
+
+                mButtonView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            }
+
             final ListView listView = (ListView) mButtonView.findViewById(R.id.lv_app);
 
             final ProgressBar loading = (ProgressBar) mButtonView.findViewById(R.id.loading);
@@ -1228,7 +1265,10 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         private void initAppView() {
 
-            //mAppView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            if(mAppView==null){
+
+                mAppView = View.inflate(getActivity(),R.layout.activity_choose_app,null);
+            }
 
             final ListView listView = (ListView) mAppView.findViewById(R.id.lv_app);
 
@@ -1454,6 +1494,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                 }
             });
+
         }
 
 

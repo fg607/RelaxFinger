@@ -8,11 +8,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <ListView
+    <android.support.v7.widget.ListViewCompat
         android:id="@+id/lv_app"
         android:visibility="gone"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"></android.support.v7.widget.ListViewCompat>
+
+   <!-- <ListView
+        android:id="@+id/lv_app"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>-->
 
 
 </RelativeLayout>

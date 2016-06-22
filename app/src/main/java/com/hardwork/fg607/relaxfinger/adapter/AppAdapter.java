@@ -1,6 +1,7 @@
 package com.hardwork.fg607.relaxfinger.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -45,6 +46,7 @@ public class AppAdapter extends BaseAdapter {
         this.mChoosedNameList = choosedNameList;
         //notifyDataSetChanged();
     }
+
 
     @Override
     public int getCount() {
@@ -104,4 +106,6 @@ public class AppAdapter extends BaseAdapter {
 
         return view1;
     }
+
+
 }
