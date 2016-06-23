@@ -421,7 +421,7 @@ public class SettingActivity extends AppCompatActivity{
                 "7.优化悬浮球移动流畅度。\r\n" +
                 "8.优化悬浮球滑动流畅度。\r\n" +
                 "9.优化操作响应速度。。\r\n" +
-                "10.修复1.3.2选择快捷菜单FC问题。\r\n" +
+                "10.修复1.3.2部分机型选择快捷菜单FC问题。\r\n" +
                 "11.修复隐藏到状态栏后再次打开设置界面自动出现的问题。");
         dialog.show();
 

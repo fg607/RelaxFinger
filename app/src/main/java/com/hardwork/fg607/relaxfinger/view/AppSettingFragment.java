@@ -912,12 +912,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                         }
 
 
-                        mShortcutAdapter.addList(shortcutList);
-
-
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
+
+                                mShortcutAdapter.addList(shortcutList);
 
                                 listView.setAdapter(mShortcutAdapter);
 
@@ -1075,12 +1074,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         toolList = FloatingBallUtils.getToolInfos();
 
-                        mToolAdapter.addList(toolList);
-
 
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
+
+                                mToolAdapter.addList(toolList);
 
                                 listView.setAdapter(mToolAdapter);
 
@@ -1263,11 +1262,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         appList = AppUtils.getLauncherAppInfos();
 
-                        adapter.addList(appList);
-
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
+
+                                adapter.addList(appList);
 
                                 listView.setAdapter(adapter);
 

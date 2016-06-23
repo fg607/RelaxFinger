@@ -3,15 +3,19 @@ package com.hardwork.fg607.relaxfinger.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import net.grandcentrix.tray.TrayAppPreferences;
+
+import java.net.URISyntaxException;
 
 public class BlankActivity extends Activity {
 
@@ -62,7 +66,23 @@ public class BlankActivity extends Activity {
         if(intent.getBooleanExtra("finish",false)){
 
             finish();
+
         }
+
+     /*   else if(intent.getStringExtra("packageName")!=null){
+
+            AppUtils.startApplication(this,intent.getStringExtra("packageName"));
+
+        }else if(intent.getStringExtra("intentUri")!=null){
+
+
+            try {
+                AppUtils.startActivity(this,intent.getStringExtra("intentUri"));
+            } catch (URISyntaxException e) {
+
+
+            }
+        }*/
     }
 
     @Override

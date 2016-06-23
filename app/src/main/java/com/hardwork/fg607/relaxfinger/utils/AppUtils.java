@@ -175,7 +175,23 @@ public class AppUtils {
             throw new  ActivityNotFoundException();
         }
 
+    }
 
+    public static boolean startApplication(Context activity,String packageName) throws ActivityNotFoundException{
+
+        PackageManager pm = activity.getPackageManager();
+        Intent intent = pm.getLaunchIntentForPackage(packageName);
+
+        if (intent != null) {
+
+            activity.startActivity(intent);
+
+            return true;
+
+        }else {
+
+            throw new  ActivityNotFoundException();
+        }
 
     }
 
@@ -188,6 +204,20 @@ public class AppUtils {
         if(intent!= null){
 
             context.startActivity(intent);
+        }else {
+
+            throw new  ActivityNotFoundException();
+        }
+
+    }
+
+    public static void startActivity(Context activity,String intentUri) throws URISyntaxException,ActivityNotFoundException {
+
+        Intent intent = Intent.parseUri(intentUri,Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+        if(intent!= null){
+
+            activity.startActivity(intent);
         }else {
 
             throw new  ActivityNotFoundException();

@@ -206,17 +206,23 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private FrameLayout mRootView;
     private Spring mScaleSpring;
 
+    private AnimationSet mShowAnimationSet;
+    private AnimationSet mShowAnimationSet1;
+    private AnimationSet mHideAnimationSet;
+    private AnimationSet mHideAnimationSet1;
+
+    private boolean mGestureActive = false;
+    private boolean mHideAnimationStart = false;
+
     private class ExampleSpringListener extends SimpleSpringListener {
 
         @Override
         public void onSpringUpdate(Spring spring) {
 
-            float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1,1,0.8);
+            float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0.8);
 
-            //if(!mCanmove){
-                mFloatImage.setScaleX(mappedValue);
-                mFloatImage.setScaleY(mappedValue);
-           // }
+            mFloatImage.setScaleX(mappedValue);
+            mFloatImage.setScaleY(mappedValue);
         }
 
     }
@@ -277,7 +283,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
         mScaleSpring = mSpringSystem.createSpring()
-        .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,5));
+        .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,4));
         /*
         mDetectThread = new DetectAppThread();
 
@@ -999,6 +1005,121 @@ public class FloatingBallService extends Service implements View.OnClickListener
         });
 
 
+        mShowAnimationSet = new AnimationSet(true);
+        mShowAnimationSet1 = new AnimationSet(true);
+
+        ScaleAnimation showScaleAimation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+                1.0f,Animation.RELATIVE_TO_SELF,0.5f);
+
+        ScaleAnimation showScaleAimation1 = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+                0f,Animation.RELATIVE_TO_SELF,0.5f);
+
+        AlphaAnimation showAlphaAnimation = new AlphaAnimation(0.1f,1.0f);
+
+
+        mShowAnimationSet.addAnimation(showAlphaAnimation);
+        mShowAnimationSet.addAnimation(showScaleAimation);
+        mShowAnimationSet.setDuration(200);
+
+
+        mShowAnimationSet1.addAnimation(showAlphaAnimation);
+        mShowAnimationSet1.addAnimation(showScaleAimation1);
+        mShowAnimationSet1.setDuration(200);
+
+        mHideAnimationSet = new AnimationSet(true);
+        mHideAnimationSet1 = new AnimationSet(true);
+
+        ScaleAnimation hideScaleAnimation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+                1.0f,Animation.RELATIVE_TO_SELF,0.5f);
+
+        ScaleAnimation hideScaleAnimation1 = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+                0.0f,Animation.RELATIVE_TO_SELF,0.5f);
+
+        AlphaAnimation hideAlphaAnimation = new AlphaAnimation(1.0f,0.1f);
+
+
+        mHideAnimationSet.addAnimation(hideAlphaAnimation);
+        mHideAnimationSet.addAnimation(hideScaleAnimation);
+        mHideAnimationSet.setFillAfter(true);
+        mHideAnimationSet.setDuration(200);
+
+        mHideAnimationSet1.addAnimation(hideAlphaAnimation);
+        mHideAnimationSet1.addAnimation(hideScaleAnimation1);
+        mHideAnimationSet1.setFillAfter(true);
+        mHideAnimationSet1.setDuration(200);
+
+        mHideAnimationSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+                mHideAnimationStart = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (mIsMenuAdd) {
+
+                            mWindowManager.removeViewImmediate(mMenuView);
+                            mIsMenuAdd = false;
+
+                            mHideAnimationStart = false;
+
+                            clearCache();
+                        }
+                    }
+                },50);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mHideAnimationSet1.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+                mHideAnimationStart = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (mIsMenuAdd) {
+
+                            mWindowManager.removeViewImmediate(mMenuView);
+                            mIsMenuAdd = false;
+
+                            mHideAnimationStart = false;
+
+                            clearCache();
+                        }
+                    }
+                },50);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+
+
+
 
 
         mMenuWmParams = new WindowManager.LayoutParams();
@@ -1067,14 +1188,39 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mMenuLayout.setVisibility(View.VISIBLE);
 
-        mShowAnimatorList.clear();
+       /* ScaleAnimation animation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+                1.0f,Animation.RELATIVE_TO_SELF,0.5f);
+        animation.setDuration(200);
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f,1.0f);
+
+        alphaAnimation.setDuration(200);
+
+        AnimationSet set = new AnimationSet(true);
+
+        set.addAnimation(alphaAnimation);
+        set.addAnimation(animation);
+*/
+
+        if(mIsFloatRight){
+
+
+            mMenuLayout.startAnimation(mShowAnimationSet);
+
+        }else {
+
+            mMenuLayout.startAnimation(mShowAnimationSet1);
+
+        }
+
+       /* mShowAnimatorList.clear();
 
         for (int i = 0, len = mArcLayout.getChildCount(); i < len; i++) {
             mShowAnimatorList.add(createShowItemAnimator(mArcLayout.getChildAt(i)));
         }
 
         mShowAnimator.playTogether(mShowAnimatorList);
-        mShowAnimator.start();
+        mShowAnimator.start();*/
         mFab.setClickable(true);
     }
 
@@ -1085,13 +1231,40 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void hideMenu() {
 
         mFab.setClickable(false);
-        mHideAnimatorList.clear();
+/*
+        ScaleAnimation animation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+                1.0f,Animation.RELATIVE_TO_SELF,0.5f);
+        animation.setDuration(200);
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f,0.1f);
+
+        alphaAnimation.setDuration(200);
+
+
+        mHideAnimationSet.addAnimation(alphaAnimation);
+        mHideAnimationSet.addAnimation(animation);*/
+
+
+        if(mIsFloatRight){
+
+
+            mMenuLayout.startAnimation(mHideAnimationSet);
+
+        }else {
+
+            mMenuLayout.startAnimation(mHideAnimationSet1);
+
+        }
+
+
+
+     /*   mHideAnimatorList.clear();
 
         for (int i = mArcLayout.getChildCount() - 1; i >= 0; i--) {
             mHideAnimatorList.add(createHideItemAnimator(mArcLayout.getChildAt(i)));
         }
         mHideAnimator.playTogether(mHideAnimatorList);
-        mHideAnimator.start();
+        mHideAnimator.start();*/
 
 
     }
@@ -1275,18 +1448,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             public boolean onTouch(View v, MotionEvent event) {
 
-             /*   if (mTag == 0) {
-                    mOldOffsetX = mBallWmParams.x;
-                    mOldOffsetY = mBallWmParams.y;
-                }*/
-
                 boolean isShowHideBar = mPreferences.getBoolean("hideAreaSwitch",true);
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         mScaleSpring.setEndValue(1);
-                      /*  mFloatImage.setPressed(true);
-                        mFloatImage.startAnimation(mZoomOutAnima);*/
                         mFloatImage.getBackground().setAlpha(255);
                         mTouchX = event.getRawX();
                         mTouchY = event.getRawY();
@@ -1305,7 +1471,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             mLongPressing = true;
 
                         mIsmoving = false;
-                            showTrack();
+
+                        //showTrack();
 
                         mOldOffsetX = mBallWmParams.x;
                         mOldOffsetY = mBallWmParams.y;
@@ -1318,7 +1485,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mCurrentX =  event.getRawX();
                         mCurrentY =  event.getRawY();
                         mIsmoving = true;
-                        //mTag = 1;
 
                         mNewOffsetX = (int)(mCurrentX-mTouchX);
                         mNewOffsetY = (int)(mCurrentY-mTouchY);
@@ -1362,38 +1528,79 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         } else {
 
 
-                            mTrackWmParams.x = mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2) + mNewOffsetX / 2;
+                            if(!mGestureActive){
+
+                                //Y轴滑动偏移量大于40像素并且Y轴滑动偏移量比X轴偏移量多出20像素时判定为向上滑动
+                                if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) < -40) {
+
+                                    mClickCount = 0;
+                                    onFloatBallFlipUp();
+
+                                    mScaleSpring.setEndValue(0);
+                                    mGestureActive = true;
+                                    return true;
+
+                                }
+                                //向下滑动
+                                else if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) > 40) {
+
+                                    mClickCount = 0;
+                                    onFloatBallFlipDown();
+
+                                    mScaleSpring.setEndValue(0);
+                                    mGestureActive = true;
+                                    return true;
+
+                                }
+                                //向左滑动
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 20 && (mNewOffsetX) < -40) {
+
+                                    mClickCount = 0;
+                                    onFloatBallFlipLeft();
+
+                                    mScaleSpring.setEndValue(0);
+                                    mGestureActive = true;
+                                    return true;
+
+                                }
+                                //向右滑动
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 10 && (mNewOffsetX) > 10) {
+
+                                    mClickCount = 0;
+                                    onFloatBallFlipRight();
+
+                                    mScaleSpring.setEndValue(0);
+                                    mGestureActive = true;
+                                    return true;
+
+                                }
+
+                            }
+
+
+                          /*  mTrackWmParams.x = mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2) + mNewOffsetX / 2;
                             mTrackWmParams.y = mOldOffsetY + (mBallWmParams.height / 2 - floatBallSize * 3 / 5 / 2) + mNewOffsetY / 2;
 
-                            updateTrackPositon();
+                            updateTrackPositon();*/
 
-                            /*if (Math.abs(mTrackWmParams.x - (mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2))) < 200
-                                    && Math.abs(mTrackWmParams.y - (mOldOffsetY + (mBallWmParams.height / 2 - floatBallSize * 3 / 5 / 2))) < 200) {
-
-                                updateTrackPositon();
-                            }*/
 
                         }
-                       // mTouchX = mCurrentX;
-                        //mTouchY = mCurrentY;
                         break;
                     case MotionEvent.ACTION_UP:
+
+                        mScaleSpring.setEndValue(0);
+                        mGestureActive = false;
 
                         if(mIsHideBarAdded){
 
                             closeHideBar();
                         }
                         mHandler.removeCallbacks(mLongPressedThread);
-                        mScaleSpring.setEndValue(0);
-                        mFloatImage.setPressed(false);
-                        mFloatImage.startAnimation(mZoomInAnima);
                         mFloatImage.getBackground().setAlpha(mFloatBallAlpha);
 
-                       // mTag = 0;
 
-                        hideTrack();
-                       // mNewOffsetX = mBallWmParams.x;
-                      //  mNewOffsetY = mBallWmParams.y;
+                        //hideTrack();
+
 
                         // 滑动偏移量小于40像素，判定为点击悬浮球
                         if (Math.abs(mNewOffsetX) <= 40 && Math.abs(mNewOffsetY) <= 40) {
@@ -1403,13 +1610,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 //取消注册的长按事件
 
-                                //mHandler.removeCallbacks(mLongPressedThread);
-
                                 mClickPressedThread = new ClickPressedThread();
                                 mHandler.postDelayed(mClickPressedThread, mDoubleClickTime);
                             }
-
-                           // onClearOffset();//清楚滑动偏移量
 
                         } else if (mCanmove) {
 
@@ -1460,26 +1663,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                             }
 
-                          /*  if(mIsSavePos){
-
-                                if(mBallWmParams.x + mBallWmParams.width/2 >= FloatingBallUtils.getScreenWidth()/2){
-
-                                    mIsFloatRight = true;
-                                }else {
-
-                                    mIsFloatRight = false;
-                                }
-
-                                if(mIsFloatRight!=mPreferences.getBoolean("floatRight",true)){
-
-                                    reverseMenu();
-                                }
-
-
-                                saveStates("floatRight",mIsFloatRight);
-                            }
-*/
-
                             if(mIsSavePos){
 
                                 int statBarHeight = FloatingBallUtils.getStatusBarHeight(FloatingBallService.this);
@@ -1499,9 +1682,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             }
 
 
-                            //setUpFloatMenuView();
-
-
 
                             mPreferences.getBoolean("moveSwitch",false);
                             if(!mPreferences.getBoolean("moveSwitch",false) && mIsSavePos){
@@ -1509,12 +1689,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                 mCanmove = false;
                             }
 
-                            //saveStates("moveSwitch", mCanmove);
 
 
                         } else {
-
-                          //  hideTrack();
 
                             mTrackWmParams.x = mOldOffsetX + (mBallWmParams.width / 2 - floatBallSize * 3 / 5 / 2);
                             mTrackWmParams.y = mOldOffsetY + (mBallWmParams.height / 2 - floatBallSize * 3 / 5 / 2);
@@ -1523,7 +1700,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             if (!mLongPressing) {
 
                                 //Y轴滑动偏移量大于40像素并且Y轴滑动偏移量比X轴偏移量多出20像素时判定为向上滑动
-                                if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) < -40) {
+                                /*if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) < -40) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipUp();
@@ -1549,7 +1726,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                     mClickCount = 0;
                                     onFloatBallFlipRight();
 
-                                }
+                                }*/
 
 
                             }
@@ -2887,15 +3064,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private void closeMenu() {
 
 
-        if(mIsMenuAdd){
-
-            //mIsMenuAdd=false;
-
-            hideMenu();
-
-            mHandler.postDelayed(mHidePopMenuThread,500);
-        }
-
         if(mIsFolderAdded){
 
             ScaleAnimation animation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
@@ -2933,14 +3101,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
                         mIsFolderAdded = false;
                     }
 
-                    mHandler.postDelayed(new Runnable() {
+                    mMenuView.setVisibility(View.VISIBLE);
+
+                  /*  mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
 
                             mMenuView.setVisibility(View.VISIBLE);
                         }
                     },200);
-
+*/
 
 
                 }
@@ -2954,6 +3124,33 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mCardView.startAnimation(animationSet);
 
 
+        }
+
+
+        if(mIsMenuAdd){
+
+            //mIsMenuAdd=false;
+
+            if(mIsFolderAdded){
+
+                if (mIsMenuAdd) {
+
+                    mWindowManager.removeViewImmediate(mMenuView);
+                    mIsMenuAdd = false;
+                    clearCache();
+                }
+
+
+            }else {
+                if(!mHideAnimationStart){
+                    hideMenu();
+                }
+
+            }
+
+
+
+           // mHandler.postDelayed(mHidePopMenuThread,500);
         }
 
 
