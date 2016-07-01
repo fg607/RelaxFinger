@@ -29,5 +29,6 @@ public class Config {
     public static final int FEEDBACK_SWITCH = 22;
     public static final int SHOTSCREEN_SWITCH = 23;
     public static final int SCREEN_ON = 24;
+    public static final int HIDE_TO_NOTIFYBAR = 25;
     public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.showFloatBall";
 }

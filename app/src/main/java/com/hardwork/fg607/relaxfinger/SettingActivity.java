@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
@@ -34,6 +36,7 @@ import com.testin.agent.TestinAgentConfig;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.List;
+import java.util.Set;
 
 public class SettingActivity extends AppCompatActivity{
 
@@ -299,7 +302,16 @@ public class SettingActivity extends AppCompatActivity{
 
                 dialog.dismiss();
 
-                startActivity(new Intent("android.settings.ACCESSIBILITY_SETTINGS"));
+                try{
+                    startActivity(new Intent("android.settings.ACCESSIBILITY_SETTINGS"));
+
+                }catch (ActivityNotFoundException e){
+
+                    e.printStackTrace();
+
+                    Toast.makeText(SettingActivity.this,"没有找到辅助功能设置界面，请手动开启！",Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });
@@ -382,7 +394,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.3.2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.3.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -409,20 +421,15 @@ public class SettingActivity extends AppCompatActivity{
     public void showUpdateInfo(){
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.3.2.1版本更新内容");
+        dialog.setTitle("悬浮助手-1.3.3版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.添加快捷文件夹(妈妈再也不用担心快捷菜单不够用啦！)。\r\n" +
-                "2.添加横屏自动隐藏开关。\r\n" +
-                "3.添加显示隐藏区域开关。\r\n" +
-                "4.添加屏幕常亮功能。\r\n" +
-                "5.解决部分快捷开关卡顿问题。\r\n" +
-                "6.修复点击悬浮球出现隐藏区域的问题。\r\n" +
-                "7.优化悬浮球移动流畅度。\r\n" +
-                "8.优化悬浮球滑动流畅度。\r\n" +
-                "9.优化操作响应速度。。\r\n" +
-                "10.修复1.3.2部分机型选择快捷菜单FC问题。\r\n" +
-                "11.修复隐藏到状态栏后再次打开设置界面自动出现的问题。");
+        dialog.setMessage("1.优化手势触发机制，打开手势功能更加顺畅(贴边手势更容易启动)。\r\n" +
+                "2.更换快捷菜单动画，弹出效果更加简洁高效。\r\n" +
+                "3.快捷菜单添加休眠/隐藏助手/电源面板/快速设置/音量加减功能。\r\n" +
+                "4.优化快捷菜单设置卡顿问题。\r\n" +
+                "5.修复部分机型辅助功能失效问题。\r\n" +
+                "6.完善部分机型快捷菜单FC问题。");
         dialog.show();
 
     }

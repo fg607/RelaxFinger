@@ -107,7 +107,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private boolean mIsFolderAdded = false;
     private MenuFolderAdapter mMenuFolderAdapter;
     private int mOldOffsetX, mOldOffsetY, mNewOffsetX, mNewOffsetY;
-    private int mTag;
     private Context mContext = MyApplication.getApplication();
     private FrameLayout mMenuLayout;
     private boolean mReverseMenu=false;
@@ -203,16 +202,25 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
     private final BaseSpringSystem mSpringSystem = SpringSystem.create();
     private final ExampleSpringListener mSpringListener = new ExampleSpringListener();
+    private final ExampleSpringListener1 mSpringListener1 = new ExampleSpringListener1();
     private FrameLayout mRootView;
     private Spring mScaleSpring;
+    private Spring mScaleSpring1;
 
     private AnimationSet mShowAnimationSet;
     private AnimationSet mShowAnimationSet1;
     private AnimationSet mHideAnimationSet;
     private AnimationSet mHideAnimationSet1;
+    private AnimationSet mShowFolderAnimationSet;
 
     private boolean mGestureActive = false;
     private boolean mHideAnimationStart = false;
+
+    private CircleImageView mMenuA = null;
+    private CircleImageView mMenuB = null;
+    private CircleImageView mMenuC = null;
+    private CircleImageView mMenuD = null;
+    private CircleImageView mMenuE = null;
 
     private class ExampleSpringListener extends SimpleSpringListener {
 
@@ -223,6 +231,27 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mFloatImage.setScaleX(mappedValue);
             mFloatImage.setScaleY(mappedValue);
+        }
+
+    }
+
+    private class ExampleSpringListener1 extends SimpleSpringListener {
+
+        @Override
+        public void onSpringUpdate(Spring spring) {
+
+            float mappedValue = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0.8);
+
+            mMenuA.setScaleX(mappedValue);
+            mMenuA.setScaleY(mappedValue);
+            mMenuB.setScaleX(mappedValue);
+            mMenuB.setScaleY(mappedValue);
+            mMenuC.setScaleX(mappedValue);
+            mMenuC.setScaleY(mappedValue);
+            mMenuD.setScaleX(mappedValue);
+            mMenuD.setScaleY(mappedValue);
+            mMenuE.setScaleX(mappedValue);
+            mMenuE.setScaleY(mappedValue);
         }
 
     }
@@ -250,7 +279,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mIsCanPopup = mPreferences.getBoolean("canPopup",true);
         mIsBallHiding = mPreferences.getBoolean("hideState",false);
 
-        mTag = 0;
         mIsAdd = false;
         mIsMenuAdd=false;
         mIsTrackAdd = false;
@@ -284,6 +312,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mScaleSpring = mSpringSystem.createSpring()
         .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,4));
+
+        mScaleSpring1 = mSpringSystem.createSpring()
+                .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,5));
         /*
         mDetectThread = new DetectAppThread();
 
@@ -509,6 +540,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         createShowNotification();
+
         closeFloatBall();
 
 
@@ -670,6 +702,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
                     break;
                 case Config.FLOAT_AUTOMOVE:
                     setFloatAutoMove(intent.getBooleanExtra("move", false));
+                    break;
+                case Config.HIDE_TO_NOTIFYBAR:
+                    hideToNotifyBar();
                     break;
                 case Config.RECOVER_FLOATBALL:
                     recoverFloatBall();
@@ -979,6 +1014,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mArcLayout = (ArcLayout) mMenuView.findViewById(R.id.arc_layout);
         mFab = (Button) mMenuView.findViewById(R.id.fab);
 
+        mMenuA = (CircleImageView) mMenuView.findViewById(R.id.menuA);
+        mMenuB = (CircleImageView) mMenuView.findViewById(R.id.menuB);
+        mMenuC = (CircleImageView) mMenuView.findViewById(R.id.menuC);
+        mMenuD = (CircleImageView) mMenuView.findViewById(R.id.menuD);
+        mMenuE = (CircleImageView) mMenuView.findViewById(R.id.menuE);
 
         for (int i = 0, size = mArcLayout.getChildCount(); i < size; i++) {
             mArcLayout.getChildAt(i).setOnClickListener(this);
@@ -987,7 +1027,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mFab.setOnClickListener(this);
 
 
-        mShowAnimatorList = new ArrayList<>();
+    /*    mShowAnimatorList = new ArrayList<>();
         mShowAnimator = new AnimatorSet();
         mShowAnimator.setDuration(400);
         mShowAnimator.setInterpolator(new OvershootInterpolator());
@@ -1002,16 +1042,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 super.onAnimationEnd(animation);
                 mMenuLayout.setVisibility(View.INVISIBLE);
             }
-        });
+        });*/
 
 
         mShowAnimationSet = new AnimationSet(true);
         mShowAnimationSet1 = new AnimationSet(true);
 
-        ScaleAnimation showScaleAimation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+        ScaleAnimation showScaleAimation = new ScaleAnimation(0.2f,1,0.2f,1,Animation.RELATIVE_TO_SELF,
                 1.0f,Animation.RELATIVE_TO_SELF,0.5f);
 
-        ScaleAnimation showScaleAimation1 = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
+        ScaleAnimation showScaleAimation1 = new ScaleAnimation(0.2f,1,0.2f,1,Animation.RELATIVE_TO_SELF,
                 0f,Animation.RELATIVE_TO_SELF,0.5f);
 
         AlphaAnimation showAlphaAnimation = new AlphaAnimation(0.1f,1.0f);
@@ -1019,20 +1059,58 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mShowAnimationSet.addAnimation(showAlphaAnimation);
         mShowAnimationSet.addAnimation(showScaleAimation);
-        mShowAnimationSet.setDuration(200);
+        mShowAnimationSet.setDuration(150);
 
 
         mShowAnimationSet1.addAnimation(showAlphaAnimation);
         mShowAnimationSet1.addAnimation(showScaleAimation1);
-        mShowAnimationSet1.setDuration(200);
+        mShowAnimationSet1.setDuration(150);
+
+        mShowAnimationSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+                mScaleSpring1.setEndValue(1);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                mScaleSpring1.setEndValue(0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mShowAnimationSet1.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+                mScaleSpring1.setEndValue(1);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                mScaleSpring1.setEndValue(0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
 
         mHideAnimationSet = new AnimationSet(true);
         mHideAnimationSet1 = new AnimationSet(true);
 
-        ScaleAnimation hideScaleAnimation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+        ScaleAnimation hideScaleAnimation = new ScaleAnimation(1,0.2f,1,0.2f,Animation.RELATIVE_TO_SELF,
                 1.0f,Animation.RELATIVE_TO_SELF,0.5f);
 
-        ScaleAnimation hideScaleAnimation1 = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+        ScaleAnimation hideScaleAnimation1 = new ScaleAnimation(1,0.2f,1,0.2f,Animation.RELATIVE_TO_SELF,
                 0.0f,Animation.RELATIVE_TO_SELF,0.5f);
 
         AlphaAnimation hideAlphaAnimation = new AlphaAnimation(1.0f,0.1f);
@@ -1041,12 +1119,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mHideAnimationSet.addAnimation(hideAlphaAnimation);
         mHideAnimationSet.addAnimation(hideScaleAnimation);
         mHideAnimationSet.setFillAfter(true);
-        mHideAnimationSet.setDuration(200);
+        mHideAnimationSet.setDuration(150);
 
         mHideAnimationSet1.addAnimation(hideAlphaAnimation);
         mHideAnimationSet1.addAnimation(hideScaleAnimation1);
         mHideAnimationSet1.setFillAfter(true);
-        mHideAnimationSet1.setDuration(200);
+        mHideAnimationSet1.setDuration(150);
 
         mHideAnimationSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -1117,9 +1195,18 @@ public class FloatingBallService extends Service implements View.OnClickListener
             }
         });
 
+        ScaleAnimation animation = new ScaleAnimation(0.5f,1,0.5f,1,Animation.RELATIVE_TO_SELF,
+                0.5f,Animation.RELATIVE_TO_SELF,0.5f);
 
+        mShowFolderAnimationSet = new AnimationSet(true);
 
+        mShowFolderAnimationSet.addAnimation(animation);
 
+        mShowFolderAnimationSet.addAnimation(showAlphaAnimation);
+
+        mShowFolderAnimationSet.setDuration(150);
+        mShowFolderAnimationSet.setFillAfter(true);
+        mShowFolderAnimationSet.setFillEnabled(true);
 
 
         mMenuWmParams = new WindowManager.LayoutParams();
@@ -1188,19 +1275,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mMenuLayout.setVisibility(View.VISIBLE);
 
-       /* ScaleAnimation animation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
-                1.0f,Animation.RELATIVE_TO_SELF,0.5f);
-        animation.setDuration(200);
-
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0.1f,1.0f);
-
-        alphaAnimation.setDuration(200);
-
-        AnimationSet set = new AnimationSet(true);
-
-        set.addAnimation(alphaAnimation);
-        set.addAnimation(animation);
-*/
 
         if(mIsFloatRight){
 
@@ -1213,14 +1287,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         }
 
-       /* mShowAnimatorList.clear();
-
-        for (int i = 0, len = mArcLayout.getChildCount(); i < len; i++) {
-            mShowAnimatorList.add(createShowItemAnimator(mArcLayout.getChildAt(i)));
-        }
-
-        mShowAnimator.playTogether(mShowAnimatorList);
-        mShowAnimator.start();*/
         mFab.setClickable(true);
     }
 
@@ -1626,7 +1692,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 hideToNotifyBar();
 
-                                mPreferences.getBoolean("moveSwitch",false);
                                 if(!mPreferences.getBoolean("moveSwitch",false) && mIsSavePos){
 
                                     mCanmove = false;
@@ -1758,6 +1823,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
         }else {
             mMenuView = li.inflate(R.layout.popup_left, null);
         }
+
+        mMenuA = (CircleImageView) mMenuView.findViewById(R.id.menuA);
+        mMenuB = (CircleImageView) mMenuView.findViewById(R.id.menuB);
+        mMenuC = (CircleImageView) mMenuView.findViewById(R.id.menuC);
+        mMenuD = (CircleImageView) mMenuView.findViewById(R.id.menuD);
+        mMenuE = (CircleImageView) mMenuView.findViewById(R.id.menuE);
 
         mMenuLayout = (FrameLayout) mMenuView.findViewById(R.id.menu_layout);
 
@@ -2139,7 +2210,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 FloatingBallUtils.volumeUp();
                 break;
             case "音量键减":
-                FloatingBallUtils.vloumeDown();
+                FloatingBallUtils.volumeDown();
                 break;
             case "后台应用":
                 /*try {
@@ -2770,7 +2841,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 }
             }*/
 
-
             closeMenu();
 
 
@@ -2875,30 +2945,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mWindowManager.addView(mMenuFolderView, mMenuFolderWmParams);
 
-
-            ScaleAnimation animation = new ScaleAnimation(0,1,0,1,Animation.RELATIVE_TO_SELF,
-                    0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-
-            animation.setDuration(200);
-
-            AlphaAnimation animation1 = new AlphaAnimation(0.1f,1.0f);
-
-            animation1.setDuration(200);
-
-            AnimationSet animationSet = new AnimationSet(true);
-
-            animationSet.addAnimation(animation);
-
-            animationSet.addAnimation(animation1);
-
-            animationSet.setFillAfter(true);
-            animationSet.setFillEnabled(true);
-
-            mCardView.setAnimation(animationSet);
-
-            animationSet.start();
-
-           // mCardView.startAnimation(animationSet);
+            mCardView.startAnimation(mShowFolderAnimationSet);
 
             mIsFolderAdded = true;
         }
@@ -3066,15 +3113,11 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         if(mIsFolderAdded){
 
-            ScaleAnimation animation = new ScaleAnimation(1,0,1,0,Animation.RELATIVE_TO_SELF,
+            ScaleAnimation animation = new ScaleAnimation(1,0.5f,1,0.5f,Animation.RELATIVE_TO_SELF,
                     0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-
-            animation.setDuration(200);
 
 
             AlphaAnimation animation1 = new AlphaAnimation(1.0f,0.1f);
-
-            animation1.setDuration(200);
 
             AnimationSet animationSet = new AnimationSet(true);
 
@@ -3082,6 +3125,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             animationSet.addAnimation(animation1);
 
+            animationSet.setDuration(150);
             animationSet.setFillAfter(true);
             animationSet.setFillEnabled(true);
 
@@ -3188,6 +3232,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     mWindowManager.removeView(mBallView);
                     mScaleSpring.removeListener(mSpringListener);
+                    mScaleSpring1.removeListener(mSpringListener1);
                     mIsAdd = !mIsAdd;
 
                 }
@@ -3218,6 +3263,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
             mFloatImage.startAnimation(animation);
 
             mScaleSpring.addListener(mSpringListener);
+            mScaleSpring1.addListener(mSpringListener1);
 
             mIsAdd = !mIsAdd;
         }

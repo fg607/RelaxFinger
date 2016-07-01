@@ -11,13 +11,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -26,6 +29,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -89,22 +93,21 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     private TextView mCurrentTextView;
     private ImageView mCurrentIcon;
     private TrayAppPreferences mPreferences;
-    static String mCurrentApp;
     private FunctionDialog mFuncDialog;
     private Activity mActivity;
 
-    private HashMap<String,Object> menu1Map = new HashMap<String, Object>();
-    private HashMap<String,Object> menu2Map = new HashMap<String, Object>();
-    private HashMap<String,Object> menu3Map = new HashMap<String, Object>();
-    private HashMap<String,Object> menu4Map = new HashMap<String, Object>();
-    private HashMap<String,Object> menu5Map = new HashMap<String, Object>();
+    private HashMap<String,MenuDataSugar> menu1Map = new HashMap<String, MenuDataSugar>();
+    private HashMap<String,MenuDataSugar> menu2Map = new HashMap<String, MenuDataSugar>();
+    private HashMap<String,MenuDataSugar> menu3Map = new HashMap<String, MenuDataSugar>();
+    private HashMap<String,MenuDataSugar> menu4Map = new HashMap<String, MenuDataSugar>();
+    private HashMap<String,MenuDataSugar> menu5Map = new HashMap<String, MenuDataSugar>();
     private ArrayList<String> mChoosedList = new ArrayList<>();
-    static HashMap<String,Object> currentMenuMap = null;
 
+    static String mCurrentApp;
+    static HashMap<String,MenuDataSugar> currentMenuMap = null;
     static ArrayList<AppInfo> appList = null;
     static ArrayList<ToolInfo> toolList = null;
     static ArrayList<ShortcutInfo> shortcutList = null;
-
 
 
     public AppSettingFragment() {
@@ -119,9 +122,9 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         View fragmentView = inflater.inflate(R.layout.fragment_app_setting, container, false);
 
         ButterKnife.bind(this,fragmentView);
+
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
 
-        //initDialog();
         initMenuData();
 
         intView();
@@ -173,184 +176,9 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         generateMenu(menu4Map,mAppTextView4,mAppIcon4);
         generateMenu(menu5Map,mAppTextView5,mAppIcon5);
 
-       /* String name;
-        int type;
-
-        name = mPreferences.getString("app1","");
-        type = mPreferences.getInt("type1",0);
-        if(name != ""){
-
-            if(type==0){
-                mAppTextView1.setText(AppUtils.getAppName(name));
-                mAppIcon1.setBackground(null);
-                mAppIcon1.setImageDrawable(AppUtils.getAppIcon(name));
-            }else if(type==1){
-                mAppTextView1.setText(name);
-                mAppIcon1.setBackgroundResource(R.drawable.path_blue_oval);
-                mAppIcon1.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
-            }else if(type==2){
-                Drawable drawable = AppUtils.getShortcutIcon(name);
-
-                if(drawable!=null){
-
-                    mAppTextView1.setText(name);
-
-                }else {
-
-                    mAppTextView1.setText("");
-
-                    mPreferences.put("app1","");
-
-                    sendMsg(Config.UPDATE_APP, "which", "1");
-                }
-
-                mAppIcon1.setBackground(null);
-                mAppIcon1.setImageDrawable(drawable);
-
-            }
-
-
-        }
-
-        name = mPreferences.getString("app2","");
-        type = mPreferences.getInt("type2",0);
-
-        if(name != ""){
-
-            if(type==0){
-                mAppTextView2.setText(AppUtils.getAppName(name));
-                mAppIcon2.setBackground(null);
-                mAppIcon2.setImageDrawable(AppUtils.getAppIcon(name));
-            }else if(type==1){
-                mAppTextView2.setText(name);
-                mAppIcon2.setBackgroundResource(R.drawable.path_blue_oval);
-                mAppIcon2.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
-            }else if(type==2){
-                Drawable drawable = AppUtils.getShortcutIcon(name);
-
-                if(drawable!=null){
-
-                    mAppTextView2.setText(name);
-
-                }else {
-
-                    mAppTextView2.setText("");
-
-                    mPreferences.put("app2","");
-
-                    sendMsg(Config.UPDATE_APP, "which", "2");
-                }
-                mAppIcon2.setBackground(null);
-                mAppIcon2.setImageDrawable(AppUtils.getShortcutIcon(name));
-            }
-        }
-
-
-        name = mPreferences.getString("app3","");
-        type = mPreferences.getInt("type3",0);
-
-        if(name != ""){
-
-            if(type==0){
-                mAppTextView3.setText(AppUtils.getAppName(name));
-                mAppIcon3.setBackground(null);
-                mAppIcon3.setImageDrawable(AppUtils.getAppIcon(name));
-            }else if(type==1){
-                mAppTextView3.setText(name);
-                mAppIcon3.setBackgroundResource(R.drawable.path_blue_oval);
-                mAppIcon3.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
-            }else if(type==2){
-                Drawable drawable = AppUtils.getShortcutIcon(name);
-
-                if(drawable!=null){
-
-                    mAppTextView3.setText(name);
-
-                }else {
-
-                    mAppTextView3.setText("");
-
-                    mPreferences.put("app3","");
-
-                    sendMsg(Config.UPDATE_APP, "which", "3");
-                }
-                mAppIcon3.setBackground(null);
-                mAppIcon3.setImageDrawable(AppUtils.getShortcutIcon(name));
-            }
-        }
-
-        name = mPreferences.getString("app4","");
-        type = mPreferences.getInt("type4",0);
-
-        if(name != ""){
-
-            if(type==0){
-                mAppTextView4.setText(AppUtils.getAppName(name));
-                mAppIcon4.setBackground(null);
-                mAppIcon4.setImageDrawable(AppUtils.getAppIcon(name));
-            }else if(type==1){
-                mAppTextView4.setText(name);
-                mAppIcon4.setBackgroundResource(R.drawable.path_blue_oval);
-                mAppIcon4.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
-            }else if(type==2){
-                Drawable drawable = AppUtils.getShortcutIcon(name);
-
-                if(drawable!=null){
-
-                    mAppTextView4.setText(name);
-
-                }else {
-
-                    mAppTextView4.setText("");
-
-                    mPreferences.put("app4","");
-
-                    sendMsg(Config.UPDATE_APP, "which", "4");
-                }
-                mAppIcon4.setBackground(null);
-                mAppIcon4.setImageDrawable(AppUtils.getShortcutIcon(name));
-            }
-        }
-
-        name = mPreferences.getString("app5","");
-        type = mPreferences.getInt("type5",0);
-
-        if(name != ""){
-
-            if(type==0){
-                mAppTextView5.setText(AppUtils.getAppName(name));
-                mAppIcon5.setBackground(null);
-                mAppIcon5.setImageDrawable(AppUtils.getAppIcon(name));
-            }else if(type==1){
-                mAppTextView5.setText(name);
-                mAppIcon5.setBackgroundResource(R.drawable.path_blue_oval);
-                mAppIcon5.setImageDrawable(FloatingBallUtils.getSwitcherIcon(name));
-            }else if(type==2){
-                Drawable drawable = AppUtils.getShortcutIcon(name);
-
-                if(drawable!=null){
-
-                    mAppTextView5.setText(name);
-
-                }else {
-
-                    mAppTextView5.setText("");
-
-                    mPreferences.put("app5","");
-
-                    sendMsg(Config.UPDATE_APP, "which", "5");
-
-
-                }
-                mAppIcon5.setBackground(null);
-                mAppIcon5.setImageDrawable(AppUtils.getShortcutIcon(name));
-            }
-        }*/
-
-
     }
 
-    private void generateMenu(HashMap<String,Object> map,TextView textView,ImageView imageView){
+    private void generateMenu(HashMap<String,MenuDataSugar> map, TextView textView, ImageView imageView){
 
         if(map.size()==0){
 
@@ -361,7 +189,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         }else if(map.size()==1){
 
-            MenuDataSugar dataSugar = (MenuDataSugar) map.get(map.keySet().iterator().next());
+            MenuDataSugar dataSugar = map.get(map.keySet().iterator().next());
 
             textView.setText(dataSugar.getName());
 
@@ -389,11 +217,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             textView.setText("快捷文件夹");
 
-            ArrayList<Bitmap> list = new ArrayList<Bitmap>();
+            ArrayList<Bitmap> list = new ArrayList<>();
 
             for(String key:map.keySet()) {
 
-                MenuDataSugar dataSugar = (MenuDataSugar) map.get(key);
+                MenuDataSugar dataSugar = map.get(key);
 
                 int type = dataSugar.getType();
 
@@ -438,91 +266,28 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
         generateMenu(currentMenuMap,mCurrentTextView,mCurrentIcon);
 
-       // byte[] menuData = FloatingBallUtils.serialize(currentMenuMap);
-
         MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where WHICH_MENU='" + mCurrentApp+"'");
 
         for(String key :currentMenuMap.keySet()){
 
-            MenuDataSugar sugar = (MenuDataSugar) currentMenuMap.get(key);
+            MenuDataSugar sugar = currentMenuMap.get(key);
 
             sugar.save();
         }
 
         sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
-
-
-
-       /* MenuDataSugar sugar = new MenuDataSugar(mCurrentApp,menuData);
-
-        List<MenuDataSugar> list = MenuDataSugar.findWithQuery(MenuDataSugar.class,"select * from MENU_DATA_SUGAR" +
-                " where WHICH_MENU='"+mCurrentApp+"'");
-
-        if(list.size()>=1){
-
-            sugar.update();
-
-        }else {
-
-            sugar.save();
-        }*/
-
-
-
-
-
     }
 
     private void initDialog(ArrayList<String> choosedMenuList) {
 
         mFuncDialog = FunctionDialog.newInstance(choosedMenuList);
 
-        mFuncDialog.setDialogClickListener(new OnDialogClickListener() {
+        mFuncDialog.setOperateFinishListener(new OnOperateFinishListener() {
+
             @Override
-            public void onDialogClick(final Intent intent) {
+            public void onOperateFinish() {
 
                 generateMenu();
-
-               /* if (intent != null) {
-
-                    if (!intent.getStringExtra("name").equals("")) {
-
-                        mCurrentTextView.setText(intent.getStringExtra("name"));
-                        if (intent.getIntExtra("type", 0) == 1) {
-                            mCurrentIcon.setBackgroundResource(R.drawable.path_blue_oval);
-
-
-                        } else {
-                            mCurrentIcon.setBackground(null);
-                        }
-
-                        mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(intent.getByteArrayExtra("icon")));
-                        if (intent.getIntExtra("type", 0) == 2) {
-                            mPreferences.put("app" + mCurrentApp, intent.getStringExtra("name"));
-                            mPreferences.put("shortcutIntent" + mCurrentApp, intent.getStringExtra("package"));
-                        } else {
-                            mPreferences.put("app" + mCurrentApp, intent.getStringExtra("package"));
-                        }
-
-
-                    } else {
-
-                        mCurrentTextView.setText(intent.getStringExtra("name"));
-                        mCurrentIcon.setBackground(null);
-                        mCurrentIcon.setImageDrawable(null);
-                        mPreferences.put("app" + mCurrentApp, "");
-
-                    }
-
-                    mPreferences.put("type" + mCurrentApp, intent.getIntExtra("type", 0));
-
-                    sendMsg(Config.UPDATE_APP, "which", mCurrentApp);
-
-                }else {
-
-                    generateMenu();
-                }*/
-
 
             }
         });
@@ -531,65 +296,86 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
 
-        switch (v.getId()){
-            case R.id.app1_layout:
-                mAppName = mAppTextView1.getText().toString();
-                mCurrentTextView = mAppTextView1;
-                mCurrentIcon = mAppIcon1;
-                mCurrentApp = "1";
-                currentMenuMap = menu1Map;
-                break;
-            case R.id.app2_layout:
-                mAppName = mAppTextView2.getText().toString();
-                mCurrentTextView = mAppTextView2;
-                mCurrentIcon = mAppIcon2;
-                mCurrentApp = "2";
-                currentMenuMap = menu2Map;
-                break;
-            case R.id.app3_layout:
-                mAppName = mAppTextView3.getText().toString();
-                mCurrentTextView = mAppTextView3;
-                mCurrentIcon = mAppIcon3;
-                mCurrentApp = "3";
-                currentMenuMap = menu3Map;
-                break;
-            case R.id.app4_layout:
-                mAppName = mAppTextView4.getText().toString();
-                mCurrentTextView = mAppTextView4;
-                mCurrentIcon = mAppIcon4;
-                mCurrentApp = "4";
-                currentMenuMap = menu4Map;
-                break;
-            case R.id.app5_layout:
-                mAppName = mAppTextView5.getText().toString();
-                mCurrentTextView = mAppTextView5;
-                mCurrentIcon = mAppIcon5;
-                mCurrentApp = "5";
-                currentMenuMap = menu5Map;
-                break;
-            default:
-                break;
-        }
+        new AsyncTask<Void,Void,Integer>(){
 
-        int type = -1;
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
 
-        mChoosedList.clear();
+                switch (v.getId()){
+                    case R.id.app1_layout:
+                        mAppName = mAppTextView1.getText().toString();
+                        mCurrentTextView = mAppTextView1;
+                        mCurrentIcon = mAppIcon1;
+                        mCurrentApp = "1";
+                        currentMenuMap = menu1Map;
+                        break;
+                    case R.id.app2_layout:
+                        mAppName = mAppTextView2.getText().toString();
+                        mCurrentTextView = mAppTextView2;
+                        mCurrentIcon = mAppIcon2;
+                        mCurrentApp = "2";
+                        currentMenuMap = menu2Map;
+                        break;
+                    case R.id.app3_layout:
+                        mAppName = mAppTextView3.getText().toString();
+                        mCurrentTextView = mAppTextView3;
+                        mCurrentIcon = mAppIcon3;
+                        mCurrentApp = "3";
+                        currentMenuMap = menu3Map;
+                        break;
+                    case R.id.app4_layout:
+                        mAppName = mAppTextView4.getText().toString();
+                        mCurrentTextView = mAppTextView4;
+                        mCurrentIcon = mAppIcon4;
+                        mCurrentApp = "4";
+                        currentMenuMap = menu4Map;
+                        break;
+                    case R.id.app5_layout:
+                        mAppName = mAppTextView5.getText().toString();
+                        mCurrentTextView = mAppTextView5;
+                        mCurrentIcon = mAppIcon5;
+                        mCurrentApp = "5";
+                        currentMenuMap = menu5Map;
+                        break;
+                    default:
+                        break;
+                }
 
-        for(String action:currentMenuMap.keySet()){
+            }
 
-            mChoosedList.add(action);
-        }
+            @Override
+            protected Integer doInBackground(Void... params) {
 
-        if(currentMenuMap.size()==1){
+                Integer type = -1;
 
-            MenuDataSugar menuDataSugar = (MenuDataSugar) currentMenuMap.get((currentMenuMap.keySet().iterator().next()));
-            type = menuDataSugar.getType();
-        }
+                mChoosedList.clear();
 
+                for(String action:currentMenuMap.keySet()){
 
-        popupFunctionDialog(type,mChoosedList);
+                    mChoosedList.add(action);
+                }
+
+                if(mChoosedList.size()==1){
+
+                    MenuDataSugar menuDataSugar = currentMenuMap.get((currentMenuMap.keySet().iterator().next()));
+                    type = menuDataSugar.getType();
+                }
+
+                return type;
+            }
+
+            @Override
+            protected void onPostExecute(final Integer type) {
+
+                super.onPostExecute(type);
+
+                popupFunctionDialog(type,mChoosedList);
+
+            }
+        }.execute();
 
 
     }
@@ -609,16 +395,32 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             initDialog(choosedMenuList);
         }
 
-        mFuncDialog.setCheckedFuncName(type,choosedMenuList);
-
         if (mFuncDialog.getDialog() != null) {
 
             mFuncDialog.getDialog().show();
 
+            MyApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    mFuncDialog.setCheckedFuncName(type,choosedMenuList);
+                }
+            },30);
+
         } else {
 
-            mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
+            MyApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    mFuncDialog.show(getActivity().getFragmentManager(), "dialogFragment");
+
+                    mFuncDialog.setCheckedFuncName(type,choosedMenuList);
+                }
+            },60);
         }
+
+
 
     }
 
@@ -643,40 +445,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     }
 
 
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == Config.CHOOSE_APP_CODE){
-
-            if(data != null){
-
-                if(!data.getStringExtra("name").equals("")){
-
-                    mCurrentTextView.setText(data.getStringExtra("name"));
-                    mCurrentIcon.setImageDrawable(ImageUtils.Bytes2Drawable(data.getByteArrayExtra("icon")));
-                    mPreferences.put("app" + mCurrentApp, data.getStringExtra("package"));
-
-
-
-                }else {
-
-                    mCurrentTextView.setText(data.getStringExtra("name"));
-                    mCurrentIcon.setImageDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                    mPreferences.put("app" + mCurrentApp,"");
-                }
-
-                sendMsg(Config.UPDATE_APP,"which",mCurrentApp);
-
-            }
-
-        }
-
-    }
-
-
-
-
     public static class FunctionDialog extends DialogFragment{
 
         @Bind(R.id.viewPager)
@@ -684,20 +452,20 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         @Bind(R.id.tabs)
         TabLayout mTabs;
 
-        static   View mAppView = null;
-        static   View mButtonView = null;
-        static   View mShortcutView = null;
+        private View mAppView = null;
+        private View mButtonView = null;
+        private View mShortcutView = null;
 
         private  ArrayList<String> mMenuChoosedList;
+        private  ArrayList<String> mOldChoosedList;
         private MyPagerAdapter mPagerAdapter;
         private  AppAdapter adapter;
         private  ToolAdapter mToolAdapter;
         private ShortcutAdapter mShortcutAdapter;
         private String mCheckdedFuncName;
-        private OnDialogClickListener mClickListener;
+        private OnOperateFinishListener mClickListener;
         private int mType=0;
         private Handler mHandler;
-        private View mDialogView;
 
         private static FunctionDialog mInstance=null;
 
@@ -727,22 +495,8 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             super.onCreate(savedInstanceState);
 
             mMenuChoosedList = getArguments().getStringArrayList("checkedName");
-           // mCheckdedFuncName = getArguments().getString("checkedName");
+
             mHandler = new Handler();
-
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            View view = inflater.inflate(R.layout.function_dialog_layout, null);
-
-            ButterKnife.bind(this, view);
-
-            initAppView();
-
-            initButtonView();
-            initShotcutView();
-
-            setupViewPager();
-
-            mDialogView= view;
 
         }
 
@@ -750,12 +504,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
             LayoutInflater inflater = getActivity().getLayoutInflater();
+
             View view = inflater.inflate(R.layout.function_dialog_layout, null);
 
             ButterKnife.bind(this, view);
 
             initAppView();
-
             initButtonView();
             initShotcutView();
 
@@ -764,6 +518,36 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BottomDialog);
 
             builder.setView(view);
+
+       /*     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    getDialog().hide();
+
+                    adapter.setAppChecked(mOldChoosedList);
+                    mShortcutAdapter.setShortcutChecked(mOldChoosedList);
+                    mToolAdapter.setToolChecked(mOldChoosedList);
+
+                    mOldChoosedList = null;
+                }
+            });
+
+            builder.setPositiveButton("完成", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    getDialog().hide();
+
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            mClickListener.onDialogClick(null);
+                        }
+                    });
+                }
+            });*/
 
            Dialog  dialog = builder.create();
 
@@ -783,7 +567,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                             @Override
                             public void run() {
 
-                                mClickListener.onDialogClick(null);
+                                mClickListener.onOperateFinish();
                             }
                         });
 
@@ -805,31 +589,26 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         }
 
 
-        private void setDialogClickListener(OnDialogClickListener listener){
+        private void setOperateFinishListener(OnOperateFinishListener listener){
 
             mClickListener = listener;
         }
 
         private void setCheckedFuncName(int type, ArrayList<String> choosedMenuList) {
 
-
             mType = type;
             mMenuChoosedList = choosedMenuList;
 
-            if (adapter != null) {
+         /*   new Thread(new Runnable() {
+                @Override
+                public void run() {
 
-                adapter.setAppChecked(mMenuChoosedList);
-            }
+                    mOldChoosedList = (ArrayList<String>) mMenuChoosedList.clone();
+                }
+            }).start();
 
-            if (mToolAdapter != null) {
 
-                mToolAdapter.setToolChecked(mMenuChoosedList);
-            }
-
-            if (mShortcutAdapter != null) {
-
-                mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-            }
+*/
 
             if (mType == -1) {
 
@@ -857,25 +636,24 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 }
             }
 
-            MyApplication.getMainThreadHandler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
+            if (adapter != null) {
 
-                    if(adapter!= null){
-                        adapter.notifyDataSetChanged();
-                    }
+                adapter.setAppChecked(mMenuChoosedList);
+                adapter.notifyDataSetChanged();
+            }
 
-                    if(mToolAdapter!=null){
-                        mToolAdapter.notifyDataSetChanged();
-                    }
+            if (mToolAdapter != null) {
 
-                    if(mShortcutAdapter!=null){
+                mToolAdapter.setToolChecked(mMenuChoosedList);
+                mToolAdapter.notifyDataSetChanged();
+            }
 
-                        mShortcutAdapter.notifyDataSetChanged();
-                    }
+            if (mShortcutAdapter != null) {
 
-                }
-            },40);
+                mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
+                mShortcutAdapter.notifyDataSetChanged();
+            }
+
 
         }
 
@@ -905,6 +683,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                             shortcutList = AppUtils.getShortcuts();
 
                         }catch (SecurityException e){
+
+                            e.printStackTrace();
+
+
+                        }catch (SQLiteException e){
 
                             e.printStackTrace();
 
@@ -939,9 +722,8 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                                     name,2,action);
 
                                             currentMenuMap.put(action,data);
-
                                             mMenuChoosedList.add(action);
-                                            //menuList.add(appList.get(i));
+
                                         }else {
 
                                             currentMenuMap.remove(action);
@@ -949,28 +731,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                         }
 
                                         mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-
-
-                                        /*Intent intent = new Intent();
-
-                                        String name = shortcutList.get(i).getShortcutTitle();
-                                        if (!name.equals(mCheckdedFuncName)) {
-
-                                            mShortcutAdapter.setShortcutChecked(name);
-                                            intent.putExtra("name", name);
-                                            intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
-                                            intent.putExtra("type",2);
-                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
-                                        } else {
-                                            mShortcutAdapter.setShortcutChecked("");
-                                            intent.putExtra("name", "");
-                                        }
-
-
-                                        mClickListener.onDialogClick(intent);
-
-                                        getDialog().hide();*/
-
 
                                     }
                                 });
@@ -1012,7 +772,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                             currentMenuMap.put(action,data);
                             mMenuChoosedList.add(action);
-                            //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(action);
@@ -1020,25 +779,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                         }
 
                         mShortcutAdapter.setShortcutChecked(mMenuChoosedList);
-                       /* Intent intent = new Intent();
-
-                        String name = shortcutList.get(i).getShortcutTitle();
-                        if (!name.equals(mCheckdedFuncName)) {
-
-                            mShortcutAdapter.setShortcutChecked(name);
-                            intent.putExtra("name", name);
-                            intent.putExtra("package", shortcutList.get(i).getShortcutIntent());
-                            intent.putExtra("type",2);
-                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(shortcutList.get(i).getShortcutIcon()));
-                        } else {
-                            mShortcutAdapter.setShortcutChecked("");
-                            intent.putExtra("name", "");
-                        }
-
-
-                        mClickListener.onDialogClick(intent);
-
-                        getDialog().hide();*/
 
 
                     }
@@ -1101,7 +841,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                                             currentMenuMap.put(name,data);
                                             mMenuChoosedList.add(name);
-                                            //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(name);
@@ -1109,32 +848,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                         }
 
                                         mToolAdapter.setToolChecked(mMenuChoosedList);
-                                    /*    Intent intent = new Intent();
-
-                                        String name = toolList.get(i).getToolName();
-
-                                        if (!name.equals(mCheckdedFuncName)) {
-
-                                            if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
-
-                                                checkPermissionGranted(Manifest.permission.CAMERA);
-                                            }
-
-
-                                            mToolAdapter.setToolChecked(name);
-                                            intent.putExtra("name", name);
-                                            intent.putExtra("package", name);
-                                            intent.putExtra("type",1);
-                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
-                                        } else {
-                                            mToolAdapter.setToolChecked("");
-                                            intent.putExtra("name", "");
-                                        }
-
-
-                                        mClickListener.onDialogClick(intent);
-
-                                        getDialog().hide();*/
 
 
                                     }
@@ -1174,39 +887,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                             currentMenuMap.put(name,data);
                             mMenuChoosedList.add(name);
-                            //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(name);
                             mMenuChoosedList.remove(name);
                         }
                         mToolAdapter.setToolChecked(mMenuChoosedList);
-                        /*Intent intent = new Intent();
-
-                        String name = toolList.get(i).getToolName();
-
-                        if (!name.equals(mCheckdedFuncName)) {
-
-                            if("手电筒".equals(name)&&Build.VERSION.SDK_INT>22){
-
-                                checkPermissionGranted(Manifest.permission.CAMERA);
-                            }
-
-
-                            mToolAdapter.setToolChecked(name);
-                            intent.putExtra("name", name);
-                            intent.putExtra("package", name);
-                            intent.putExtra("type",1);
-                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(toolList.get(i).getToolIcon()));
-                        } else {
-                            mToolAdapter.setToolChecked("");
-                            intent.putExtra("name", "");
-                        }
-
-
-                        mClickListener.onDialogClick(intent);
-
-                        getDialog().hide();*/
 
 
                     }
@@ -1292,8 +978,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                                             mMenuChoosedList.add(action);
 
-
-                                            //menuList.add(appList.get(i));
                                         }else {
 
                                             currentMenuMap.remove(action);
@@ -1302,28 +986,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                         }
 
                                         adapter.setAppChecked(mMenuChoosedList);
-
-
-                                        /*Intent intent = new Intent();
-
-                                        String name = appList.get(i).getAppName();
-                                        if (!name.equals(mCheckdedFuncName)) {
-
-                                            adapter.setAppChecked(name);
-                                            intent.putExtra("name", name);
-                                            intent.putExtra("package", appList.get(i).getAppPackage());
-                                            intent.putExtra("type",0);
-                                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
-                                        } else {
-                                            adapter.setAppChecked("");
-                                            intent.putExtra("name", "");
-                                        }*/
-
-
-                                       // mClickListener.onDialogClick(intent);
-
-                                        //getDialog().hide();
-
 
                                     }
                                 });
@@ -1366,7 +1028,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                             currentMenuMap.put(action,data);
                             mMenuChoosedList.add(action);
 
-                            //menuList.add(appList.get(i));
                         }else {
 
                             currentMenuMap.remove(action);
@@ -1375,25 +1036,6 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         adapter.setAppChecked(mMenuChoosedList);
 
-                      /*  Intent intent = new Intent();
-
-                        String name = appList.get(i).getAppName();
-                        if (!name.equals(mCheckdedFuncName)) {
-
-                            adapter.setAppChecked(name);
-                            intent.putExtra("name", name);
-                            intent.putExtra("package", appList.get(i).getAppPackage());
-                            intent.putExtra("type",0);
-                            intent.putExtra("icon", ImageUtils.Drawable2Bytes(appList.get(i).getAppIcon()));
-                        } else {
-                            adapter.setAppChecked("");
-                            intent.putExtra("name", "");
-                        }
-
-
-                        mClickListener.onDialogClick(intent);*/
-
-                       // getDialog().hide();
 
 
                     }
@@ -1475,9 +1117,9 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
     }
 
-    public interface OnDialogClickListener{
+    public interface OnOperateFinishListener{
 
-        public void onDialogClick(Intent intent);
+        public void onOperateFinish();
 
     }
 

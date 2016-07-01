@@ -31,7 +31,7 @@ public class ShortcutAdapter extends BaseAdapter {
     public void addList(ArrayList<ShortcutInfo> list){
 
         this.mShortcutList = list;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public void setShortcutChecked(String name){
@@ -50,7 +50,7 @@ public class ShortcutAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mShortcutList.size();
+        return mShortcutList!=null?mShortcutList.size():0;
     }
 
     @Override

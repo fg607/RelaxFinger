@@ -17,7 +17,7 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
  */
 public class NavAccessibilityService extends AccessibilityService {
 
-    public  static AccessibilityService instance;
+    public  static AccessibilityService instance = null;
     private BroadcastReceiver mBatInfoReceiver;
     private SharedPreferences sp;
 

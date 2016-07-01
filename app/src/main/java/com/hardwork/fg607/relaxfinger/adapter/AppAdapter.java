@@ -31,7 +31,7 @@ public class AppAdapter extends BaseAdapter {
     public void addList(ArrayList<AppInfo> list){
 
         this.mAppList = list;
-        notifyDataSetChanged();
+     //   notifyDataSetChanged();
     }
 
     public void setAppChecked(String name){
@@ -50,7 +50,7 @@ public class AppAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mAppList.size();
+        return mAppList!=null?mAppList.size():0;
     }
 
     @Override

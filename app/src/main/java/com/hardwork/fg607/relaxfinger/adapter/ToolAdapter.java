@@ -31,7 +31,7 @@ public class ToolAdapter extends BaseAdapter {
     public void addList(ArrayList<ToolInfo> list){
 
         this.mToolList = list;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public void setToolChecked(String name){
@@ -50,7 +50,7 @@ public class ToolAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mToolList.size();
+        return mToolList!=null?mToolList.size():0;
     }
 
     @Override

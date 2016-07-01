@@ -52,6 +52,7 @@ import com.hardwork.fg607.relaxfinger.model.AppInfo;
 import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
 import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 
@@ -327,7 +328,7 @@ public class FloatingBallUtils {
     /**
      * 音量下键
      */
-    public static void vloumeDown() {
+    public static void volumeDown() {
 
         if(mAudioManager ==null){
             mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
@@ -475,6 +476,11 @@ public class FloatingBallUtils {
      */
     public static String saveBitmap(Bitmap bitmap,String folder,String fileName) throws IOException {
 
+
+        if(bitmap == null){
+
+            return null;
+        }
         String rootdir = Environment.getExternalStorageDirectory().getAbsolutePath()+
                 folder;
 
@@ -683,6 +689,12 @@ public class FloatingBallUtils {
         ToolInfo vibration = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_6_vibration),"震动/声音");
         ToolInfo mute = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_5_mute),"静音/声音");
         ToolInfo rotation = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_8_rotation),"屏幕旋转");
+        ToolInfo lockScreen = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_lockscreen),"休眠");
+        ToolInfo hideBall = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_hide),"隐藏悬浮球");
+        ToolInfo powerPanel = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_powerpanel),"电源面板");
+        ToolInfo settingPanel = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_setting),"快速设置");
+        ToolInfo volumeUp = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_13_volume_up),"音量加");
+        ToolInfo volumeDown = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_14_volume_down),"音量减");
         ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
         ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
         ToolInfo musicPrev = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_17_music_prev),"音乐上一曲");
@@ -702,6 +714,12 @@ public class FloatingBallUtils {
         toolList.add(vibration);
         toolList.add(screenShot);
         toolList.add(mute);
+        toolList.add(lockScreen);
+        toolList.add(hideBall);
+        toolList.add(powerPanel);
+        toolList.add(settingPanel);
+        toolList.add(volumeUp);
+        toolList.add(volumeDown);
         toolList.add(music);
         toolList.add(musicNext);
         toolList.add(musicPrev);
@@ -751,6 +769,24 @@ public class FloatingBallUtils {
                 break;
             case "屏幕常亮":
                 icon = context.getResources().getDrawable(R.drawable.screen_on);
+                break;
+            case "休眠":
+                icon = context.getResources().getDrawable(R.drawable.switch_lockscreen);
+                break;
+            case "隐藏悬浮球":
+                icon = context.getResources().getDrawable(R.drawable.switch_hide);
+                break;
+            case "音量加":
+                icon = context.getResources().getDrawable(R.drawable.switch_13_volume_up);
+                break;
+            case "音量减":
+                icon = context.getResources().getDrawable(R.drawable.switch_14_volume_down);
+                break;
+            case "电源面板":
+                icon = context.getResources().getDrawable(R.drawable.switch_powerpanel);
+                break;
+            case "快速设置":
+                icon = context.getResources().getDrawable(R.drawable.switch_setting);
                 break;
             default:
                 break;
@@ -886,6 +922,63 @@ public class FloatingBallUtils {
                 }).start();
 
                 break;
+
+            case "休眠":
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lockScreen(context);
+                    }
+                }).start();
+                break;
+            case "隐藏悬浮球":
+                Intent intent = new Intent();
+                intent.putExtra("what",Config.HIDE_TO_NOTIFYBAR);
+                intent.setClass(context, FloatingBallService.class);
+                context.startService(intent);
+                break;
+            case "音量加":
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        volumeUp();
+                    }
+                }).start();
+                break;
+            case "音量减":
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        volumeDown();
+                    }
+                }).start();
+                break;
+            case "电源面板":
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(NavAccessibilityService.instance!=null){
+
+                            openPowerDialog(NavAccessibilityService.instance);
+                        }
+
+                    }
+                }).start();
+                break;
+            case "快速设置":
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(NavAccessibilityService.instance!=null){
+
+                            openQuickSetting(NavAccessibilityService.instance);
+                        }
+
+                    }
+                }).start();
+                break;
+
             default:
                 break;
         }

@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -446,7 +447,7 @@ public class AppUtils {
         }
     }
 
-    public static ArrayList<ShortcutInfo> getShortcuts() throws SecurityException{
+    public static ArrayList<ShortcutInfo> getShortcuts() throws SecurityException,SQLiteException {
 
 
         ArrayList<ShortcutInfo> list = new ArrayList<>();

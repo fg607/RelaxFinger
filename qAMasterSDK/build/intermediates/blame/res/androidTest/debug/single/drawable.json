@@ -84,24 +84,24 @@
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_button_feedback.xml"
     },
     {
-        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_checkbox.xml",
-        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_checkbox.xml"
-    },
-    {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_star.xml",
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_star.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_checkbox.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_checkbox.xml"
     },
     {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_dialog_header_background.xml",
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_dialog_header_background.xml"
     },
     {
-        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_alertdialog_button_textcolor.xml",
-        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_alertdialog_button_textcolor.xml"
-    },
-    {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_button_problem.xml",
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_button_problem.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_alertdialog_button_textcolor.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/drawable/qamaster_alertdialog_button_textcolor.xml"
     },
     {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/drawable/qamaster_user_list_background.xml",

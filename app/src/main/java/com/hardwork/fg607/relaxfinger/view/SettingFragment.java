@@ -790,7 +790,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }
 
 
-            if (iconName != null) {
+            if (iconName != null && FloatingBallUtils.bitmap!=null) {
                 try {
                     FloatingBallUtils.saveBitmap(FloatingBallUtils.bitmap,iconName);
                 } catch (IOException e) {

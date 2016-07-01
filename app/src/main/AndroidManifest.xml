@@ -23,6 +23,7 @@
     <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS" />
     <uses-permission android:name="com.teslacoilsw.launcher.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.teslacoilsw.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="ginlemon.flower.launcher.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.cyanogenport.trebuchet.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.kaneoriley.cyanogenport.launcher.permission.READ_SETTINGS"/>
 
