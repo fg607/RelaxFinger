@@ -4,6 +4,7 @@ package com.hardwork.fg607.relaxfinger.service;
  * Created by fg607 on 15-8-20.
  */
 
+import android.Manifest;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -348,14 +349,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mMenuFolderWmParams = new WindowManager.LayoutParams();
 
-        if (Build.VERSION.SDK_INT < 19) {
+        mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 
-            mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-
-        } else {
-
-            mMenuFolderWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
-        }
 
         mMenuFolderWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
         mMenuFolderWmParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -368,7 +363,6 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mMenuFolderWmParams.format = PixelFormat.RGBA_8888;
 
-
     }
 
     @Override
@@ -380,6 +374,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
             mIsLandscape = false;
+            mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth()-floatBallSize/2-DensityUtil.dip2px(MyApplication.getApplication(),40));
+            mBallWmParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight()/2-floatBallSize/2);
+            updateFloatBall();
             changeBallToOrigin();
 
             if(mPreferences.getBoolean("autoHideSwitch",false)){
@@ -393,7 +390,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
         else if (orientation == Configuration.ORIENTATION_LANDSCAPE){
 
             mIsLandscape = true;
-            changeBallToFree();
+           // changeBallToFree();
 
             if (mPreferences.getBoolean("autoHideSwitch", false)) {
 
@@ -867,7 +864,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                     String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
                             +"/RelaxFinger/DIY.png";
-                    Bitmap icon = ImageUtils.scaleBitmap(filePath,200);
+                    Bitmap icon = ImageUtils.scaleBitmap(filePath,floatBallSize,floatBallSize);
 
                     mFloatImage.setBackground(ImageUtils.bitmap2Drawable(icon));
                 }
@@ -1475,21 +1472,15 @@ public class FloatingBallService extends Service implements View.OnClickListener
     /**
      * 创建ＦloatBallView，并初始化显示参数
      */
-    private void createFloatBallView() {
+    public void createFloatBallView() {
 
 
         //设置悬浮窗口参数
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         mBallWmParams = new WindowManager.LayoutParams();
 
-        if (Build.VERSION.SDK_INT < 19) {
+        mBallWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 
-            mBallWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-
-        }else {
-
-            mBallWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
-        }
         mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
         mBallWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
@@ -1508,6 +1499,9 @@ public class FloatingBallService extends Service implements View.OnClickListener
         mZoomInAnima = new ScaleAnimation(0.9f,1f,0.9f,1f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         mZoomInAnima.setDuration(100);
         mZoomInAnima.setFillAfter(false);
+
+        //系统能识别的最小滑动距离
+        final int touchSlop = ViewConfiguration.get(FloatingBallService.this).getScaledTouchSlop();
 
         //注册触摸事件监听器
         mFloatImage.setOnTouchListener(new View.OnTouchListener() {
@@ -1597,7 +1591,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                             if(!mGestureActive){
 
                                 //Y轴滑动偏移量大于40像素并且Y轴滑动偏移量比X轴偏移量多出20像素时判定为向上滑动
-                                if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) < -40) {
+                                if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > touchSlop/2 && (mNewOffsetY) < -touchSlop) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipUp();
@@ -1608,7 +1602,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 }
                                 //向下滑动
-                                else if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > 20 && (mNewOffsetY) > 40) {
+                                else if (Math.abs(mNewOffsetY) - Math.abs(mNewOffsetX) > touchSlop/2 && (mNewOffsetY) > touchSlop) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipDown();
@@ -1619,7 +1613,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 }
                                 //向左滑动
-                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 20 && (mNewOffsetX) < -40) {
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > touchSlop/2 && (mNewOffsetX) < -touchSlop) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipLeft();
@@ -1630,7 +1624,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 }
                                 //向右滑动
-                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > 10 && (mNewOffsetX) > 10) {
+                                else if (Math.abs(mNewOffsetX) - Math.abs(mNewOffsetY) > touchSlop/2 && (mNewOffsetX) > touchSlop) {
 
                                     mClickCount = 0;
                                     onFloatBallFlipRight();
@@ -1669,7 +1663,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
                         // 滑动偏移量小于40像素，判定为点击悬浮球
-                        if (Math.abs(mNewOffsetX) <= 40 && Math.abs(mNewOffsetY) <= 40) {
+                        if (Math.abs(mNewOffsetX) <= touchSlop && Math.abs(mNewOffsetY) <= touchSlop) {
 
 
                             if (System.currentTimeMillis() - mPreClickTime <= LONG_PRESS_TIME) {
@@ -1704,7 +1698,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                                 moveToScreenEdge(event.getRawX());
 
-                            } else if(mIsSavePos) {
+                            } else if(mIsSavePos && !mIsLandscape) {
 
                                 saveStates("ballWmParamsX", mBallWmParams.x);
                                 saveStates("ballWmParamsY", mBallWmParams.y);
@@ -1917,11 +1911,16 @@ public class FloatingBallService extends Service implements View.OnClickListener
         if (mBallWmParams.x + mBallWmParams.width / 2 >= FloatingBallUtils.getScreenWidth() / 2) {
 
             moveToScreenRight(startx);
-            mIsFloatRight = true;
+            if(!mIsLandscape){
+                mIsFloatRight = true;
+            }
+
 
         } else {
 
-            mIsFloatRight = false;
+            if(!mIsLandscape){
+                mIsFloatRight = false;
+            }
             moveToScreenLeft(startx);
         }
 
@@ -1958,13 +1957,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
             @Override
             public void onAnimationEnd(Animator animation) {
 
-                if(mIsSavePos){
+                if(mIsSavePos && !mIsLandscape){
 
                     saveStates("ballWmParamsX", mBallWmParams.x);
                     saveStates("ballWmParamsY", mBallWmParams.y);
                 }
 
-                if(mReverseMenu){
+                if(mReverseMenu && !mIsLandscape){
 
                     reverseMenu();
 
@@ -2001,13 +2000,13 @@ public class FloatingBallService extends Service implements View.OnClickListener
             @Override
             public void onAnimationEnd(Animator animation) {
 
-                if(mIsSavePos){
+                if(mIsSavePos && !mIsLandscape){
 
                     saveStates("ballWmParamsX", mBallWmParams.x);
                     saveStates("ballWmParamsY", mBallWmParams.y);
                 }
 
-                if(mReverseMenu){
+                if(mReverseMenu  && !mIsLandscape){
 
                     reverseMenu();
 
@@ -2090,6 +2089,19 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mCanmove = true;
                 break;
             case "快捷应用":
+
+                if(mIsLandscape){
+
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Toast.makeText(mContext,"横屏不允许打开快捷菜单!",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    return;
+                }
 
                 new Thread(new Runnable() {
                     @Override

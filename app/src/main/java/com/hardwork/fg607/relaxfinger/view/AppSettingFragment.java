@@ -68,27 +68,27 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
 public class AppSettingFragment extends Fragment implements View.OnClickListener{
 
-    @Bind(R.id.app1_layout) RelativeLayout mLayout1;
-    @Bind(R.id.app2_layout) RelativeLayout mLayout2;
-    @Bind(R.id.app3_layout) RelativeLayout mLayout3;
-    @Bind(R.id.app4_layout) RelativeLayout mLayout4;
-    @Bind(R.id.app5_layout) RelativeLayout mLayout5;
-    @Bind(R.id.app1_name) TextView mAppTextView1;
-    @Bind(R.id.app2_name) TextView mAppTextView2;
-    @Bind(R.id.app3_name) TextView mAppTextView3;
-    @Bind(R.id.app4_name) TextView mAppTextView4;
-    @Bind(R.id.app5_name) TextView mAppTextView5;
-    @Bind(R.id.icon_app1) ImageView mAppIcon1;
-    @Bind(R.id.icon_app2) ImageView mAppIcon2;
-    @Bind(R.id.icon_app3) ImageView mAppIcon3;
-    @Bind(R.id.icon_app4) ImageView mAppIcon4;
-    @Bind(R.id.icon_app5) ImageView mAppIcon5;
+    @BindView(R.id.app1_layout) RelativeLayout mLayout1;
+    @BindView(R.id.app2_layout) RelativeLayout mLayout2;
+    @BindView(R.id.app3_layout) RelativeLayout mLayout3;
+    @BindView(R.id.app4_layout) RelativeLayout mLayout4;
+    @BindView(R.id.app5_layout) RelativeLayout mLayout5;
+    @BindView(R.id.app1_name) TextView mAppTextView1;
+    @BindView(R.id.app2_name) TextView mAppTextView2;
+    @BindView(R.id.app3_name) TextView mAppTextView3;
+    @BindView(R.id.app4_name) TextView mAppTextView4;
+    @BindView(R.id.app5_name) TextView mAppTextView5;
+    @BindView(R.id.icon_app1) ImageView mAppIcon1;
+    @BindView(R.id.icon_app2) ImageView mAppIcon2;
+    @BindView(R.id.icon_app3) ImageView mAppIcon3;
+    @BindView(R.id.icon_app4) ImageView mAppIcon4;
+    @BindView(R.id.icon_app5) ImageView mAppIcon5;
     private String mAppName;
     private TextView mCurrentTextView;
     private ImageView mCurrentIcon;
@@ -447,9 +447,9 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
     public static class FunctionDialog extends DialogFragment{
 
-        @Bind(R.id.viewPager)
+        @BindView(R.id.viewPager)
         ViewPager mViewPager;
-        @Bind(R.id.tabs)
+        @BindView(R.id.tabs)
         TabLayout mTabs;
 
         private View mAppView = null;
@@ -1122,6 +1122,5 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
         public void onOperateFinish();
 
     }
-
 
 }

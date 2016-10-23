@@ -19,13 +19,13 @@ import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
 public class AppChooseFragment extends Fragment {
 
-    @Bind(R.id.lv_app)
+    @BindView(R.id.lv_app)
     ListView mListView;
     private ArrayList<AppInfo> mAppList;
     private AppAdapter mAppAdapter;

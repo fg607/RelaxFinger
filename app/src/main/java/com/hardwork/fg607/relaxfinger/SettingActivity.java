@@ -1,6 +1,7 @@
 package com.hardwork.fg607.relaxfinger;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -11,7 +12,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -38,14 +43,14 @@ import net.grandcentrix.tray.TrayAppPreferences;
 import java.util.List;
 import java.util.Set;
 
-public class SettingActivity extends AppCompatActivity{
+public class SettingActivity extends AppCompatActivity {
 
     private boolean mIsAccessibilityEnable;
     private boolean mIsAdmin;
     private DevicePolicyManager mDeviceManager;
     private ComponentName mComponentName;
     private AccessibilityManager mManager;
-    private List< AccessibilityServiceInfo> mList;
+    private List<AccessibilityServiceInfo> mList;
     private AlertDialog mAlertDialog;
     private SettingFragment mSettingFragment = new SettingFragment();
     private GestureFragment mGestureFragment;
@@ -73,12 +78,7 @@ public class SettingActivity extends AppCompatActivity{
             public void onGestureSettingClick() {
 
                 FragmentTransaction transaction = getFragmentManager().beginTransaction()
-                        .setCustomAnimations(
-                                R.animator.fragment_left_enter,
-                                R.animator.fragment_left_exit,
-                                R.animator.fragment_pop_left_enter,
-                                R.animator.fragment_pop_left_exit);
-
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
 
                 if (mGestureFragment == null) {
@@ -91,8 +91,9 @@ public class SettingActivity extends AppCompatActivity{
 
                 transaction.addToBackStack(null);
 
-                transaction.commit();
+                transaction.commitAllowingStateLoss();
 
+                getFragmentManager().executePendingTransactions();
                 SettingActivity.this.setTitle("手势功能设置");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -102,11 +103,7 @@ public class SettingActivity extends AppCompatActivity{
             public void onAppSettingClick() {
 
                 FragmentTransaction transaction = getFragmentManager().beginTransaction()
-                        .setCustomAnimations(
-                                R.animator.fragment_left_enter,
-                                R.animator.fragment_left_exit,
-                                R.animator.fragment_pop_left_enter,
-                                R.animator.fragment_pop_left_exit);
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
 
                 if (mAppSettingFragment == null) {
@@ -122,6 +119,7 @@ public class SettingActivity extends AppCompatActivity{
 
                 transaction.commit();
 
+                getFragmentManager().executePendingTransactions();
                 SettingActivity.this.setTitle("快捷菜单设置");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -129,7 +127,8 @@ public class SettingActivity extends AppCompatActivity{
             }
         });
 
-        getFragmentManager().beginTransaction().replace(R.id.fragment, mSettingFragment).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment, mSettingFragment).addToBackStack(null).commit();
 
         //防止内存不足重绘重叠
        /* if(savedInstanceState == null){
@@ -150,12 +149,13 @@ public class SettingActivity extends AppCompatActivity{
 
     }
 
+
     private void initTestinAgent() {
 
-        boolean isOpenCatchCrash = mPreferences.getBoolean("testinSwitch",true);
+        boolean isOpenCatchCrash = mPreferences.getBoolean("testinSwitch", true);
 
 
-        if(isOpenCatchCrash){
+        if (isOpenCatchCrash) {
 
               /*初始化崩溃收集工具*/
             TestinAgentConfig config = new TestinAgentConfig.Builder(this)
@@ -197,23 +197,22 @@ public class SettingActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
 
-
         FragmentManager fm = getFragmentManager();
         if (fm.getBackStackEntryCount() > 1) {
 
-            fm.popBackStack();
+            fm.popBackStackImmediate();
             SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         } else {
 
-            super.onBackPressed();
+            finish();
         }
     }
 
     private void initAccessibility() {
         mManager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-        mDeviceManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mComponentName = new ComponentName(SettingActivity.this,ScreenOffAdminReceiver.class);
+        mDeviceManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mComponentName = new ComponentName(SettingActivity.this, ScreenOffAdminReceiver.class);
     }
 
 
@@ -223,18 +222,25 @@ public class SettingActivity extends AppCompatActivity{
 
         TestinAgent.onResume(this);
 
-        if(mPreferences.getInt("versionCode",0)< AppUtils.getVersionCode(this)){
+        if (mPreferences.getInt("versionCode", 0) < AppUtils.getVersionCode(this)) {
 
             showUpdateInfo();
 
-            mPreferences.put("versionCode",AppUtils.getVersionCode(this));
+            mPreferences.put("versionCode", AppUtils.getVersionCode(this));
         }
 
-        if(mAlertDialog != null && mAlertDialog.isShowing()){
+        if (mAlertDialog != null && mAlertDialog.isShowing()) {
 
             mAlertDialog.dismiss();
         }
         checkAccessibility();
+
+        //6.0以上需要手动打开Draw over other apps
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+
+            requestDrawOverLays();
+        }
+
 
 
     }
@@ -267,30 +273,30 @@ public class SettingActivity extends AppCompatActivity{
 
             openAlertDialog();
 
-        }else if(mIsShowTeaching){
+        } else if (mIsShowTeaching) {
 
-                sendMsg(Config.SHOW_TEACHING,"showTeaching",0);
-                mIsShowTeaching = false;
-                mPreferences.put("showTeaching", false);
+            sendMsg(Config.SHOW_TEACHING, "showTeaching", 0);
+            mIsShowTeaching = false;
+            mPreferences.put("showTeaching", false);
         }
 
         mIsAdmin = mDeviceManager.isAdminActive(mComponentName);
 
-        try{
-            if(mIsAdmin){
+        try {
+            if (mIsAdmin) {
                 mSettingFragment.getLockScreenSwitch().setChecked(true);
-            }else {
+            } else {
                 mSettingFragment.getLockScreenSwitch().setChecked(false);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
-            Log.e("ERROR","resume error");
+            Log.e("ERROR", "resume error");
         }
 
     }
 
-    public void openAlertDialog(){
+    public void openAlertDialog() {
 
         mAlertDialog = new AlertDialog.Builder(this).create();
         mAlertDialog.setTitle("激活导航服务");
@@ -302,14 +308,14 @@ public class SettingActivity extends AppCompatActivity{
 
                 dialog.dismiss();
 
-                try{
+                try {
                     startActivity(new Intent("android.settings.ACCESSIBILITY_SETTINGS"));
 
-                }catch (ActivityNotFoundException e){
+                } catch (ActivityNotFoundException e) {
 
                     e.printStackTrace();
 
-                    Toast.makeText(SettingActivity.this,"没有找到辅助功能设置界面，请手动开启！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SettingActivity.this, "没有找到辅助功能设置界面，请手动开启！", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -338,9 +344,9 @@ public class SettingActivity extends AppCompatActivity{
         stopService(intent);
     }
 
-    public  void sendMsg(int what,String name,int msg) {
+    public void sendMsg(int what, String name, int msg) {
         Intent intent = new Intent();
-        intent.putExtra("what",what);
+        intent.putExtra("what", what);
         intent.putExtra(name, msg);
         intent.setClass(this, FloatingBallService.class);
         startService(intent);
@@ -371,12 +377,12 @@ public class SettingActivity extends AppCompatActivity{
 
         }
 
-        if(id == android.R.id.home){
+        if (id == android.R.id.home) {
 
             FragmentManager fm = getFragmentManager();
             if (fm.getBackStackEntryCount() > 1) {
 
-                fm.popBackStack();
+                fm.popBackStackImmediate();
                 SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             } else {
@@ -388,7 +394,7 @@ public class SettingActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public void developerInfo(){
+    public void developerInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("关于悬浮助手");
@@ -398,7 +404,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    public void questionsAnswer(){
+    public void questionsAnswer() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("常见问题解答");
@@ -418,7 +424,7 @@ public class SettingActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    public void showUpdateInfo(){
+    public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle("悬浮助手-1.3.3版本更新内容");
@@ -435,7 +441,31 @@ public class SettingActivity extends AppCompatActivity{
     }
 
 
+    public static int OVERLAY_PERMISSION_REQ_CODE = 1234;
 
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestDrawOverLays() {
+        if (!Settings.canDrawOverlays(SettingActivity.this)) {
+            Toast.makeText(this, "can not DrawOverlays", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + SettingActivity.this.getPackageName()));
+            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+        } else {
+            // Already hold the SYSTEM_ALERT_WINDOW permission, do addview or something.
+        }
+    }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (!Settings.canDrawOverlays(this)) {
+                // SYSTEM_ALERT_WINDOW permission not granted...
+                Toast.makeText(this, "Permission Denieddd by user.Please Check it in Settings", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission Allowed", Toast.LENGTH_SHORT).show();
+                // Already hold the SYSTEM_ALERT_WINDOW permission, do addview or something.
+            }
+        }
+    }
 
 }

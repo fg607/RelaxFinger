@@ -24,7 +24,7 @@ public class NotificationService extends NotificationListenerService {
 
         String title = sbn.getNotification().extras.getString("android.title");
 
-        if(title.equals("选择输入法")){
+        if(title.contains("选择输入法") || title.contains("更改键盘")){
 
             if(sp.getBoolean("floatSwitch",false)){
 
@@ -39,7 +39,7 @@ public class NotificationService extends NotificationListenerService {
 
         String title = sbn.getNotification().extras.getString("android.title");
 
-        if(title.equals("选择输入法")){
+        if(title.equals("选择输入法") || title.contains("更改键盘")){
 
             if(sp.getBoolean("floatSwitch",false)){
 

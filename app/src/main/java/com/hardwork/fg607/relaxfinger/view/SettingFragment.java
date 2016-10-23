@@ -19,6 +19,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,9 +32,11 @@ import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
+import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
 import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
@@ -45,7 +48,7 @@ import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.io.IOException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SettingFragment extends PreferenceFragment implements OnPreferenceChangeListener,View.OnClickListener {
@@ -77,17 +80,17 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SharedPreferences mSharePreferences;
 
     private View mThemeView;
-    @Bind(R.id.img1) RelativeLayout mImg1;
-    @Bind(R.id.img2) RelativeLayout mImg2;
-    @Bind(R.id.img3) RelativeLayout mImg3;
-    @Bind(R.id.img4) RelativeLayout mImg4;
-    @Bind(R.id.img5) RelativeLayout mImg5;
-    @Bind(R.id.img6) ImageView mImg6;
-    @Bind(R.id.check1) ImageView mCheck1;
-    @Bind(R.id.check2) ImageView mCheck2;
-    @Bind(R.id.check3) ImageView mCheck3;
-    @Bind(R.id.check4) ImageView mCheck4;
-    @Bind(R.id.check5) ImageView mCheck5;
+    @BindView(R.id.img1) RelativeLayout mImg1;
+    @BindView(R.id.img2) RelativeLayout mImg2;
+    @BindView(R.id.img3) RelativeLayout mImg3;
+    @BindView(R.id.img4) RelativeLayout mImg4;
+    @BindView(R.id.img5) RelativeLayout mImg5;
+    @BindView(R.id.img6) ImageView mImg6;
+    @BindView(R.id.check1) ImageView mCheck1;
+    @BindView(R.id.check2) ImageView mCheck2;
+    @BindView(R.id.check3) ImageView mCheck3;
+    @BindView(R.id.check4) ImageView mCheck4;
+    @BindView(R.id.check5) ImageView mCheck5;
     private ImageView mViewChoosed;
     private String mThemeChoosed;
 
@@ -121,8 +124,16 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mClickListener = listener;
     }
 
-
     private void checkSetting() {
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if(!Settings.canDrawOverlays(getActivity())){
+
+                mFloatSwitch.setChecked(false);
+            }
+        }
 
         sendMsg(Config.FLOAT_SWITCH, "ballstate", mFloatSwitch.isChecked());
 
@@ -283,7 +294,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
             String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
                     +"/RelaxFinger/DIY.png";
-            Bitmap icon = ImageUtils.scaleBitmap(filePath,100);
+
+            Bitmap icon = ImageUtils.scaleBitmap(filePath, DensityUtil.dip2px(getActivity(),40),
+                    DensityUtil.dip2px(getActivity(),40));
 
             mImg5.setBackground(ImageUtils.bitmap2Drawable(icon));
             mImg5.setClickable(true);
@@ -624,7 +637,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     }
 
-    private void FloatChange(boolean newValue) {
+    public void FloatChange(boolean newValue) {
 
         mPreferences.put("floatSwitch", newValue);
 
@@ -766,17 +779,27 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         if(requestCode == Config.REQUEST_PICK) {
 
             if(data != null) {
-                Uri imageUri = data.getData();
-                try {
-                    //将选择的图片进行暂存
-                    FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
-                    Intent intent = new Intent();
-                    intent.setClass(getActivity(), ClipImageActivity.class);
-                    startActivityForResult(intent,Config.REQUEST_CLIP);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                try {
+
+                    Uri imageUri = data.getData();
+
+                    try {
+                        //将选择的图片进行暂存
+                        FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                        Intent intent = new Intent();
+                        intent.setClass(getActivity(), ClipImageActivity.class);
+                        startActivityForResult(intent,Config.REQUEST_CLIP);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }catch (OutOfMemoryError e){
+
+                    Toast.makeText(getActivity(),"图片过大，无法正常加载！",Toast.LENGTH_SHORT).show();
                 }
+
             }
 
         }
@@ -797,6 +820,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                     e.printStackTrace();
                 }
 
+                if(mImg5==null){
+
+                    FloatingBallUtils.bitmap = null;
+                    return;
+                }
+
                 //显示裁剪后的图标
                 mImg5.setBackground(ImageUtils.bitmap2Drawable(FloatingBallUtils.bitmap));
 
@@ -810,11 +839,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                     mFloatBallTheme.setSummary(mThemeChoosed);
                 }
 
-
                 FloatingBallUtils.bitmap = null;
-                //showImg6(mUserBitmap);
-                /*mViewChoosed.setVisibility(View.INVISIBLE);
-                mViewChoosed = setIconChoosed(mIconPath);*/
             }
         }
 

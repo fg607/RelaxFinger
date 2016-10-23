@@ -10,10 +10,12 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by fg607 on 15-11-26.
@@ -127,30 +129,98 @@ public class ImageUtils {
     /**
      * 缩放图标
      * @param filename
-     * @param size
+     * @param scaleWidth
+     * @param scaleHeight
      * @return
      */
-    public static Bitmap scaleBitmap(String filename,float size) {
+    public static Bitmap scaleBitmap(String filename,int scaleWidth,int scaleHeight) {
+
+        if(scaleWidth==0 || scaleHeight==0 ){
+
+            Log.e("ImageUtils","scaleBitmap scaleWidth or scaleHeight can not be 0");
+            return null;
+        }
+
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
 
         BitmapFactory.decodeFile(filename, options);
 
-        int be = (int)(options.outHeight / (float)size);
 
-        if (be <= 0) {
-            be = 1;
+        //缩放系数
+        int inSampleSize = 1;
+
+        //bitmap 实际尺寸
+        int height = options.outHeight;
+        int width = options.outWidth;
+
+        //根据scalewidth 和scaleheight计算缩放系数
+        if(width>scaleWidth || height>scaleHeight){
+
+            int halfWidht = width/2;
+            int halfHeight = height/2;
+
+
+            while ((halfHeight/inSampleSize)>=scaleHeight && (halfWidht/inSampleSize)>=scaleWidth){
+
+                inSampleSize *=2;
+            }
+
         }
 
-        BitmapFactory.Options options1 = new BitmapFactory.Options();
-        options1.inSampleSize = be;
-        options1.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        options1.inPurgeable = true;
-        options1.inInputShareable = true;
-        options1.inJustDecodeBounds = false;
-        Bitmap outputbitmap = BitmapFactory.decodeFile(filename, options1);
+
+        options.inSampleSize = inSampleSize;
+        options.inJustDecodeBounds = false;
+        Bitmap outputbitmap = BitmapFactory.decodeFile(filename, options);
 
         return outputbitmap;
+    }
+
+    public static Bitmap ScaleBitmap(Bitmap bitmap,int scaleWidth,int scaleHeight){
+
+        if(scaleWidth==0 || scaleHeight==0 ){
+
+            Log.e("ImageUtils","scaleBitmap scaleWidth or scaleHeight can not be 0");
+            return null;
+        }
+        Bitmap outputBitmap = null;
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        //测量bitmap实际尺寸
+        options.inJustDecodeBounds = true;
+
+        byte[] bitmapArray = Bitmap2Bytes(bitmap);
+
+        BitmapFactory.decodeByteArray(bitmapArray,0,bitmapArray.length,options);
+
+        //缩放系数
+        int inSampleSize = 1;
+
+        //bitmap 实际尺寸
+        int height = options.outHeight;
+        int width = options.outWidth;
+
+        //根据scalewidth 和scaleheight计算缩放系数
+        if(width>scaleWidth || height>scaleHeight){
+
+            int halfWidht = width/2;
+            int halfHeight = height/2;
+
+            while (halfHeight/inSampleSize>=scaleHeight && halfWidht/inSampleSize>=scaleWidth){
+
+                inSampleSize *=2;
+            }
+
+        }
+
+        options.inSampleSize = inSampleSize;
+
+        options.inJustDecodeBounds = false;
+
+        outputBitmap = BitmapFactory.decodeByteArray(bitmapArray,0,bitmapArray.length,options);
+
+        return outputBitmap;
     }
 
     public static Bitmap getCircleBitmap(Bitmap bitmap) {

@@ -66,7 +66,6 @@ public class ToolAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
 
-
         ImageView icon;
         TextView name;
         CheckBox checkBox;

@@ -464,33 +464,41 @@ public class AppUtils {
         }
 
 
-        Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent" },
+        try{
+
+            Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent" },
                     null, null, null);
 
+            if (c != null && c.getCount() > 0) {
 
-        if (c != null && c.getCount() > 0) {
+                String intent = null;
+                String title;
+                byte[] icon;
 
-            String intent = null;
-            String title;
-            byte[] icon;
-
-            while(c.moveToNext()){
-                icon = c.getBlob(0);
-                title = c.getString(1);
-                intent = c.getString(2);
+                while(c.moveToNext()){
+                    icon = c.getBlob(0);
+                    title = c.getString(1);
+                    intent = c.getString(2);
 
 
-                if(icon !=null && intent!=null){
+                    if(icon !=null && intent!=null){
 
-                    ShortcutInfo shortcutInfo = new ShortcutInfo(ImageUtils.Bytes2Drawable(icon),
-                            title,intent);
+                        ShortcutInfo shortcutInfo = new ShortcutInfo(ImageUtils.Bytes2Drawable(icon),
+                                title,intent);
 
-                    list.add(shortcutInfo);
+                        list.add(shortcutInfo);
+                    }
+
                 }
 
             }
 
+        }catch (Exception e){
+
+            e.printStackTrace();
         }
+
+
 
         return list;
 
