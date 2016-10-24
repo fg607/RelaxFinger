@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.hardwork.fg607.relaxfinger"
@@ -54,5 +54,4 @@ dependencies {
     compile 'com.facebook.rebound:rebound:0.3.8'
     compile 'com.github.satyan:sugar:1.5'
     compile project(':qAMasterSDK')
-
 }
