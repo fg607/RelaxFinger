@@ -8,6 +8,7 @@ android:
   - tools
   - platform-tools
   - extra
+jdk: oraclejdk8
 script:
 - "./gradlew assembleRelease"
 deploy:
