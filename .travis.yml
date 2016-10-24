@@ -3,7 +3,7 @@ sudo: false
 android:
   components:
   - build-tools-25.0.0
-  - android-25
+  - android-24
   - extra-android-support
   - tools
   - platform-tools
