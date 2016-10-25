@@ -370,18 +370,14 @@ public class FloatingBallUtils {
 
         String prePackageName = null;
 
-        List<String> packageList = AppUtils.getTasks();
-        Log.i("tasks:",packageList.toString());
-        if(packageList.size()>0){
-            prePackageName = packageList.get(0);
-        }else {
-
-            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
-        }
+        prePackageName = AppUtils.getPreviousApp();
 
         if(prePackageName!=null){
 
             AppUtils.startApplication(prePackageName);
+        }else {
+
+            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
         }
 
 

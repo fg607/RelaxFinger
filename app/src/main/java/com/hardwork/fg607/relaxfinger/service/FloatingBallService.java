@@ -2184,7 +2184,12 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 FloatingBallUtils.keyHome(this);
                 break;
             case "最近任务键":
-                FloatingBallUtils.openRecnetTask(mAccessibilityService.instance);
+                //FloatingBallUtils.openRecnetTask(mAccessibilityService.instance);
+                try {
+                    FloatingBallUtils.previousApp();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case "休眠(需要开启锁屏功能)":
                 FloatingBallUtils.lockScreen(this);

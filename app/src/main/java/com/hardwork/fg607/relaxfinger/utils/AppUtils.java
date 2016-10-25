@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -278,22 +280,22 @@ public class AppUtils {
         return null;
     }
 
-    public static List<String> getTasks() throws Exception {
+    public static String getPreviousApp() throws Exception {
 
         if (Build.VERSION.SDK_INT >= 21) {
 
-            return  getTasksNew();
+            return  getPreviousNew();
 
         } else {
 
-           return getTasksOld();
+           return getPreviousOld();
         }
     }
 
     //API 21 and above
-    public static List<String> getTasksNew() throws Exception {
+    public static String getPreviousNew() throws Exception {
 
-        List<String> packageNameList = new ArrayList<>();
+        //List<String> packageNameList = new ArrayList<>();
         Field field = null;
         try {
             field = ActivityManager.RunningAppProcessInfo.class.getDeclaredField("processState");
@@ -313,35 +315,65 @@ public class AppUtils {
                 if (state != null) {
                     ApplicationInfo info = getApplicationInfoByProcessName(app.processName);
 
-                    if(info!= null)
-                        packageNameList.add(info.packageName);
+                    if(info!= null){
+                        Log.i("task",info.packageName);
+                        return info.packageName;
+                    }
 
                 }
             }
         }
 
-        return packageNameList;
+        return null;
     }
 
     //API below 21
     @SuppressWarnings("deprecation")
-    public static List<String>  getTasksOld() throws Exception {
+    public static String  getPreviousOld() throws Exception {
 
         List<String> packageNameList = new ArrayList<>();
         String packageName = null;
         ActivityManager activity = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> runningTask = activity.getRunningTasks(5);
+        List<ActivityManager.RunningTaskInfo> runningTask = activity.getRunningTasks(3);
         if (runningTask != null) {
             for(ActivityManager.RunningTaskInfo task:runningTask){
                 ComponentName componentTop = task.topActivity;
                 packageName = componentTop.getPackageName();
                 packageNameList.add(packageName);
+                Log.i("task",packageName);
             }
 
         }
 
-        return packageNameList;
+        if(packageNameList.size()>2 && packageNameList.get(0).equals("com.hardwork.fg607.relaxfinger")){
 
+            return packageNameList.get(2);
+        }
+
+        return packageNameList.size()>1?packageNameList.get(1):null;
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static String getForegroundApp(Context context) {
+        UsageStatsManager usageStatsManager =
+                (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        long ts = System.currentTimeMillis();
+        List<UsageStats> queryUsageStats =
+                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+        if (queryUsageStats == null || queryUsageStats.isEmpty()) {
+            return null;
+        }
+
+        UsageStats recentStats = null;
+        for (UsageStats usageStats : queryUsageStats) {
+            if(recentStats == null
+                    || recentStats.getLastTimeUsed() < usageStats.getLastTimeUsed()){
+                recentStats = usageStats;
+            }
+        }
+
+        return recentStats.getPackageName();
     }
 
     /**
