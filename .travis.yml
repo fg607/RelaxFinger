@@ -2,11 +2,11 @@ language: android
 sudo: false
 android:
   components:
-  - build-tools-25.0.0
-  - android-25
-  - tools
-  - platform-tools
-  - extra
+   - tools
+   - platform-tools
+   - android-25
+   - build-tools-25.0.0
+   - extra
 jdk: oraclejdk8
 script:
 - "./gradlew assembleRelease"
