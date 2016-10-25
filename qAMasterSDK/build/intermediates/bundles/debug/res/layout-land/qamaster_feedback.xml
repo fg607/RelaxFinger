@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/qamaster_dialog_bg" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/qamaster_dialog_bg"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <include layout="@layout/qamaster_feedback_header" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="3"
+                android:orientation="vertical" >
+
+                <include layout="@layout/qamaster_problem_description" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:background="@color/qamaster_dialog_divider" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="2"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@color/qamaster_dialog_panel_bg"
+                    android:orientation="vertical" >
+
+                    <include layout="@layout/qamaster_feedback_title" />
+
+                    <com.qamaster.android.ui.QAMasterRatingBar
+                        android:id="@+id/qamaster_feedback_rating_bar"
+                        style="@style/qamaster_blue_rating_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="10dp"
+                        android:max="5"
+                        android:numStars="5"
+                        android:rating="3"
+                        android:stepSize="1" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@color/qamaster_dialog_divider"
+                    android:paddingBottom="0dp"
+                    android:paddingTop="0dp" />
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/qamaster_dialog_panel_bg"
+                    android:orientation="horizontal"
+                    android:paddingBottom="12dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="12dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+
+                        <include
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/qamaster_screenshot_height"
+                            android:layout_weight="0"
+                            layout="@layout/qamaster_screenshot_element" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical" >
+
+                            <com.qamaster.android.ui.MontserratTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical|left"
+                                android:paddingLeft="16dp"
+                                android:text="@string/qamaster_include_screenshot"
+                                android:textAllCaps="true"
+                                android:textColor="@color/qamaster_dialog_panel_header"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical|left"
+                                android:paddingLeft="16dp"
+                                android:paddingTop="2dp"
+                                android:text="@string/qamaster_send_screenshot_desc"
+                                android:textColor="@color/qamaster_dialog_panel_text"
+                                android:textSize="12sp"
+                                android:typeface="sans" />
+                        </LinearLayout>
+
+                        <CheckBox
+                            android:id="@+id/qamaster_feedback_include_screenshot_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right|top"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="0dp"
+                            android:layout_weight="0"
+                            android:button="@drawable/qamaster_checkbox"
+                            android:checked="true"
+                            android:gravity="center_vertical" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

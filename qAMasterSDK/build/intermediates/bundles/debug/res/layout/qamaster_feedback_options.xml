@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_white">
+
+    <TextView
+            android:id="@+id/qamaster_feedback_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/qamaster_report_options_title"
+            android:textColor="@color/qamaster_black"
+            android:textSize="17sp" />
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center"
+            android:text="@string/qamaster_report_options_description"
+            android:textColor="@color/qamaster_lightGrey"
+            android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:baselineAligned="false"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_divider" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/qamaster_feedback_start_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_button_bg"
+        android:gravity="center"
+        android:text="@string/qamaster_feedback_options_start"
+        android:textColor="@drawable/qamaster_alertdialog_button_textcolor"
+        android:textSize="17sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:baselineAligned="false"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_divider" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/qamaster_problem_start_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_button_bg"
+        android:gravity="center"
+        android:text="@string/qamaster_problem_options_start"
+        android:textColor="@drawable/qamaster_alertdialog_button_textcolor"
+        android:textSize="17sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:baselineAligned="false"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_divider" />
+    </LinearLayout>
+
+     <Button
+        android:id="@+id/qamaster_report_cancel_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_button_bg"
+        android:gravity="center"
+        android:text="@string/qamaster_report_options_cancel"
+        android:textColor="@drawable/qamaster_alertdialog_button_textcolor"
+        android:textSize="17sp" />
+
+    <LinearLayout
+        android:id="@+id/qamaster_report_cancel_divider_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:baselineAligned="false"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_divider" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/qamaster_report_end_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@color/qamaster_dialog_button_bg"
+        android:gravity="center"
+        android:text="@string/qamaster_report_options_end"
+        android:textColor="@drawable/qamaster_alertdialog_button_textcolor"
+        android:textSize="17sp" />
+
+</LinearLayout>

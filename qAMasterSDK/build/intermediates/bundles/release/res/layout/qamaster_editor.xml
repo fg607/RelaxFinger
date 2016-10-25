@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_editor_bg" >
+
+    <com.qamaster.android.ui.overlay.OverlayView
+        android:id="@+id/qamaster_overlay"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <RelativeLayout
+        android:id="@+id/qamaster_overlay_header"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/qamaster_editor_header_bg" >
+
+        <com.qamaster.android.ui.MontserratTextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical|left"
+            android:paddingLeft="16dip"
+            android:text="@string/qamaster_edit_screenshot"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="20sp" />
+
+        <com.qamaster.android.ui.AwesomeFontButton
+            android:id="@+id/qamaster_overlay_go_report"
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/qamaster_editor_button"
+            android:text="@string/qamaster_accept_icon"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="26dp"
+            tools:ignore="SpUsage" />
+
+        <com.qamaster.android.ui.AwesomeFontButton
+            android:id="@+id/qamaster_overlay_delete_screenshot"
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:layout_toLeftOf="@+id/qamaster_overlay_go_report"
+            android:background="@drawable/qamaster_editor_button"
+            android:text="@string/qamaster_trash_icon"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="26dp"
+            tools:ignore="SpUsage" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/qamaster_overlay_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/qamaster_editor_footer_bg" >
+
+        <com.qamaster.android.ui.AwesomeFontButton
+            android:id="@+id/qamaster_overlay_pencil"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:text="@string/qamaster_pencil_icon" />
+
+        <com.qamaster.android.ui.AwesomeFontButton
+            android:id="@+id/qamaster_overlay_spray"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:text="@string/qamaster_spray_icon" />
+
+        <com.qamaster.android.ui.AwesomeFontButton
+            android:id="@+id/qamaster_overlay_eraser"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:text="@string/qamaster_eraser_icon" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/qamaster_login_app_version"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/qamaster_dialog_footer_background"
+    android:gravity="center_horizontal|center_vertical"
+    android:textColor="@color/qamaster_footer_text"
+    android:textSize="12sp"
+    tools:showIn="@layout/qamaster_login"
+    tools:text="Footer text" />

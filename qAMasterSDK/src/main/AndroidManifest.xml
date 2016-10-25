@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.qamaster.android"
+    android:versionCode="6"
+    android:versionName="2.3" >
+
+    <uses-sdk
+        android:minSdkVersion="8" />
+
+    <!-- Required permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <activity android:name="com.qamaster.android.ui.ProblemActivity" />
+        <activity android:name="com.qamaster.android.ui.FeedbackActivity" />
+        <activity android:name="com.qamaster.android.ui.ScreenshotEditorActivity" />
+    </application>
+
+</manifest>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/qamaster_white">
+
+    <EditText
+        android:id="@+id/qamaster_report_message_edit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:background="@drawable/qamaster_textbox"
+        android:gravity="top|left"
+        android:hint="@string/qamaster_report_message_hint"
+        android:inputType="text|textMultiLine|textShortMessage|textCapSentences"
+        android:padding="5dp"
+        android:textColor="@color/qamaster_input_text"
+        android:textColorHint="@color/qamaster_input_hint"
+        android:textSize="16sp"
+        android:scrollbars="vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:baselineAligned="false"
+        android:paddingBottom="0dp"
+        android:paddingTop="0dp" >
+        <FrameLayout
+            android:id="@+id/qamaster_report_divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/qamaster_dialog_divider" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/qamaster_report_contact_edit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="7"
+        android:background="@drawable/qamaster_textbox"
+        android:gravity="center_vertical|left"
+        android:hint="@string/qamaster_report_contact_hint"
+        android:inputType="text"
+        android:padding="5dp"
+        android:textColor="@color/qamaster_input_text"
+        android:textColorHint="@color/qamaster_input_hint"
+        android:textSize="16sp" />
+
+</LinearLayout>

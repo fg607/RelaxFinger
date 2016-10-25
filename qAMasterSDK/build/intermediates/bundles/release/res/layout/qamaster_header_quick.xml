@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:ignore="InconsistentLayout" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@drawable/qamaster_dialog_header_background"
+        android:gravity="center_vertical|left"
+        android:orientation="vertical"
+        android:paddingLeft="16dp" >
+
+        <com.qamaster.android.ui.MontserratTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/qamaster_login_title"
+            android:textColor="@color/qamaster_header_text"
+            android:textSize="19sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/qamaster_subheader_bg"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="16dp" >
+
+        <TextView
+            android:id="@+id/qamaster_header_quick_subheader"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/qamaster_login_quick_subtitle"
+            android:textColor="@color/qamaster_subheader_text"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

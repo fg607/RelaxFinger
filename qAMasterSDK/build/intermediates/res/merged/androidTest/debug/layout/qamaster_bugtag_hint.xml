@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:qamaster="http://schemas.android.com/apk/lib/com.qamaster.android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_transparent_palegrey" >
+
+    <com.qamaster.android.ui.util.GifImageView
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        qamaster:gif_src="@drawable/bugtag_hint" />
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"
+        android:gravity="center"
+        android:background="@drawable/qamaster_editor_button"
+        android:text="@string/qamaster_report_method_hint"
+        android:textColor="@color/qamaster_paleBlack"
+        android:textSize="15sp" />
+
+</LinearLayout>

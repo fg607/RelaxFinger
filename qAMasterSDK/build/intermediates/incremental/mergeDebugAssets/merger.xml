@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/src/main/assets"/><source path="/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/generated/assets/shaders/debug"/></dataSet><dataSet config="debug"><source path="/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/src/debug/assets"/></dataSet></merger>

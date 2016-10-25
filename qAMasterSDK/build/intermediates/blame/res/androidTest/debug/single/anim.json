@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_login_fadeout.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_login_fadeout.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_forgot_passcode_out.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_forgot_passcode_out.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_slide_out.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_slide_out.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_edit_screeshot_fadeout.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_edit_screeshot_fadeout.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_slide_in.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_slide_in.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_forgot_passcode_in.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_forgot_passcode_in.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_edit_screeshot_fadein.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_edit_screeshot_fadein.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/anim/qamaster_login_fadein.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/anim/qamaster_login_fadein.xml"
+    }
+]

@@ -1,0 +1,45 @@
+[
+    {
+        "outputFile": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/incremental/mergeDebugAndroidTestResources/merged.dir/values-sw600dp-v13/values-sw600dp-v13.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 65,
+                    "endOffset": 116
+                },
+                "from": {
+                    "file": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/values-sw600dp-v13/values-sw600dp-v13.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 65,
+                        "endOffset": 116
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 121,
+                    "endColumn": 62,
+                    "endOffset": 179
+                },
+                "from": {
+                    "file": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/values-sw600dp-v13/values-sw600dp-v13.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 121,
+                        "endColumn": 62,
+                        "endOffset": 179
+                    }
+                }
+            }
+        ]
+    }
+]

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:padding="0dp"
+    tools:showIn="@layout/qamaster_problem" >
+
+    <EditText
+        android:id="@+id/qamaster_report_message_edit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/qamaster_textbox"
+        android:gravity="top|left"
+        android:hint="@string/qamaster_problem_hint"
+        android:inputType="text|textMultiLine|textShortMessage|textCapSentences"
+        android:padding="16dp"
+        android:textColor="@color/qamaster_input_text"
+        android:textColorHint="@color/qamaster_input_hint"
+        android:textSize="18sp" />
+
+</FrameLayout>

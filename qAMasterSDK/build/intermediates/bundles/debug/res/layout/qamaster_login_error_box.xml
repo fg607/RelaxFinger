@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qamaster.android.dialog.LoginErrorBox xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/qamaster_login_error_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/qamaster_error_bg"
+    android:padding="10dp"
+    android:visibility="gone"
+    tools:showIn="@layout/qamaster_login_normal"
+    tools:visibility="visible" >
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/qamaster_login_error_box_title"
+        android:textAllCaps="true"
+        android:textColor="@color/qamaster_error_text"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/qamaster_login_error_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textColor="@color/qamaster_error_text"
+        android:textSize="14sp"
+        tools:text="Here comes the error code With very very very long text." />
+
+    <com.qamaster.android.ui.AwesomeFontTextView
+        android:id="@+id/qamaster_login_error_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="@string/qamaster_close_icon"
+        android:textColor="@color/qamaster_error_text"
+        android:textSize="14sp" />
+
+</com.qamaster.android.dialog.LoginErrorBox>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/qamaster_beta_dialog_header_background"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:id="@+id/qamaster_forgot_passcode_action_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_vertical"
+        android:text="@string/qamaster_login_beta_go_back"
+        android:textColor="@color/qamaster_beta_forgot_passcode" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/qamaster_paleGrey" />
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/qamaster_login_beta_get_passcode_label"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/qamaster_forgot_passcode_edit"
+        style="@style/qamaster_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="12dp"
+        android:hint="@string/qamaster_login_username_hint"
+        android:inputType="text|textEmailAddress"
+        android:textColorHint="@color/qamaster_input_hint"
+        android:textStyle="bold" />
+
+    <com.qamaster.android.ui.MontserratButton
+        android:id="@+id/qamaster_forgot_passcode_action"
+        style="@style/qamaster_button"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/qamaster_button"
+        android:text="@string/qamaster_login_beta_get_passcode_button" />
+
+</LinearLayout>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@drawable/qamaster_beta_dialog_header_background"
+    android:orientation="horizontal" >
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:id="@+id/qamaster_login_forgot_passcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="16dp"
+        android:text="@string/qamaster_login_forgot_passcode"
+        android:textColor="@color/qamaster_beta_forgot_passcode" />
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/qamaster_login_forgot_passcode"
+        android:paddingLeft="16dp"
+        android:text="@string/qamaster_login_beta_title"
+        android:textColor="@color/qamaster_beta_title"
+        android:textSize="20sp" />
+
+</RelativeLayout>

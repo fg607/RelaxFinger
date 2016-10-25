@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_transparent"
+    android:padding="0dp" >
+
+    <com.qamaster.android.ui.AwesomeFontButton
+        android:id="@+id/qamaster_show_info"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/qamaster_header_button"
+        android:text="@string/qamaster_dialog_info"
+        android:textColor="@color/qamaster_problem_header_text"
+        android:textSize="26dp"
+        tools:ignore="SpUsage"
+        tools:text="info" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/qamaster_report_dialog_buttons_distance"
+            android:orientation="vertical" >
+
+            <com.qamaster.android.ui.AwesomeFontTextView
+                android:id="@+id/qamaster_report_dialog_bug"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/qamaster_report_bug_circle"
+                android:gravity="center"
+                android:text="@string/qamaster_bug_icon"
+                android:textColor="@color/qamaster_white"
+                android:textSize="36dp" />
+
+            <com.qamaster.android.ui.MontserratTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="16dp"
+                android:text="@string/qamaster_report_a_bug"
+                android:textAllCaps="true"
+                android:textColor="@color/qamaster_white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/qamaster_report_dialog_buttons_distance"
+            android:orientation="vertical" >
+
+            <com.qamaster.android.ui.AwesomeFontTextView
+                android:id="@+id/qamaster_report_dialog_feedback"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/qamaster_report_feedback_circle"
+                android:gravity="center"
+                android:text="@string/qamaster_feedback_icon"
+                android:textColor="@color/qamaster_white"
+                android:textSize="36dp" />
+
+            <com.qamaster.android.ui.MontserratTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="16dp"
+                android:text="@string/qamaster_give_feedback"
+                android:textAllCaps="true"
+                android:textColor="@color/qamaster_white"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

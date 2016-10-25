@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.qamaster.android.ui.UserListAdapterRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/qamaster_user_list_background"
+    android:orientation="horizontal"
+    android:paddingBottom="0dp"
+    android:paddingTop="0dp" >
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="-4dp"
+        android:duplicateParentState="true"
+        android:focusable="false" >
+
+        <ImageView
+            android:id="@+id/qamaster_user_avatar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:duplicateParentState="true"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="12dp"
+            android:src="@drawable/qamaster_avatar" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:duplicateParentState="true"
+            android:focusable="false"
+            android:gravity="center"
+            android:src="@drawable/qamaster_avatar_mask" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/qamaster_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:duplicateParentState="true"
+        android:focusable="false"
+        android:gravity="left|center_vertical"
+        android:textColor="@drawable/qamaster_user_list_textcolor"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        tools:text="User name" />
+
+</com.qamaster.android.ui.UserListAdapterRow>

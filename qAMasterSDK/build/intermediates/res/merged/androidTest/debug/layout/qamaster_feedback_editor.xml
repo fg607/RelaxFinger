@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_editor_bg" >
+
+    <com.qamaster.android.ui.overlay.OverlayView
+        android:id="@+id/qamaster_feedback_overlay"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <RelativeLayout
+        android:id="@+id/qamaster_feedback_overlay_header"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/qamaster_editor_header_bg" >
+
+        <Button
+            android:id="@+id/qamaster_feedback_overlay_cancel"
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/qamaster_editor_button"
+            android:text="@string/qamaster_report_back"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="20dp" />
+
+        <com.qamaster.android.ui.MontserratTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/qamaster_editor_button"
+            android:text="@string/qamaster_report_header_title"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/qamaster_feedback_overlay_report"
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/qamaster_editor_button"
+            android:text="@string/qamaster_report_commit"
+            android:textColor="@color/qamaster_editor_header_text"
+            android:textSize="20dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/qamaster_feedback_overlay_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/qamaster_editor_footer_bg" >
+
+        <ImageButton
+            android:id="@+id/qamaster_feedback_overlay_pencil"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/pencil" />
+
+        <ImageButton
+            android:id="@+id/qamaster_feedback_overlay_text"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/text" />
+
+        <ImageButton
+            android:id="@+id/qamaster_feedback_overlay_eraser"
+            style="@style/qamaster_editor_button"
+            android:layout_width="match_parent"
+            android:layout_height="64dip"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/clear" />
+    </LinearLayout>
+
+</RelativeLayout>

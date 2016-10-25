@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="64dp"
+    android:background="@color/qamaster_feedback_header_bg"
+    android:orientation="horizontal"
+    tools:showIn="@layout/qamaster_feedback" >
+
+    <com.qamaster.android.ui.MontserratTextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="16dp"
+        android:text="@string/qamaster_feedback_header_title"
+        android:textColor="@color/qamaster_feedback_header_text"
+        android:textSize="20sp" />
+
+    <com.qamaster.android.ui.AwesomeFontButton
+        android:id="@+id/qamaster_send_report"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/qamaster_header_button"
+        android:text="@string/qamaster_send_icon"
+        android:textColor="@color/qamaster_feedback_header_text"
+        android:textSize="26dp"
+        tools:ignore="SpUsage"
+        tools:text="send" />
+
+</RelativeLayout>

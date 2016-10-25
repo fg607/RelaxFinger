@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/qamaster_transparent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <include layout="@layout/qamaster_header_quick" />
+
+    <ListView
+        android:id="@+id/qamaster_login_users_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/qamaster_dialog_bg"
+        android:cacheColorHint="@color/qamaster_transparent"
+        android:divider="@color/qamaster_dialog_divider"
+        android:dividerHeight="0dp"
+        android:paddingBottom="0dp"
+        android:paddingTop="0dp"
+        tools:listitem="@layout/qamaster_user" />
+
+    <LinearLayout
+        android:id="@+id/qamaster_login_progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_bg"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible" >
+
+        <include
+            android:id="@+id/qamaster_login_progress_user"
+            layout="@layout/qamaster_user" />
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+    <include layout="@layout/qamaster_dialog_footer" />
+
+</LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <include layout="@layout/qamaster_testcycles_header" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/qamaster_subheader_bg"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="16dp"
+        android:text="@string/qamaster_select_test_cycle_desc"
+        android:textColor="@color/qamaster_subheader_text"
+        android:textSize="14sp" />
+
+    <ListView
+        android:id="@+id/qamaster_testcycles_users_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/qamaster_dialog_bg"
+        android:cacheColorHint="@color/qamaster_dialog_bg"
+        android:divider="@color/qamaster_user_list_divider"
+        android:dividerHeight="1dp"
+        tools:listitem="@layout/qamaster_testcycle" />
+
+</LinearLayout>
