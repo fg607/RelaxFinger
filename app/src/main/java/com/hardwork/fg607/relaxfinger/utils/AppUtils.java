@@ -315,7 +315,7 @@ public class AppUtils {
                 if (state != null) {
                     ApplicationInfo info = getApplicationInfoByProcessName(app.processName);
 
-                    if(info!= null){
+                    if(info!= null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")){
                         Log.i("task",info.packageName);
                         return info.packageName;
                     }
