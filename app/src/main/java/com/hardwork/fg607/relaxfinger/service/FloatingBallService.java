@@ -2187,11 +2187,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 FloatingBallUtils.openRecnetTask(mAccessibilityService.instance);
                 break;
             case "切换上一个应用":
-                try {
-                    FloatingBallUtils.previousApp();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                FloatingBallUtils.previousApp();
                 break;
             case "休眠(需要开启锁屏功能)":
                 FloatingBallUtils.lockScreen(this);

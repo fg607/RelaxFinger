@@ -53,12 +53,12 @@
         android:summaryOn="锁屏功能已开启"
         android:title="开启锁屏" />
 
-    <com.jenzz.materialpreference.SwitchPreference
+  <!--  <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
         android:key="shotscreenSwitch"
         android:summaryOff="长按截屏已关闭"
         android:summaryOn="自由模式下长按截屏"
-        android:title="长按屏幕截图" />
+        android:title="长按屏幕截图" />-->
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"

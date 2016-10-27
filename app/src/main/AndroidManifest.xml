@@ -18,15 +18,19 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name=" android.permission.SYSTEM_OVERLAY_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission xmlns:tools="http://schemas.android.com/tools" android:name="android.permission.PACKAGE_USAGE_STATS"
+    tools:ignore="ProtectedPermissions" />
+
+    <!--常见桌面权限-->
     <uses-permission android:name="com.google.android.apps.nexuslauncher.permission.READ_SETTINGS"/>
-    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
-    <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS" />
-    <uses-permission android:name="com.teslacoilsw.launcher.permission.READ_SETTINGS"/>
-    <uses-permission android:name="com.teslacoilsw.launcher.permission.READ_SETTINGS"/>
-    <uses-permission android:name="ginlemon.flower.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.android.launcher2.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.cyanogenport.trebuchet.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.kaneoriley.cyanogenport.launcher.permission.READ_SETTINGS"/>
+
 
     <!--收集崩溃信息权限-->
     <uses-permission android:name="android.permission.INTERNET"/>

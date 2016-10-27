@@ -36,6 +36,8 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -282,7 +284,11 @@ public class AppUtils {
 
     public static String getPreviousApp() throws Exception {
 
-        if (Build.VERSION.SDK_INT >= 21) {
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+
+            return  getPreviousM();
+
+        }else if (Build.VERSION.SDK_INT >= 21) {
 
             return  getPreviousNew();
 
@@ -355,25 +361,53 @@ public class AppUtils {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static String getForegroundApp(Context context) {
+    public static String getPreviousM() {
+
+        class RecentUseComparator implements Comparator<UsageStats> {
+            @Override
+            public int compare(UsageStats lhs, UsageStats rhs) {
+                return (lhs.getLastTimeUsed() > rhs.getLastTimeUsed()) ? -1 : (lhs.getLastTimeUsed() == rhs.getLastTimeUsed()) ? 0 : 1;
+            }
+        }
+        RecentUseComparator recentComp = new RecentUseComparator();
+
+
         UsageStatsManager usageStatsManager =
                 (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         long ts = System.currentTimeMillis();
         List<UsageStats> queryUsageStats =
-                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 1000 * 10, ts);
         if (queryUsageStats == null || queryUsageStats.isEmpty()) {
             return null;
         }
 
-        UsageStats recentStats = null;
+        Collections.sort(queryUsageStats, recentComp);
+
+
+        String packageName = null;
+
+        for(int i = 1;i<queryUsageStats.size();i++){
+
+            packageName = queryUsageStats.get(i).getPackageName();
+
+           if(!packageName.equals("com.hardwork.fg607.relaxfinger") &&
+                   !packageName.contains("launcher") && !packageName.contains("systemui")&&
+                   !packageName.contains("packageinstaller")){
+
+               Log.i("usage",packageName);
+               return packageName;
+           }
+        }
+
+      /*  UsageStats recentStats = null;
         for (UsageStats usageStats : queryUsageStats) {
             if(recentStats == null
                     || recentStats.getLastTimeUsed() < usageStats.getLastTimeUsed()){
                 recentStats = usageStats;
             }
-        }
+        }*/
 
-        return recentStats.getPackageName();
+        return null;
     }
 
     /**

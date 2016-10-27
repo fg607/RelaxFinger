@@ -60,7 +60,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mAutoMoveSwitch;
     private SwitchPreference mAutoStartSwitch;
     private SwitchPreference mVibratorSwitch;
-    private SwitchPreference mShotscreenSwitch;
+    //private SwitchPreference mShotscreenSwitch;
     private SwitchPreference mFeedbackSwitch;
     private SwitchPreference mNotifySwitch;
     private SwitchPreference mTestinAgentSwitch;
@@ -178,8 +178,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mVibratorSwitch.setOnPreferenceChangeListener(this);
         mFeedbackSwitch = (SwitchPreference) findPreference("feedbackSwitch");
         mFeedbackSwitch.setOnPreferenceChangeListener(this);
-        mShotscreenSwitch = (SwitchPreference) findPreference("shotscreenSwitch");
-        mShotscreenSwitch.setOnPreferenceChangeListener(this);
+      /*  mShotscreenSwitch = (SwitchPreference) findPreference("shotscreenSwitch");
+        mShotscreenSwitch.setOnPreferenceChangeListener(this);*/
         mToEdgeSwitch = (SwitchPreference) findPreference("toEdgeSwitch");
         mToEdgeSwitch.setOnPreferenceChangeListener(this);
         mLockScreenSwitch = (SwitchPreference) findPreference("lockScreenSwitch");

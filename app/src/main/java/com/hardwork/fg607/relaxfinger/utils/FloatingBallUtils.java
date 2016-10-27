@@ -7,12 +7,14 @@ package com.hardwork.fg607.relaxfinger.utils;
 
 import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -366,19 +368,45 @@ public class FloatingBallUtils {
 
     }
 
-    public static void previousApp() throws Exception {
+    public static void previousApp(){
 
-        String prePackageName = null;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        prePackageName = AppUtils.getPreviousApp();
+                String prePackageName = null;
 
-        if(prePackageName!=null){
+                try {
 
-            AppUtils.startApplication(prePackageName);
-        }else {
+                    prePackageName = AppUtils.getPreviousApp();
 
-            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
-        }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if(prePackageName!=null){
+
+                    try {
+                        AppUtils.startApplication(prePackageName);
+                    }catch (ActivityNotFoundException e){
+
+                        e.printStackTrace();
+                    }
+
+
+                }else {
+
+                    MyApplication.getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+
 
 
     }
@@ -1178,6 +1206,7 @@ public class FloatingBallUtils {
 
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static void switchFlashlight() {
 
 
