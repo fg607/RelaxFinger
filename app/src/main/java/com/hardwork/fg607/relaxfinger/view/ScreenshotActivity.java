@@ -1,6 +1,7 @@
 package com.hardwork.fg607.relaxfinger.view;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +11,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -41,16 +44,33 @@ public class ScreenshotActivity extends Activity {
     private AudioManager mAudioManager=null;
     private int mOriginVolume=0;
     private boolean mIsExist =false;
+    private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         verifyStoragePermissions(ScreenshotActivity.this);
 
-        takeScreenshot();
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+
+            takeScreenshot();
+        }else {
+
+            Toast.makeText(this,"当前系统不支持快捷截屏!",Toast.LENGTH_SHORT).show();
+
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    finish();
+                }
+            },500);
+        }
+
 
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void takeScreenshot() {
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager)
                 getSystemService(Context.MEDIA_PROJECTION_SERVICE);

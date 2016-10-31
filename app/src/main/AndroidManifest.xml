@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hardwork.fg607.relaxfinger">
+    package="com.hardwork.fg607.relaxfinger"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -20,8 +21,7 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name=" android.permission.SYSTEM_OVERLAY_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission xmlns:tools="http://schemas.android.com/tools" android:name="android.permission.PACKAGE_USAGE_STATS"
-    tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
     <!--常见桌面权限-->
     <uses-permission android:name="com.google.android.apps.nexuslauncher.permission.READ_SETTINGS"/>

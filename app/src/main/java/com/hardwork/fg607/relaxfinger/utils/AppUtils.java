@@ -284,7 +284,7 @@ public class AppUtils {
 
     public static String getPreviousApp() throws Exception {
 
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+        if(Build.VERSION.SDK_INT>=22){
 
             return  getPreviousM();
 
@@ -323,7 +323,14 @@ public class AppUtils {
 
                     if(info!= null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")){
                         Log.i("task",info.packageName);
-                        return info.packageName;
+
+                        Intent intent = pm.getLaunchIntentForPackage(info.packageName);
+
+                        if(intent != null){
+
+                            return info.packageName;
+                        }
+
                     }
 
                 }
@@ -390,9 +397,10 @@ public class AppUtils {
 
             packageName = queryUsageStats.get(i).getPackageName();
 
-           if(!packageName.equals("com.hardwork.fg607.relaxfinger") &&
-                   !packageName.contains("launcher") && !packageName.contains("systemui")&&
-                   !packageName.contains("packageinstaller")){
+            Intent intent = pm.getLaunchIntentForPackage(packageName);
+
+           if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger") &&
+                   !packageName.contains("launcher")){
 
                Log.i("usage",packageName);
                return packageName;

@@ -458,6 +458,16 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		Canvas canvas = new Canvas(bitmap);
 
 		draw(canvas);
+
+		if(width<borderlength){
+
+			borderlength = width;
+		}
+
+		if(height<borderlength){
+
+			borderlength = height;
+		}
 		return toRoundBitmap(Bitmap.createBitmap(bitmap,
 				(width - borderlength) / 2,
 				(height - borderlength) / 2, borderlength, borderlength));

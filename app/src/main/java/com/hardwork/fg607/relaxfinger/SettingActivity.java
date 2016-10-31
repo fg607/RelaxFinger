@@ -13,6 +13,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -237,18 +239,29 @@ public class SettingActivity extends AppCompatActivity {
         }
         checkAccessibility();
 
-        //6.0以上需要手动打开Draw over other apps
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-
-            requestDrawOverLays();
+        if(Build.VERSION.SDK_INT>=22){
 
             if(!isNoSwitch()){
 
                 Intent intent = new Intent( Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                startActivity(intent);
-            }
-        }
+                try {
 
+                    startActivity(intent);
+
+                }catch (Exception e){
+
+                    Toast.makeText(this,"该ROM不支持切换上一应用功能!",Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            //6.0以上需要手动打开Draw over other apps
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+
+                requestDrawOverLays();
+            }
+
+        }
     }
 
     @Override
@@ -469,6 +482,15 @@ public class SettingActivity extends AppCompatActivity {
                 // Already hold the SYSTEM_ALERT_WINDOW permission, do addview or something.
             }
         }
+    }
+
+    private boolean isNoOption() {
+        PackageManager packageManager = getApplicationContext()
+                .getPackageManager();
+        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
 
     //判断调用该设备中“有权查看使用权限的应用”这个选项的APP有没有打开
