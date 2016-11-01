@@ -309,31 +309,29 @@ public class AppUtils {
         }
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
-        for (ActivityManager.RunningAppProcessInfo app : appList) {
-            if (app.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                    && app.importanceReasonCode == ActivityManager.RunningAppProcessInfo.REASON_UNKNOWN ) {
-                Integer state = null;
-                try {
-                    state = field.getInt(app);
-                } catch (Exception e) {
-                }
+        //i=1从第二个检索,因为第一个是当前app
+        for (int i = 1; i < appList.size(); i++) {
+            Integer state = null;
+            try {
+                state = field.getInt(appList.get(i));
+            } catch (Exception e) {
+            }
 
-                if (state != null) {
-                    ApplicationInfo info = getApplicationInfoByProcessName(app.processName);
+            if (state != null) {
+                ApplicationInfo info = getApplicationInfoByProcessName(appList.get(i).processName);
 
-                    if(info!= null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")){
-                        Log.i("task",info.packageName);
+                if (info != null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")) {
 
-                        Intent intent = pm.getLaunchIntentForPackage(info.packageName);
+                    Intent intent = pm.getLaunchIntentForPackage(info.packageName);
 
-                        if(intent != null){
+                    if (intent != null) {
 
-                            return info.packageName;
-                        }
-
+                        //Log.i("background", info.packageName);
+                        return info.packageName;
                     }
 
                 }
+
             }
         }
 
