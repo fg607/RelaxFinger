@@ -312,7 +312,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
 
         mScaleSpring = mSpringSystem.createSpring()
-        .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,4));
+        .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,5));
 
         mScaleSpring1 = mSpringSystem.createSpring()
                 .setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(100,5));
@@ -484,7 +484,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.notify_logo)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("RelaxFinger")
                         .setOngoing(true)
                         .setContentText("点击进入设置");
@@ -512,7 +512,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.notify_logo)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("RelaxFinger")
                         .setContentText("点击显示悬浮球");
 

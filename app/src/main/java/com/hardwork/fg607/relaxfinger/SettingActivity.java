@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -239,21 +240,22 @@ public class SettingActivity extends AppCompatActivity {
         }
         checkAccessibility();
 
-        if(Build.VERSION.SDK_INT>=22){
+        if (Build.VERSION.SDK_INT >= 21) {
 
-            if(!isNoSwitch()){
+            if (!isNoSwitch()) {
 
-                Intent intent = new Intent( Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 try {
 
                     startActivity(intent);
 
-                }catch (Exception e){
+                } catch (Exception e) {
 
-                    Toast.makeText(this,"该ROM不支持切换上一应用功能!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "该ROM不支持切换上一应用功能!", Toast.LENGTH_SHORT).show();
                 }
 
             }
+
 
             //6.0以上需要手动打开Draw over other apps
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
@@ -484,14 +486,14 @@ public class SettingActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isNoOption() {
+  /*  private boolean isNoOption() {
         PackageManager packageManager = getApplicationContext()
                 .getPackageManager();
         Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
         List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
-    }
+    }*/
 
     //判断调用该设备中“有权查看使用权限的应用”这个选项的APP有没有打开
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -506,4 +508,13 @@ public class SettingActivity extends AppCompatActivity {
         }
         return true;
     }
+
+  /*  @TargetApi(Build.VERSION_CODES.KITKAT)
+    private boolean hasPermission() {
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }*/
 }

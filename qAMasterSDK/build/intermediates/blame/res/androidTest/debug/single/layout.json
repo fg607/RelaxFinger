@@ -100,12 +100,12 @@
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/layout/qamaster_header_beta.xml"
     },
     {
-        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/layout/qamaster_login_forgot_passcode.xml",
-        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/layout/qamaster_login_forgot_passcode.xml"
-    },
-    {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/layout/qamaster_editor.xml",
         "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/layout/qamaster_editor.xml"
+    },
+    {
+        "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/layout/qamaster_login_forgot_passcode.xml",
+        "source": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/bundles/debug/res/layout/qamaster_login_forgot_passcode.xml"
     },
     {
         "merged": "/home/fg607/AndroidStudioProjects/RelaxFinger/qAMasterSDK/build/intermediates/res/merged/androidTest/debug/layout/qamaster_testcycle.xml",

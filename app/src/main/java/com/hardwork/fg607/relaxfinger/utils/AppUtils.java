@@ -169,6 +169,8 @@ public class AppUtils {
         PackageManager pm = context.getPackageManager();
         Intent intent = pm.getLaunchIntentForPackage(packageName);
 
+        //intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         if (intent != null) {
 
             context.startActivity(intent);
@@ -284,21 +286,18 @@ public class AppUtils {
 
     public static String getPreviousApp() throws Exception {
 
-        if(Build.VERSION.SDK_INT>=22){
-
-            return  getPreviousM();
-
-        }else if (Build.VERSION.SDK_INT >= 21) {
+        if(Build.VERSION.SDK_INT>=21){
 
             return  getPreviousNew();
 
-        } else {
+        }else{
 
-           return getPreviousOld();
+            return  getPreviousOld();
+
         }
     }
 
-    //API 21 and above
+    /*//API 21 and above
     public static String getPreviousNew() throws Exception {
 
         //List<String> packageNameList = new ArrayList<>();
@@ -320,7 +319,9 @@ public class AppUtils {
             if (state != null) {
                 ApplicationInfo info = getApplicationInfoByProcessName(appList.get(i).processName);
 
-                if (info != null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")) {
+                if (info != null && !info.packageName.equals("com.hardwork.fg607.relaxfinger")
+                        && !info.packageName.contains("input")
+                        && !info.packageName.contains("keyboard")) {
 
                     Intent intent = pm.getLaunchIntentForPackage(info.packageName);
 
@@ -336,13 +337,13 @@ public class AppUtils {
         }
 
         return null;
-    }
+    }*/
 
     //API below 21
     @SuppressWarnings("deprecation")
     public static String  getPreviousOld() throws Exception {
 
-        List<String> packageNameList = new ArrayList<>();
+        int count = 0;
         String packageName = null;
         ActivityManager activity = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> runningTask = activity.getRunningTasks(3);
@@ -350,23 +351,33 @@ public class AppUtils {
             for(ActivityManager.RunningTaskInfo task:runningTask){
                 ComponentName componentTop = task.topActivity;
                 packageName = componentTop.getPackageName();
-                packageNameList.add(packageName);
-                Log.i("task",packageName);
+
+                Intent intent = pm.getLaunchIntentForPackage(packageName);
+                if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger")
+                        && !packageName.contains("input")
+                        && !packageName.contains("keyboard")){
+
+                    count++;
+
+                    if(count == 2){
+
+                        return packageName;
+                    }
+
+                    Log.i("task",packageName);
+
+                }
+
             }
 
         }
 
-        if(packageNameList.size()>2 && packageNameList.get(0).equals("com.hardwork.fg607.relaxfinger")){
-
-            return packageNameList.get(2);
-        }
-
-        return packageNameList.size()>1?packageNameList.get(1):null;
+        return null;
 
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static String getPreviousM() {
+    public static String getPreviousNew() {
 
         class RecentUseComparator implements Comparator<UsageStats> {
             @Override
@@ -381,7 +392,7 @@ public class AppUtils {
                 (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         long ts = System.currentTimeMillis();
         List<UsageStats> queryUsageStats =
-                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 1000 * 10, ts);
+                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
         if (queryUsageStats == null || queryUsageStats.isEmpty()) {
             return null;
         }
@@ -391,16 +402,18 @@ public class AppUtils {
 
         String packageName = null;
 
+        //i=1因为第一个是当前应用
         for(int i = 1;i<queryUsageStats.size();i++){
 
             packageName = queryUsageStats.get(i).getPackageName();
 
             Intent intent = pm.getLaunchIntentForPackage(packageName);
 
-           if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger") &&
-                   !packageName.contains("launcher")){
+           if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger")
+                   && !packageName.contains("input")
+                   && !packageName.contains("keyboard")){
 
-               Log.i("usage",packageName);
+               //Log.i("usage",packageName);
                return packageName;
            }
         }
