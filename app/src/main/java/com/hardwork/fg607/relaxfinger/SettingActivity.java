@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,13 +24,19 @@ import android.provider.Settings;
 import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
@@ -421,7 +428,20 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.4.0\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        TextView textView = new TextView(this);
+        textView.setTextSize(16);
+        textView.setTextColor(Color.BLACK);
+        textView.setText("版本：v1.4.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        TextView url = new TextView(this);
+        url.setTextSize(16);
+        url.setTextColor(Color.BLACK);
+        url.setText(Html.fromHtml("<a href='https://github.com/fg607/RelaxFinger'>悬浮助手源代码地址</a>"));
+        url.setMovementMethod(LinkMovementMethod.getInstance());
+        layout.addView(textView);
+        layout.addView(url);
+        dialog.setView(layout,30,10,20,20);
         dialog.show();
     }
 
@@ -441,19 +461,23 @@ public class SettingActivity extends AppCompatActivity {
                 "6.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
                 "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
                 "7.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
-                "，确保新图片名称依然是DIY.png即可。");
+                "，确保新图片名称依然是DIY.png即可。\r\n" +
+                "8.安卓6.0及以上系统出现叠加层解决方法:在系统设置->开发者选项->停用HW叠加层即可。");
         dialog.show();
     }
 
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.4.0版本更新内容");
+        dialog.setTitle("悬浮助手-1.4.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("1.支持安卓6.0及以上系统(包括7.1.1)。\r\n" +
                 "2.横屏取消自由移动模式(但不能使用快捷菜单)。\r\n" +
-                "3.添加切换到上一个应用功能。");
+                "3.添加切换到上一个应用功能。\r\n" +
+                "4.修复快捷菜单卡顿问题,弹出更加流畅。\r\n" +
+                "5.修复快捷菜单应用图标矩形问题。\r\n" +
+                "6.修复切换上一个应用bug。");
         dialog.show();
 
     }

@@ -326,7 +326,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "彩虹":
                 imageView = mCheck2;
                 break;
-            case "红色":
+            case "Google":
                 imageView = mCheck3;
                 break;
             case "苹果":
@@ -713,7 +713,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 mThemeChoosed="彩虹";
                 break;
             case R.id.img3:
-                mThemeChoosed="红色";
+                mThemeChoosed="Google";
                 break;
             case R.id.img4:
                 mThemeChoosed="苹果";

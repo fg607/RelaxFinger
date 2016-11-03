@@ -34,6 +34,7 @@ import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -387,12 +388,11 @@ public class AppUtils {
         }
         RecentUseComparator recentComp = new RecentUseComparator();
 
-
         UsageStatsManager usageStatsManager =
                 (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         long ts = System.currentTimeMillis();
         List<UsageStats> queryUsageStats =
-                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, 0, ts);
+                usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts-1000*60*60, ts);
         if (queryUsageStats == null || queryUsageStats.isEmpty()) {
             return null;
         }
