@@ -170,11 +170,19 @@ public class AppUtils {
         PackageManager pm = context.getPackageManager();
         Intent intent = pm.getLaunchIntentForPackage(packageName);
 
-        //intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
 
         if (intent != null) {
 
-            context.startActivity(intent);
+            String className = intent.getComponent().getClassName();
+
+            //解决直接用pm.getLaunchIntentForPackage(packageName)会重新打开APP的问题
+            Intent intent1 = new Intent(Intent.ACTION_MAIN);
+            intent1.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent1.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent1.setComponent(new ComponentName(packageName, className));
+
+            context.startActivity(intent1);
 
             return true;
 
@@ -298,8 +306,8 @@ public class AppUtils {
         }
     }
 
-    /*//API 21 and above
-    public static String getPreviousNew() throws Exception {
+    //API 21 and above
+    public static String getPreviousNewN() throws Exception {
 
         //List<String> packageNameList = new ArrayList<>();
         Field field = null;
@@ -338,7 +346,7 @@ public class AppUtils {
         }
 
         return null;
-    }*/
+    }
 
     //API below 21
     @SuppressWarnings("deprecation")
@@ -623,4 +631,5 @@ public class AppUtils {
 
         return  drawable;
     }
+
 }

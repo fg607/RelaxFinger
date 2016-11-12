@@ -433,7 +433,7 @@ public class SettingActivity extends AppCompatActivity {
         TextView textView = new TextView(this);
         textView.setTextSize(16);
         textView.setTextColor(Color.BLACK);
-        textView.setText("版本：v1.4.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        textView.setText("版本：v1.4.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         TextView url = new TextView(this);
         url.setTextSize(16);
         url.setTextColor(Color.BLACK);
@@ -470,15 +470,11 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.4.1版本更新内容");
+        dialog.setTitle("悬浮助手-1.4.2版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.支持安卓6.0及以上系统(包括7.1.1)。\r\n" +
-                "2.横屏取消自由移动模式(但不能使用快捷菜单)。\r\n" +
-                "3.添加切换到上一个应用功能。\r\n" +
-                "4.修复快捷菜单卡顿问题,弹出更加流畅。\r\n" +
-                "5.修复快捷菜单应用图标矩形问题。\r\n" +
-                "6.修复切换上一个应用bug。");
+        dialog.setMessage("1.默认输入法遮挡悬浮球(解决不能避让的问题)。\r\n" +
+                "2.修复切换某些APP会重新打开APP的问题。");
         dialog.show();
 
     }

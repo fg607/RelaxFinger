@@ -10,8 +10,8 @@ android {
         minSdkVersion 18
         targetSdkVersion 25
         resValue "string", "tray__authority", "${applicationId}.tray"
-        versionCode 15
-        versionName "1.4.1"
+        versionCode 16
+        versionName "1.4.2"
     }
 
     signingConfigs {

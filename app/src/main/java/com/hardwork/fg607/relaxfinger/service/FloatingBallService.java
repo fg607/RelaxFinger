@@ -1469,7 +1469,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mBallWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 
-        mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
         mBallWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - floatBallSize / 2 - DensityUtil.dip2px(MyApplication.getApplication(), 40));

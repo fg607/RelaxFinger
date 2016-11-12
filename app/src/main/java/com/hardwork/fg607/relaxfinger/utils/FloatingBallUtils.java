@@ -413,7 +413,6 @@ public class FloatingBallUtils {
 
     public static void nextApp(){
 
-
     }
 
     public static void killCurrentApp(){
