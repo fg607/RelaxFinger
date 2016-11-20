@@ -433,7 +433,7 @@ public class SettingActivity extends AppCompatActivity {
         TextView textView = new TextView(this);
         textView.setTextSize(16);
         textView.setTextColor(Color.BLACK);
-        textView.setText("版本：v1.4.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        textView.setText("版本：v1.4.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         TextView url = new TextView(this);
         url.setTextSize(16);
         url.setTextColor(Color.BLACK);
@@ -470,11 +470,11 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.4.2版本更新内容");
+        dialog.setTitle("悬浮助手-1.4.3版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.默认输入法遮挡悬浮球(解决不能避让的问题)。\r\n" +
-                "2.修复切换某些APP会重新打开APP的问题。");
+        dialog.setMessage("1.更改快捷菜单背景遮罩覆盖状态栏和导航栏。\r\n" +
+                "2.解决全屏切换隐藏显示状态栏时悬浮球会上下移动的问题。");
         dialog.show();
 
     }

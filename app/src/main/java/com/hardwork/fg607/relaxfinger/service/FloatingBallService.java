@@ -1207,7 +1207,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mMenuWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
         }
-        mMenuWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mMenuWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mMenuWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
 
@@ -1223,7 +1223,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mPopBackWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 
-        mPopBackWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+        mPopBackWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mPopBackWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         //mPopBackWmParams.alpha=0.3f;
@@ -1469,7 +1469,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
         mBallWmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 
-        mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+        mBallWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mBallWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mBallWmParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - floatBallSize / 2 - DensityUtil.dip2px(MyApplication.getApplication(), 40));

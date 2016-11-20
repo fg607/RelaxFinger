@@ -170,8 +170,6 @@ public class AppUtils {
         PackageManager pm = context.getPackageManager();
         Intent intent = pm.getLaunchIntentForPackage(packageName);
 
-
-
         if (intent != null) {
 
             String className = intent.getComponent().getClassName();
