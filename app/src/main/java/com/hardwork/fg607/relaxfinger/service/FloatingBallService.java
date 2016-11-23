@@ -118,7 +118,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
     private int mClickCount;
     public static final long CLICK_SPACING_TIME = 100;//双击间隔时间
     private long mDoubleClickTime = CLICK_SPACING_TIME;
-    public static final long LONG_PRESS_TIME = ViewConfiguration.getLongPressTimeout();
+    public static final long LONG_PRESS_TIME = ViewConfiguration.getLongPressTimeout()-100;
     public static final int MIN_BALL_ALPHA = 255;
     public static final int MAX_BALL_ALPHA = 10;
     public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 30);
@@ -952,8 +952,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
                 mDetectThread=null;
             }*/
 
-
             stopSelf();
+
         }
     }
 
@@ -1207,7 +1207,8 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
             mMenuWmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
         }
-        mMenuWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        mMenuWmParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mMenuWmParams.gravity = Gravity.LEFT | Gravity.TOP;
 
 
@@ -1530,7 +1531,7 @@ public class FloatingBallService extends Service implements View.OnClickListener
 
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(mGestureActive){
+                        if(!mCanmove && mGestureActive){
 
                             mHandler.removeCallbacks(mLongPressedThread);
                             return true;
@@ -1721,15 +1722,17 @@ public class FloatingBallService extends Service implements View.OnClickListener
                                 int statBarHeight = FloatingBallUtils.getStatusBarHeight(FloatingBallService.this);
                                 int screenHeight = DensityUtil.getScreenHeight(FloatingBallService.this);
 
-                                if (mBallWmParams.y >= (statBarHeight + (MENU_WINDOW_HEIGHT / 2 - mBallWmParams.height / 2))
-                                        && mBallWmParams.y <= screenHeight - (MENU_WINDOW_HEIGHT / 2 + mBallWmParams.height / 2 + statBarHeight)) {
+                                /*if (mBallWmParams.y >= (statBarHeight + (MENU_WINDOW_HEIGHT / 2 - mBallWmParams.height / 2))
+                                        && mBallWmParams.y <= screenHeight - (MENU_WINDOW_HEIGHT / 2 + mBallWmParams.height / 2)) {
 
                                     mIsCanPopup = true;
 
                                 } else {
 
                                     mIsCanPopup = false;
-                                }
+                                }*/
+
+                                mIsCanPopup = true;
 
                                 saveStates("canPopup", mIsCanPopup);
                             }

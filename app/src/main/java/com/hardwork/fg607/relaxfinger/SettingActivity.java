@@ -433,7 +433,7 @@ public class SettingActivity extends AppCompatActivity {
         TextView textView = new TextView(this);
         textView.setTextSize(16);
         textView.setTextColor(Color.BLACK);
-        textView.setText("版本：v1.4.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        textView.setText("版本：v1.4.4\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         TextView url = new TextView(this);
         url.setTextSize(16);
         url.setTextColor(Color.BLACK);
@@ -457,12 +457,16 @@ public class SettingActivity extends AppCompatActivity {
                 "2.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
                 "3.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
                 "4.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
-                "5.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。\r\n" +
+                "5.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。" +
+                "如果仍然无效,打开输入法,把通知栏打开看一下选择输入法通知的标题,反馈给我,我加到软件里面就可以了。\r\n" +
                 "6.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
                 "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
                 "7.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
                 "，确保新图片名称依然是DIY.png即可。\r\n" +
-                "8.若频繁需要重新激活,系统设置->安全->应用程序许可->RelaxFinger->自动运行打开->重启手机即可。\r\n" +
+                "8.若频繁需要重新激活,系统设置->安全->应用程序许可->RelaxFinger->启用自动运行," +
+                "部分国产手机->电池管理->受保护应用->启用悬浮助手,任务管理器中的一键清除也会杀掉悬浮助手," +
+                "可以在任务管理界面,给悬浮助手加上锁即可,手机不同加锁方法自行百度," +
+                "华为是任务管理器界面按住悬浮助手往下拉，MIUI好像是就有个锁，点一下就好了。\r\n" +
                 "9.安卓6.0及以上系统出现叠加层解决方法:在系统设置->开发者选项->停用HW叠加层即可。");
         dialog.show();
     }
@@ -470,11 +474,12 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.4.3版本更新内容");
+        dialog.setTitle("悬浮助手-1.4.4版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.更改快捷菜单背景遮罩覆盖状态栏和导航栏。\r\n" +
-                "2.解决全屏切换隐藏显示状态栏时悬浮球会上下移动的问题。");
+        dialog.setMessage("1.修复某些手机不能避让输入法的问题。\r\n" +
+                "2.修复使用手势无法移动悬浮球的问题。\r\n" +
+                "3.解除悬浮球位置对弹出快捷菜单的限制。(可以随意放置悬浮球了,不会提示空间不足)");
         dialog.show();
 
     }
