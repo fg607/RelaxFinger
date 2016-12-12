@@ -1,16 +1,11 @@
 package com.hardwork.fg607.relaxfinger.model;
 
 import android.content.ActivityNotFoundException;
-import android.content.Intent;
 
-import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
-import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.orm.SugarRecord;
-import com.orm.dsl.Unique;
 
-import java.io.Serializable;
 import java.net.URISyntaxException;
 
 /**

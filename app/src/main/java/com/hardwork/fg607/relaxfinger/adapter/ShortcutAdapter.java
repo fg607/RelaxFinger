@@ -21,7 +21,6 @@ public class ShortcutAdapter extends BaseAdapter {
 
     private ArrayList<ShortcutInfo> mShortcutList;
     private Context mContext;
-    private String mChoosedShortcutName;
     private ArrayList<String> mChoosedNameList;
 
     public ShortcutAdapter(Context context){
@@ -31,20 +30,11 @@ public class ShortcutAdapter extends BaseAdapter {
     public void addList(ArrayList<ShortcutInfo> list){
 
         this.mShortcutList = list;
-        //notifyDataSetChanged();
-    }
-
-    public void setShortcutChecked(String name){
-
-        this.mChoosedShortcutName = name;
-        //notifyDataSetChanged();
-
     }
 
     public void setShortcutChecked(ArrayList<String> choosedNameList){
 
         this.mChoosedNameList = choosedNameList;
-       // notifyDataSetChanged();
 
     }
 
@@ -94,14 +84,6 @@ public class ShortcutAdapter extends BaseAdapter {
 
             checkBox.setChecked(false);
         }
-      /*  if(mShortcutList.get(i).getShortcutTitle().equals(mChoosedShortcutName)){
-
-            checkBox.setChecked(true);
-        }
-        else {
-
-            checkBox.setChecked(false);
-        }*/
 
         return view1;
     }

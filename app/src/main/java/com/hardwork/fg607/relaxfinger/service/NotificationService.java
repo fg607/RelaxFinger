@@ -1,14 +1,14 @@
 package com.hardwork.fg607.relaxfinger.service;
 
-import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
+import android.support.annotation.RequiresApi;
 
-import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 public class NotificationService extends NotificationListenerService {
@@ -20,37 +20,58 @@ public class NotificationService extends NotificationListenerService {
         context = getApplicationContext();
         sp = FloatingBallUtils.getSharedPreferences();
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
 
-        String title = sbn.getNotification().extras.getString("android.title");
+        try {
 
-        Log.i("title",title);
+            String title = sbn.getNotification().extras.getString("android.title");
 
-        if(title.contains("选择输入法") || title.contains("更改键盘")
-                || title.contains("选择键盘")){
+            if (title == null) return;
 
-            if(sp.getBoolean("floatSwitch",false)){
+            if(title.contains("选择输入法") || title.contains("更改键盘")
+                    || title.contains("选择键盘")){
 
-                sendMsg(Config.FLOAT_AUTOMOVE, "move", true);
+                if(sp.getBoolean("floatSwitch",false)){
+
+                    sendMsg(Config.FLOAT_AUTOMOVE, "move", true);
+                }
+
             }
 
+        }catch (Exception e){
+
+            e.printStackTrace();
         }
+
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
 
-        String title = sbn.getNotification().extras.getString("android.title");
+        try {
 
-        if(title.equals("选择输入法") || title.contains("更改键盘")
-                || title.contains("选择键盘")){
+            String title = sbn.getNotification().extras.getString("android.title");
 
-            if(sp.getBoolean("floatSwitch",false)){
+            if (title == null) return;
 
-                sendMsg(Config.FLOAT_AUTOMOVE, "move", false);
+            if(title.equals("选择输入法") || title.contains("更改键盘")
+                    || title.contains("选择键盘")){
+
+                if(sp.getBoolean("floatSwitch",false)){
+
+                    sendMsg(Config.FLOAT_AUTOMOVE, "move", false);
+                }
             }
+
+        }catch (Exception e){
+
+            e.printStackTrace();
         }
+
 
     }
 
@@ -59,7 +80,7 @@ public class NotificationService extends NotificationListenerService {
         Intent intent = new Intent();
         intent.putExtra("what",what);
         intent.putExtra(name, action);
-        intent.setClass(this, FloatingBallService.class);
+        intent.setClass(this, FloatService.class);
         startService(intent);
     }
 

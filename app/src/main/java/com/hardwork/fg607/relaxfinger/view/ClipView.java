@@ -8,14 +8,14 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * ²Ã¼ô±ß¿ò
+ * è£å‰ªè¾¹æ¡†
  * @author AC
  *
  */
 public class ClipView extends View {
 
 	/**
-	 * ±ß¿ò¾à×óÓÒ±ß½ç¾àÀë£¬ÓÃÓÚµ÷Õû±ß¿ò³¤¶È
+	 * è¾¹æ¡†è·å·¦å³è¾¹ç•Œè·ç¦»ï¼Œç”¨äºè°ƒæ•´è¾¹æ¡†é•¿åº¦
 	 */
 	public static final int BORDERDISTANCE = 50;
 
@@ -44,17 +44,17 @@ public class ClipView extends View {
 		int width = this.getWidth();
 		int height = this.getHeight();
 
-		int innerCircle = dip2px(mContext,150); // ÄÚÔ²°ë¾¶
-		int ringWidth = height; // Ô²»·¿í¶È
+		int innerCircle = dip2px(mContext,150); // å†…åœ†åŠå¾„
+		int ringWidth = height; // åœ†ç¯å®½åº¦
 
-		// µÚÒ»ÖÖ·½·¨»æÖÆÔ²»·
-		// »æÖÆÄÚÔ²
+		// ç¬¬ä¸€ç§æ–¹æ³•ç»˜åˆ¶åœ†ç¯
+		// ç»˜åˆ¶å†…åœ†
 		mPaint.setColor(Color.WHITE);
 		mPaint.setStrokeWidth(2);
 		mPaint.setStyle(Paint.Style.STROKE);
 		canvas.drawCircle(width / 2, height / 2, innerCircle, mPaint);
 
-		// »æÖÆÔ²»·
+		// ç»˜åˆ¶åœ†ç¯
 		mPaint.setColor(0xaa000000);
 		mPaint.setStrokeWidth(ringWidth);
 		canvas.drawCircle(width / 2, height / 2, innerCircle + 1 + ringWidth
@@ -62,7 +62,7 @@ public class ClipView extends View {
 
 	}
 
-	/* ¸ù¾İÊÖ»úµÄ·Ö±æÂÊ´Ó dp µÄµ¥Î» ×ª³ÉÎª px(ÏñËØ) */
+	/* æ ¹æ®æ‰‹æœºçš„åˆ†è¾¨ç‡ä» dp çš„å•ä½ è½¬æˆä¸º px(åƒç´ ) */
 	public static int dip2px(Context context, float dpValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return (int) (dpValue * scale + 0.5f);

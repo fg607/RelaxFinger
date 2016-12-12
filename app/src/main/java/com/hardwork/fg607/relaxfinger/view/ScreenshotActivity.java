@@ -3,8 +3,10 @@ package com.hardwork.fg607.relaxfinger.view;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
@@ -14,21 +16,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
-import com.hardwork.fg607.relaxfinger.utils.Config;
-import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
-import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
+import com.hardwork.fg607.relaxfinger.service.FloatService;
+import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.ScreenshotCallback;
 import com.hardwork.fg607.relaxfinger.utils.Screenshotter;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.RunnableFuture;
 
 public class ScreenshotActivity extends Activity {
 
@@ -42,9 +40,51 @@ public class ScreenshotActivity extends Activity {
     };
 
     private AudioManager mAudioManager=null;
+    private MediaPlayer mShootMP;
     private int mOriginVolume=0;
     private boolean mIsExist =false;
     private Handler mHandler = new Handler();
+
+    private Messenger mMessenger = null;
+    private boolean mBound = false;
+
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessenger = new Messenger(service);
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessenger = null;
+            mBound = false;
+        }
+    };
+
+    public void bindFloatService(){
+
+        if(!mBound){
+
+            bindService(new Intent(this,FloatService.class),mServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+
+    }
+
+    public void unbindFloatService(){
+
+        if(mBound){
+
+            unbindService(mServiceConnection);
+
+            mBound = false;
+            mMessenger = null;
+        }
+
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +93,9 @@ public class ScreenshotActivity extends Activity {
 
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
 
+            bindFloatService();
             takeScreenshot();
+
         }else {
 
             Toast.makeText(this,"当前系统不支持快捷截屏!",Toast.LENGTH_SHORT).show();
@@ -99,13 +141,47 @@ public class ScreenshotActivity extends Activity {
                                     if(!mIsExist){
 
                                         sendMsg(Config.HIDE_BALL, "hide", false);
-                                        saveScreenshot(bitmap);
+
+                                        if(mMessenger != null){
+
+                                            Message message = Message.obtain();
+                                            message.what = Config.SCREEN_SHOT;
+                                            Bundle bundle = new Bundle();
+                                            bundle.putParcelable("screenShot",bitmap);
+                                            message.setData(bundle);
+
+                                            try {
+
+                                                mMessenger.send(message);
+
+                                                Toast.makeText(ScreenshotActivity.this, "截图成功！", Toast.LENGTH_SHORT).show();
+
+                                            } catch (RemoteException e) {
+                                                e.printStackTrace();
+                                                Toast.makeText(ScreenshotActivity.this, "截图失败！", Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        }else {
+
+                                            Toast.makeText(ScreenshotActivity.this, "截图失败！", Toast.LENGTH_SHORT).show();
+                                        }
+
 
                                         mIsExist = true;
                                     }
 
                                     mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mOriginVolume, 0);
+
+                                    if (mShootMP != null){
+
+                                        mShootMP.release();
+                                    }
+
+                                    unbindFloatService();
+
                                     finish();
+
                                 }
                             });
 
@@ -117,29 +193,6 @@ public class ScreenshotActivity extends Activity {
 
     }
 
-    private void saveScreenshot(Bitmap bitmap) {
-
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
-
-        Date date = new Date();
-
-        String strDate = dateFormat.format(date);
-
-        try {
-            String filePath = FloatingBallUtils.saveBitmap(bitmap,strDate+".png");
-
-            FloatingBallUtils.scanFile(this,filePath);
-
-            Toast.makeText(this, "截图成功！", Toast.LENGTH_SHORT).show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            Toast.makeText(this,"截图失败！",Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
     public static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
@@ -181,10 +234,11 @@ public class ScreenshotActivity extends Activity {
         if (mOriginVolume != 0)
         {
 
-             MediaPlayer   shootMP = MediaPlayer.create(this, Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
-            if (shootMP != null){
+             mShootMP = MediaPlayer.create(this, Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
 
-                shootMP.start();
+            if (mShootMP != null){
+
+                mShootMP.start();
             }
 
         }
@@ -194,7 +248,7 @@ public class ScreenshotActivity extends Activity {
         Intent intent = new Intent();
         intent.putExtra("what",what);
         intent.putExtra(name, action);
-        intent.setClass(this, FloatingBallService.class);
+        intent.setClass(this, FloatService.class);
         startService(intent);
     }
 }

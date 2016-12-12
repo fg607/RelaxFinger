@@ -21,7 +21,6 @@ public class ToolAdapter extends BaseAdapter {
 
     private ArrayList<ToolInfo> mToolList;
     private Context mContext;
-    private String mChoosedToolName;
     private ArrayList<String> mChoosedNameList;
 
     public ToolAdapter(Context context){
@@ -31,20 +30,11 @@ public class ToolAdapter extends BaseAdapter {
     public void addList(ArrayList<ToolInfo> list){
 
         this.mToolList = list;
-        //notifyDataSetChanged();
-    }
-
-    public void setToolChecked(String name){
-
-        this.mChoosedToolName = name;
-        notifyDataSetChanged();
-
     }
 
     public void setToolChecked(ArrayList<String> choosedNameList){
 
         this.mChoosedNameList = choosedNameList;
-       // notifyDataSetChanged();
 
     }
 
@@ -94,14 +84,6 @@ public class ToolAdapter extends BaseAdapter {
 
             checkBox.setChecked(false);
         }
-      /*  if(mToolList.get(i).getToolName().equals(mChoosedToolName)){
-
-            checkBox.setChecked(true);
-        }
-        else {
-
-            checkBox.setChecked(false);
-        }*/
 
         return view1;
     }

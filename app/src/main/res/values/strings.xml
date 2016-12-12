@@ -5,7 +5,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_setting">悬浮助手-RelaxFinger</string>
-    <string name="accessibility">悬浮助手</string>
+    <string name="accessibility">悬浮助手正常运行需要开启辅助功能</string>
     <string name="admin">悬浮助手</string>
     <string name="functionChooseTitle">选择手势功能</string>
     <string name="title_activity_main">MainActivity</string>

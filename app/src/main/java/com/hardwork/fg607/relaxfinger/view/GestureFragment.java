@@ -1,21 +1,27 @@
 package com.hardwork.fg607.relaxfinger.view;
 
 
-import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
+import android.os.RemoteException;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.hardwork.fg607.relaxfinger.R;
-import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
-import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.SettingActivity;
+import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import net.grandcentrix.tray.TrayAppPreferences;
+
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isUsageAccess;
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.requestUsageAccessPermission;
 
 
 public class GestureFragment extends PreferenceFragment implements OnPreferenceClickListener {
@@ -50,7 +56,7 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
         mSwipeUp.setSummary(mPreferences.getString("swipeUp", "通知栏"));
         mSwipeDown.setSummary(mPreferences.getString("swipeDown", "Home键"));
         mSwipeLeft.setSummary(mPreferences.getString("swipeLeft", "快捷应用"));
-        mSwipeRight.setSummary(mPreferences.getString("swipeRight", "快速设置"));
+        mSwipeRight.setSummary(mPreferences.getString("swipeRight", "隐藏悬浮球"));
     }
 
     private void initPreferences() {
@@ -72,12 +78,21 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
         mSwipeRight.setOnPreferenceClickListener(this);
     }
 
-    public  void sendMsg(int what,String name,boolean action) {
-        Intent intent = new Intent();
-        intent.putExtra("what",what);
-        intent.putExtra(name, action);
-        intent.setClass(getActivity(), FloatingBallService.class);
-        getActivity().startService(intent);
+    public  void sendMsg(int what) {
+
+        Message message = Message.obtain();
+
+        message.what = what;
+
+        try {
+            if(SettingActivity.sMessenger != null){
+
+                SettingActivity.sMessenger.send(message);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -94,7 +109,17 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
         final String summary = preference.getSummary().toString();
 
         Resources res =getResources();
-        String[] function=res.getStringArray(R.array.array_function);
+        String[] function;
+
+        if (Build.VERSION.SDK_INT >= 21) {
+
+            function = res.getStringArray(R.array.array_function_lollipop);
+
+        }else {
+
+            function = res.getStringArray(R.array.array_function);
+        }
+
 
         int pos =  -1;
 
@@ -109,10 +134,19 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
 
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.functionChooseTitle)
-                .items(R.array.array_function)
+                .items(function)
                 .itemsCallbackSingleChoice(pos, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+
+                        if(text.equals("切换上一个应用")){
+
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !isUsageAccess()){
+                                Toast.makeText(getActivity(),"切换上一应用需要打开通知使用权限!", Toast.LENGTH_SHORT).show();
+                                requestUsageAccessPermission();
+                                return false;
+                            }
+                        }
 
                         switch (preference.getKey()) {
 
@@ -149,20 +183,7 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
 
                         }
 
-                        sendMsg(Config.GESTURE_FUNCTION, "loadfunction", true);
-
-                        if (text.equals("休眠(需要开启锁屏功能)")) {
-
-
-                        } else if (text.equals("后台应用")) {
-
-                            sendMsg(Config.START_DETECT, "startDetect", true);
-                        }
-
-                        if(summary.equals("后台应用") && !text.equals("后台应用")){
-
-                            sendMsg(Config.STOP_DETECT, "stopDetect", true);
-                        }
+                        sendMsg(Config.GESTURE_FUNCTION);
 
                         return true;
                     }
@@ -170,4 +191,5 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
                 .negativeText("取消")
                 .show();
     }
+
 }

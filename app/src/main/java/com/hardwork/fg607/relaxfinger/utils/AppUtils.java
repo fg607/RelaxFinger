@@ -20,21 +20,16 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
-import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
 import com.hardwork.fg607.relaxfinger.model.ShortcutInfo;
-import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -355,6 +350,7 @@ public class AppUtils {
         ActivityManager activity = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> runningTask = activity.getRunningTasks(3);
         if (runningTask != null) {
+
             for(ActivityManager.RunningTaskInfo task:runningTask){
                 ComponentName componentTop = task.topActivity;
                 packageName = componentTop.getPackageName();
@@ -362,7 +358,7 @@ public class AppUtils {
                 Intent intent = pm.getLaunchIntentForPackage(packageName);
                 if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger")
                         && !packageName.contains("input")
-                        && !packageName.contains("keyboard")){
+                        && !packageName.contains("keyboard") && !packageName.contains("launcher")){
 
                     count++;
 
@@ -370,8 +366,6 @@ public class AppUtils {
 
                         return packageName;
                     }
-
-                    Log.i("task",packageName);
 
                 }
 
@@ -400,6 +394,15 @@ public class AppUtils {
         List<UsageStats> queryUsageStats =
                 usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts-1000*60*60, ts);
         if (queryUsageStats == null || queryUsageStats.isEmpty()) {
+
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"切换上一应用需要查看应用使用情况权限!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            AccessibilityUtil.requestUsageAccessPermission();
             return null;
         }
 
@@ -417,7 +420,7 @@ public class AppUtils {
 
            if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger")
                    && !packageName.contains("input")
-                   && !packageName.contains("keyboard")){
+                   && !packageName.contains("keyboard") && !packageName.contains("launcher")){
 
                //Log.i("usage",packageName);
                return packageName;

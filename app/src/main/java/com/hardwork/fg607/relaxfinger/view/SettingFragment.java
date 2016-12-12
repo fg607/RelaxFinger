@@ -2,6 +2,8 @@ package com.hardwork.fg607.relaxfinger.view;
 
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -9,25 +11,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Message;
+import android.os.RemoteException;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -37,15 +36,12 @@ import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
-import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
-import com.hardwork.fg607.relaxfinger.utils.Config;
+import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
 import com.orm.SugarRecord;
-import com.testin.agent.TestinAgent;
-import com.testin.agent.TestinAgentConfig;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
@@ -53,6 +49,9 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.checkAccessibility;
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isServiceRunning;
 
 public class SettingFragment extends PreferenceFragment implements OnPreferenceChangeListener,View.OnClickListener {
 
@@ -63,10 +62,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mAutoMoveSwitch;
     private SwitchPreference mAutoStartSwitch;
     private SwitchPreference mVibratorSwitch;
-    //private SwitchPreference mShotscreenSwitch;
     private SwitchPreference mFeedbackSwitch;
-    private SwitchPreference mNotifySwitch;
-    private SwitchPreference mTestinAgentSwitch;
     private SwitchPreference mAutoHideSwitch;
     private SwitchPreference mHideAreaSwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
@@ -81,6 +77,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private OnSettingClickListener mClickListener;
     private TrayAppPreferences mPreferences;
     private SharedPreferences mSharePreferences;
+
+    private Context mContext;
+    private SettingActivity mActivity;
 
     private View mThemeView;
     @BindView(R.id.img1) RelativeLayout mImg1;
@@ -112,12 +111,10 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
 
-        initPreferences();
-
         mDeviceManager = (DevicePolicyManager) MyApplication.getApplication().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mComponentName = new ComponentName(MyApplication.getApplication(), ScreenOffAdminReceiver.class);
 
-        checkSetting();
+        initPreferences();
 
 
     }
@@ -127,51 +124,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mClickListener = listener;
     }
 
-    private void checkSetting() {
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            if(!Settings.canDrawOverlays(getActivity())){
-
-                mFloatSwitch.setChecked(false);
-            }
-        }
-
-        sendMsg(Config.FLOAT_SWITCH, "ballstate", mFloatSwitch.isChecked());
-
-        if (!mDeviceManager.isAdminActive(mComponentName)) {
-
-            mLockScreenSwitch.setChecked(false);
-        }
-
-        boolean canMove = mPreferences.getBoolean("moveSwitch", false);
-
-        sendMsg(Config.MOVE_SWITCH, "canmove", canMove);
-
-        mMoveSwitch.setChecked(canMove);
-
-        int position = mSharePreferences.getInt("seekbar_position", 50);
-
-        mFloatBallSize.setSummary(position + "");
-
-        position = mSharePreferences.getInt("alpha_position", 50);
-
-        mFloatBallAlpha.setSummary(position + "");
-
-        if(isNotifyEnabled()){
-
-            mAutoMoveSwitch.setChecked(true);
-        }else {
-
-            mAutoMoveSwitch.setChecked(false);
-        }
-
-    }
-
 
     private void initPreferences() {
-
 
         mFloatSwitch = (SwitchPreference) findPreference("floatSwitch");
         mFloatSwitch.setOnPreferenceChangeListener(this);
@@ -181,20 +135,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mVibratorSwitch.setOnPreferenceChangeListener(this);
         mFeedbackSwitch = (SwitchPreference) findPreference("feedbackSwitch");
         mFeedbackSwitch.setOnPreferenceChangeListener(this);
-      /*  mShotscreenSwitch = (SwitchPreference) findPreference("shotscreenSwitch");
-        mShotscreenSwitch.setOnPreferenceChangeListener(this);*/
         mToEdgeSwitch = (SwitchPreference) findPreference("toEdgeSwitch");
         mToEdgeSwitch.setOnPreferenceChangeListener(this);
         mLockScreenSwitch = (SwitchPreference) findPreference("lockScreenSwitch");
         mLockScreenSwitch.setOnPreferenceChangeListener(this);
         mAutoMoveSwitch = (SwitchPreference) findPreference("autoMoveSwitch");
         mAutoMoveSwitch.setOnPreferenceChangeListener(this);
-        mNotifySwitch = (SwitchPreference) findPreference("notifySwitch");
-        mNotifySwitch.setOnPreferenceChangeListener(this);
         mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
         mAutoStartSwitch.setOnPreferenceChangeListener(this);
-        mTestinAgentSwitch = (SwitchPreference) findPreference("testinAgentSwitch");
-        mTestinAgentSwitch.setOnPreferenceChangeListener(this);
         mAutoHideSwitch = (SwitchPreference) findPreference("autoHideSwitch");
         mAutoHideSwitch.setOnPreferenceChangeListener(this);
         mHideAreaSwitch = (SwitchPreference) findPreference("hideAreaSwitch");
@@ -238,6 +186,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }
         });
 
+        int position = mSharePreferences.getInt("seekbar_position", 50);
+        mFloatBallSize.setSummary(position + "");
+
         mFloatBallAlpha = (com.jenzz.materialpreference.Preference) findPreference("floatBallAlpha");
         mFloatBallAlpha.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -248,6 +199,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 return true;
             }
         });
+
+        position = mSharePreferences.getInt("alpha_position", 50);
+        mFloatBallAlpha.setSummary(position + "");
 
         mFloatBallTheme = (com.jenzz.materialpreference.Preference) findPreference("floatBallTheme");
         mFloatBallTheme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -265,26 +219,23 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     private void showThemeDialog() {
 
+        if (mThemeDialog == null) {
 
-        if(mThemeDialog==null){
+            if (mThemeView == null) initThemeView();
 
-            mThemeDialog = new AlertDialog.Builder(getActivity()).setTitle("悬浮球主题").create();
-
-            if(mThemeView==null){
-                initThemeView();
-            }
-
-            mThemeDialog.setView(mThemeView);
+            mThemeDialog = new AlertDialog.Builder(mContext)
+                    .setTitle("悬浮球主题")
+                    .setView(mThemeView)
+                    .create();
         }
 
-
-
         mThemeDialog.show();
+
     }
 
     private void initThemeView() {
 
-        mThemeView = getActivity().getLayoutInflater().inflate(R.layout.balltheme_dialog_layout, null);
+        mThemeView = LayoutInflater.from(mContext).inflate(R.layout.balltheme_dialog_layout, null);
 
         ButterKnife.bind(this, mThemeView);
 
@@ -298,8 +249,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             String filePath= Environment.getExternalStorageDirectory().getAbsolutePath()
                     +"/RelaxFinger/DIY.png";
 
-            Bitmap icon = ImageUtils.scaleBitmap(filePath, DensityUtil.dip2px(getActivity(),40),
-                    DensityUtil.dip2px(getActivity(),40));
+            Bitmap icon = ImageUtils.scaleBitmap(filePath, DensityUtil.dip2px(mContext,40),
+                    DensityUtil.dip2px(mContext,40));
 
             mImg5.setBackground(ImageUtils.bitmap2Drawable(icon));
             mImg5.setClickable(true);
@@ -356,9 +307,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         int position = mSharePreferences.getInt("alpha_position", 50);
 
         AlertDialog.Builder builder =
-                new AlertDialog.Builder(getActivity());
+                new AlertDialog.Builder(mContext);
         builder.setTitle("悬浮球透明度");
-        View layout = getActivity().getLayoutInflater().inflate(R.layout.ballsize_dialog_layout, null);
+        View layout = LayoutInflater.from(mContext).inflate(R.layout.ballsize_dialog_layout, null);
         builder.setView(layout);
 
 
@@ -401,9 +352,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         int position = mSharePreferences.getInt("seekbar_position", 50);
 
         AlertDialog.Builder builder =
-                new AlertDialog.Builder(getActivity());
+                new AlertDialog.Builder(mContext);
         builder.setTitle("悬浮球大小");
-        View layout = getActivity().getLayoutInflater().inflate(R.layout.ballsize_dialog_layout, null);
+        View layout = LayoutInflater.from(mContext).inflate(R.layout.ballsize_dialog_layout, null);
         builder.setView(layout);
 
 
@@ -437,12 +388,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         });
 
         builder.show();
-
-      /*  new MaterialDialog.Builder(getActivity())
-                .title("悬浮球大小")
-                .customView(R.layout.ballsize_dialog_layout, false)
-                .negativeText("取消")
-                .show();*/
     }
 
     @Override
@@ -462,9 +407,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "feedbackSwitch":
                 feedbackChange((boolean) newValue);
                 break;
-            case "shotscreenSwitch":
-                shotscreenChange((boolean) newValue);
-                break;
             case "toEdgeSwitch":
                 toEdgeChange((boolean) newValue);
                 break;
@@ -478,21 +420,15 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 }else {
                     if((boolean)newValue) {
 
-                        Toast.makeText(getActivity(), "避让功能适用于4.4以上系统！", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "避让功能适用于4.4以上系统！", Toast.LENGTH_SHORT).show();
 
                         return false;
                     }
                 }
 
                 break;
-            case "notifySwitch":
-                notifyChange((boolean) newValue);
-                break;
             case "autoStartSwitch":
                 autoStartChange((boolean) newValue);
-                break;
-            case "testinAgentSwitch":
-                exceptionCatchChange((boolean) newValue);
                 break;
             case "autoHideSwitch":
                 autoHideChange((boolean) newValue);
@@ -512,29 +448,19 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private void hideAreaChange(boolean newValue) {
 
         mPreferences.put("hideAreaSwitch",newValue);
+
+        sendMsg(Config.HIDE_AREA_SWITCH,"showHideArea",newValue);
     }
 
     private void autoHideChange(boolean newValue) {
 
         mPreferences.put("autoHideSwitch",newValue);
-    }
 
-    private void exceptionCatchChange(boolean newValue) {
-
-        mPreferences.put("testinSwitch", newValue);
-    }
-
-    private void shotscreenChange(boolean newValue) {
-
-        mPreferences.put("shotscreenSwitch", newValue);
-
-        sendMsg(Config.SHOTSCREEN_SWITCH, "isShotscreen", newValue);
+        sendMsg(Config.AUTO_HIDE_SWITCH,"isAutoHide",newValue);
     }
 
 
     private void autoMoveChange(boolean newValue) {
-
-       // mPreferences.put("autoMoveSwitch",newValue);
 
         openNotificationAccess();
 
@@ -553,15 +479,19 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     }
 
-    private boolean isNotifyEnabled() {
+    /**
+     * 检测是否拥有通知使用权
+     * @return
+     */
+    private boolean canAvoidKeyborad() {
 
         if(Build.VERSION.SDK_INT < 19){
 
             return false;
         }
 
-            String pkgName = getActivity().getPackageName();
-        final String flat = Settings.Secure.getString(getActivity().getContentResolver(),
+            String pkgName = mActivity.getPackageName();
+        final String flat = Settings.Secure.getString(mContext.getContentResolver(),
                 "enabled_notification_listeners");
         if (!TextUtils.isEmpty(flat)) {
             final String[] names = flat.split(":");
@@ -575,12 +505,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }
         }
         return false;
-    }
-
-    private void notifyChange(boolean newValue) {
-
-        mPreferences.put("notifySwitch", newValue);
-        sendMsg(Config.NOTIFY_SWITCH, "isNotify", newValue);
     }
 
     private void vibratorChange(boolean newValue) {
@@ -621,7 +545,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             if (!mIsAdmin) {
                 Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
                 intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName);
-                getActivity().startActivity(intent);
+                mContext.startActivity(intent);
             }
         } else {
 
@@ -642,64 +566,125 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     public void FloatChange(boolean newValue) {
 
-        mPreferences.put("floatSwitch", newValue);
+        if(!newValue){
 
-        sendMsg(Config.FLOAT_SWITCH, "ballstate", newValue);
+            exitFloatService();
+
+        }else {
+
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+
+                requestDrawOverLays();
+
+            }else {
+
+                activateFloatService();
+            }
+
+
+        }
+
 
     }
 
+    private void exitFloatService() {
 
-    /**
-     * 向Ｓervice发送消息
-     *
-     * @param action
-     */
-    public void sendMsg(String name, String action) {
-        Intent intent = new Intent();
-        intent.putExtra(name, action);
-        intent.setClass(getActivity(), FloatingBallService.class);
-        getActivity().startService(intent);
+        mActivity.unbindFloatService();
+
+        mActivity.stopFloatService();
+
+        mPreferences.put("floatSwitch", false);
+    }
+
+    private void activateFloatService() {
+
+        mActivity.startFloatService();
+
+        mActivity.bindFloatService();
+
+        mPreferences.put("floatSwitch", true);
+    }
+
+    public static int OVERLAY_PERMISSION_REQ_CODE = 1234;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestDrawOverLays() {
+        if (!Settings.canDrawOverlays(mActivity)) {
+            Toast.makeText(mContext, "悬浮助手需要开启在其他应用上层显示权限!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + mActivity.getPackageName()));
+            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+        }else {
+
+            activateFloatService();
+        }
     }
 
     public void sendMsg(int what, String name, int msg) {
-        Intent intent = new Intent();
-        intent.putExtra("what", what);
-        intent.putExtra(name, msg);
-        intent.setClass(getActivity(), FloatingBallService.class);
-        getActivity().startService(intent);
+
+        Message message = Message.obtain();
+
+        message.what = what;
+
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(name,msg);
+
+        message.setData(bundle);
+
+        try {
+            if(SettingActivity.sMessenger != null){
+
+                SettingActivity.sMessenger.send(message);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMsg(int what, String name, String msg) {
-        Intent intent = new Intent();
-        intent.putExtra("what", what);
-        intent.putExtra(name, msg);
-        intent.setClass(getActivity(), FloatingBallService.class);
-        getActivity().startService(intent);
+
+        Message message = Message.obtain();
+
+        message.what = what;
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString(name,msg);
+
+        message.setData(bundle);
+
+        try {
+            if(SettingActivity.sMessenger != null){
+
+                SettingActivity.sMessenger.send(message);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMsg(int what, String name, boolean action) {
-        Intent intent = new Intent();
-        intent.putExtra("what", what);
-        intent.putExtra(name, action);
-        intent.setClass(getActivity(), FloatingBallService.class);
-        getActivity().startService(intent);
-    }
 
+        Message message = Message.obtain();
 
-    public SwitchPreference getFloatSwitch() {
-        return mFloatSwitch;
-    }
+        message.what = what;
 
-    public SwitchPreference getMoveSwitch() {
-        return mMoveSwitch;
-    }
+        Bundle bundle = new Bundle();
 
-    public SwitchPreference getLockScreenSwitch() {
-        return mLockScreenSwitch;
-    }
+        bundle.putBoolean(name,action);
 
-    public SwitchPreference getAutoStartSwitch() {
-        return mAutoStartSwitch;
+        message.setData(bundle);
+
+        try {
+            if(SettingActivity.sMessenger != null){
+
+                SettingActivity.sMessenger.send(message);
+
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -756,7 +741,16 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
             mViewChoosed = setIconChoosed(mThemeChoosed);
 
-            FloatingBallUtils.checkPermissionGranted(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+                if(!FloatingBallUtils.checkPermissionGranted(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE)){
+
+                    FloatingBallUtils.hideToNotifybar();
+                }
+
+            }
+
 
             sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
 
@@ -779,7 +773,18 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(requestCode == Config.REQUEST_PICK) {
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(mActivity)) {
+                    mFloatSwitch.setChecked(false);
+                    Toast.makeText(mContext, "开启悬浮助手需要授权在其他应用上层显示!", Toast.LENGTH_SHORT).show();
+                }else {
+
+                    activateFloatService();
+                }
+            }
+        }else if(requestCode == Config.REQUEST_PICK) {
 
             if(data != null) {
 
@@ -789,9 +794,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
                     try {
                         //将选择的图片进行暂存
-                        FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                        FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), imageUri);
                         Intent intent = new Intent();
-                        intent.setClass(getActivity(), ClipImageActivity.class);
+                        intent.setClass(mContext, ClipImageActivity.class);
                         startActivityForResult(intent,Config.REQUEST_CLIP);
 
                     } catch (IOException e) {
@@ -800,7 +805,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
                 }catch (OutOfMemoryError e){
 
-                    Toast.makeText(getActivity(),"图片过大，无法正常加载！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,"图片过大，无法正常加载！",Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -838,7 +843,19 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
                 if("自定义".equals(mThemeChoosed)){
 
-                    sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+                    //等待绑定sevice
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(100);
+                                sendMsg(Config.FLOAT_THEME, "theme", mThemeChoosed);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
                     mFloatBallTheme.setSummary(mThemeChoosed);
                 }
 
@@ -848,46 +865,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     }
 
-    /* @Override
-         public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
-             Animator animator = null;
-
-             if (nextAnim == R.animator.fragment_pop_left_enter) {
-                 animator = AnimatorInflater.loadAnimator(getActivity(), nextAnim);
-                 if (animator != null && enter) {
-
-                     animator.addListener(new Animator.AnimatorListener() {
-                         @Override
-                         public void onAnimationStart(Animator animation) {
-                             if(mCallBack != null){
-
-                                 mCallBack.enterAnimationEnd();
-
-                             }
-                         }
-
-                         @Override
-                         public void onAnimationEnd(Animator animation) {
-                             *//*if(mCallBack != null){
-
-                            mCallBack.enterAnimationEnd();
-
-                        }*//*
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-                    }
-                });
-            }
-        }
-        return animator;
-    }
-*/
     public interface OnSettingClickListener {
 
         public void onGestureSettingClick();
@@ -899,18 +876,62 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     public void onResume() {
         super.onResume();
 
+        if (!mDeviceManager.isAdminActive(mComponentName)) {
+
+            mLockScreenSwitch.setChecked(false);
+        }
+
         boolean canMove = mPreferences.getBoolean("moveSwitch", false);
 
         mMoveSwitch.setChecked(canMove);
 
-        if(isNotifyEnabled()){
 
-            mAutoMoveSwitch.setChecked(true);
-
-        }else {
+        if(!canAvoidKeyborad()){
 
             mAutoMoveSwitch.setChecked(false);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if(!Settings.canDrawOverlays(mActivity)){
+
+                mFloatSwitch.setChecked(false);
+                if(isServiceRunning(mContext,"com.hardwork.fg607.relaxfinger.service.FloatService")){
+
+                    mActivity.stopFloatService();
+                }
+            }
+        }
+
+        if(!mFloatSwitch.isChecked()){
+
+            if(isServiceRunning()){
+
+                mActivity.unbindFloatService();
+                mActivity.stopFloatService();
+            }
+
+        }else {
+            if(!mActivity.isAlertShowing()){
+
+                mActivity.startFloatService();
+                mActivity.bindFloatService();
+            }
 
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        mActivity = (SettingActivity) getActivity();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mContext = activity;
+        mActivity = (SettingActivity) getActivity();
     }
 }

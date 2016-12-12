@@ -40,9 +40,9 @@
 
 
     <com.jenzz.materialpreference.Preference
-        android:defaultValue="快速设置"
+        android:defaultValue="隐藏悬浮球"
         android:key="swipeRight"
-        android:summary="快速设置"
+        android:summary="隐藏悬浮球"
         android:title="右滑" />
 
 </PreferenceScreen>

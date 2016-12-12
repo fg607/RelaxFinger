@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RelaxFinger.iml" filepath="$PROJECT_DIR$/RelaxFinger.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/qAMasterSDK/qAMasterSDK.iml" filepath="$PROJECT_DIR$/qAMasterSDK/qAMasterSDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/悬浮助手noroot.iml" filepath="$PROJECT_DIR$/悬浮助手noroot.iml" />
     </modules>
   </component>
 </project>

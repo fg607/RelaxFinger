@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
     <!--常见桌面权限-->
@@ -31,13 +32,11 @@
     <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.cyanogenport.trebuchet.permission.READ_SETTINGS"/>
     <uses-permission android:name="com.kaneoriley.cyanogenport.launcher.permission.READ_SETTINGS"/>
-
-
-    <!--收集崩溃信息权限-->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.READ_LOGS"/>
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="com.teslacoilsw.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.cmnlauncher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.huawei.android.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="org.adw.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="home.solo.launcher.free.permission.READ_SETTINGS"/>
 
 
     <application
@@ -55,16 +54,12 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ChooseAppActivity"
-            android:label="选择快捷应用" />
 
         <service
-            android:name=".service.FloatingBallService"
+            android:name=".service.FloatService"
             android:configChanges="orientation|keyboardHidden"
             android:enabled="true"
             android:exported="true"
@@ -120,11 +115,6 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.Transparent" />
-        <activity
-            android:name=".view.BlankActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:theme="@style/MyDialogStyle" />
         <activity android:name=".view.ClipImageActivity" />
     </application>
 

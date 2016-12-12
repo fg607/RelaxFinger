@@ -4,6 +4,7 @@ package com.hardwork.fg607.relaxfinger.utils;
  * Created by fg607 on 16-4-16.
  */
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -25,6 +27,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by omerjerk on 17/2/16.
  */
+@TargetApi(Build.VERSION_CODES.KITKAT)
 public class Screenshotter implements ImageReader.OnImageAvailableListener {
 
     private static final String TAG = "LibScreenshotter";
@@ -65,6 +68,7 @@ public class Screenshotter implements ImageReader.OnImageAvailableListener {
      * @param resultCode The result code returned by the request for accessing MediaProjection permission
      * @param data The intent returned by the same request
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public Screenshotter takeScreenshot(Context context, int resultCode, Intent data, final ScreenshotCallback cb) {
         this.context = context;
         this.cb = cb;
@@ -108,6 +112,7 @@ public class Screenshotter implements ImageReader.OnImageAvailableListener {
         return this;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onImageAvailable(ImageReader reader) {
 

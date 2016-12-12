@@ -53,20 +53,6 @@
         android:summaryOn="锁屏功能已开启"
         android:title="开启锁屏" />
 
-  <!--  <com.jenzz.materialpreference.SwitchPreference
-        android:defaultValue="true"
-        android:key="shotscreenSwitch"
-        android:summaryOff="长按截屏已关闭"
-        android:summaryOn="自由模式下长按截屏"
-        android:title="长按屏幕截图" />-->
-
-    <com.jenzz.materialpreference.SwitchPreference
-        android:defaultValue="true"
-        android:key="notifySwitch"
-        android:summaryOff="通知栏已关闭"
-        android:summaryOn="通知栏已开启"
-        android:title="通知栏" />
-
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
         android:key="autoStartSwitch"
@@ -87,7 +73,6 @@
         android:summaryOff="隐藏区域已关闭"
         android:summaryOn="隐藏区域已开启"
         android:title="显示隐藏区域" />
-
 
     <com.jenzz.materialpreference.Preference
         android:key="floatBallTheme"
@@ -112,13 +97,6 @@
     <com.jenzz.materialpreference.Preference
         android:key="appSetting"
         android:title="快捷菜单设置"/>
-
-    <com.jenzz.materialpreference.SwitchPreference
-        android:defaultValue="true"
-        android:key="testinAgentSwitch"
-        android:summaryOff="异常报告已关闭"
-        android:summaryOn="异常报告已开启"
-        android:title="异常捕获反馈" />
 
 
 </PreferenceScreen>

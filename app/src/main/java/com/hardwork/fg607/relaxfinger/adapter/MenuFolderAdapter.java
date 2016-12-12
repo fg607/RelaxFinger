@@ -7,19 +7,16 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.R;
-import com.hardwork.fg607.relaxfinger.model.ItemClickListener;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,12 +27,21 @@ public class MenuFolderAdapter extends BaseAdapter {
     private Context mContext;
     private List<MenuDataSugar> mMenuDataList;
 
-    private ItemClickListener mItemClickListener;
+    private OnFolderItemClickListener mItemClickListener;
 
-    public MenuFolderAdapter(Context context,ItemClickListener listener){
+    public interface OnFolderItemClickListener{
+
+        void folderItemClick();
+    }
+
+    public MenuFolderAdapter(Context context){
 
         this.mContext = context;
-        this.mItemClickListener = listener;
+    }
+
+    public void setOnFolderItemClickListener(OnFolderItemClickListener listener){
+
+        mItemClickListener = listener;
     }
 
     public void setMenuDataList(List<MenuDataSugar> list){
@@ -132,7 +138,7 @@ public class MenuFolderAdapter extends BaseAdapter {
 
                 if(mItemClickListener!=null){
 
-                    mItemClickListener.itemClick();
+                    mItemClickListener.folderItemClick();
                 }
 
             }

@@ -29,7 +29,7 @@ import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 
 /**
- * ÓÃÓÚËõ·Å²Ã¼ôµÄ×Ô¶¨ÒåImageViewÊÓÍ¼
+ *   ç”¨äºç¼©æ”¾è£å‰ªçš„è‡ªå®šä¹‰ImageViewè§†å›¾
  * @author AC
  *
  */
@@ -79,7 +79,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 	}
 
 	/**
-	 * ÒÀ¾İÍ¼Æ¬¿í¸ß±ÈÀı£¬ÉèÖÃÍ¼Ïñ³õÊ¼Ëõ·ÅµÈ¼¶ºÍÎ»ÖÃ
+	 * ä¾æ®å›¾ç‰‡é«˜åº¦æ¯”ä¾‹,è®¾ç½®å›¾åƒåˆå§‹ç¼©æ”¾ç­‰çº§å’Œä½ç½®
 	 */
 	private void configPosition() {
 		super.setScaleType(ScaleType.MATRIX);
@@ -95,27 +95,27 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		borderlength = (int) (viewWidth - BORDERDISTANCE * 2);
 		float scale = 1.0f;
 		/**
-		 * ÅĞ¶ÏÍ¼Æ¬¿í¸ß±ÈÀı£¬µ÷ÕûÏÔÊ¾Î»ÖÃºÍËõ·Å´óĞ¡
+		 * åˆ¤æ–­å›¾ç‰‡å®½é«˜æ¯”ä¾‹,è°ƒæ•´æ˜¾ç¤ºä½ç½®å’Œç¼©æ”¾å¤§å°
 		 */
-		// Í¼Æ¬¿í¶ÈĞ¡ÓÚµÈÓÚ¸ß¶È
+		// å›¾ç‰‡å®½åº¦å°äºç­‰äºé«˜åº¦
 		if (drawableWidth <= drawableHeight) {
-			// ÅĞ¶ÏÍ¼Æ¬¿í¶ÈÊÇ·ñĞ¡ÓÚ±ß¿ò, Ëõ·ÅÆÌÂú²Ã¼ô±ß¿ò
+			// åˆ¤æ–­å›¾ç‰‡å®½åº¦æ˜¯å¦å°äºè¾¹æ¡†,ç¼©æ”¾é“ºæ»¡è£å‰ªè¾¹æ¡†
 			if (drawableWidth < borderlength) {
 				baseMatrix.reset();
 				scale = (float) borderlength / drawableWidth;
-				// Ëõ·Å
+				// ç¼©æ”¾
 				baseMatrix.postScale(scale, scale);
 			}
-			// Í¼Æ¬¿í¶È´óÓÚ¸ß¶È
+			// å›¾ç‰‡å®½åº¦å¤§äºé«˜åº¦
 		} else {
 			if (drawableHeight < borderlength) {
 				baseMatrix.reset();
 				scale = (float) borderlength / drawableHeight;
-				// Ëõ·Å
+				// ç¼©æ”¾
 				baseMatrix.postScale(scale, scale);
 			}
 		}
-		// ÒÆ¶¯¾ÓÖĞ
+		// ç§»åŠ¨å±…ä¸­
 		baseMatrix.postTranslate((viewWidth - drawableWidth * scale) / 2,
 				(viewHeight - drawableHeight * scale) / 2);
 
@@ -355,7 +355,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		if (isJusted) {
 			return;
 		}
-		// µ÷ÕûÊÓÍ¼Î»ÖÃ
+		// è°ƒæ•´è§†å›¾ä½ç½®
 		configPosition();
 	}
 
@@ -390,7 +390,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		float deltaX = 0, deltaY = 0;
 		final float viewWidth = getWidth();
 		final float viewHeight = getHeight();
-		// ÅĞ¶ÏÒÆ¶¯»òËõ·Åºó£¬Í¼Æ¬ÏÔÊ¾ÊÇ·ñ³¬³ö²Ã¼ô¿ò±ß½ç
+		//åˆ¤æ–­ç§»åŠ¨æˆ–ç¼©æ”¾å,å›¾ç‰‡æ˜¾ç¤ºæ˜¯å¦è¶…å‡ºè£å‰ªæ¡†è¾¹ç•Œ
 		if (rect.top > (viewHeight - borderlength) / 2) {
 			deltaY = (viewHeight - borderlength) / 2 - rect.top;
 		}
@@ -444,7 +444,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 	}
 
 	/**
-	 * ¼ôÇĞÍ¼Æ¬£¬·µ»Ø¼ôÇĞºóµÄbitmap¶ÔÏó
+	 * å‰ªåˆ‡å›¾ç‰‡,è¿”å›å‰ªåˆ‡åçš„bitmapå¯¹è±¡
 	 * 
 	 * @return
 	 */
@@ -474,10 +474,10 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 	}
 
 	/**
-	 * ×ª»»Í¼Æ¬³ÉÔ²ĞÎ
+	 * è½¬æ¢å›¾ç‰‡æˆåœ†å½¢
 	 * 
 	 * @param bitmap
-	 *            ´«ÈëBitmap¶ÔÏó
+	 *            ä¼ å…¥Bitmapå¯¹è±¡
 	 * @return
 	 */
 	public Bitmap toRoundBitmap(Bitmap bitmap) {
@@ -535,7 +535,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, src, dst, paint);
 
-		//¼Ó°×±ß
+		//åŠ ç™½è¾¹
 		final int bordercolor = 0x7f171717;
 		Paint mBorderPaint = new Paint();
 		mBorderPaint.setStyle(Paint.Style.STROKE);
@@ -546,7 +546,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		float mBorderRadius = Math.min((float) width / 2 - 30, (float) height / 2 - 30);
 	//	canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);
 
-		//¼ÓÒõÓ°
+		//åŠ é˜´å½±
 		final int shadercolor = 0x00ffffff;
 		Paint mShaderPaint = new Paint();
 		mShaderPaint.setStyle(Paint.Style.STROKE);

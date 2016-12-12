@@ -31,7 +31,6 @@ public class AppAdapter extends BaseAdapter {
     public void addList(ArrayList<AppInfo> list){
 
         this.mAppList = list;
-     //   notifyDataSetChanged();
     }
 
     public void setAppChecked(String name){
@@ -95,14 +94,6 @@ public class AppAdapter extends BaseAdapter {
 
             checkBox.setChecked(false);
         }
-       /* if(mAppList.get(i).getAppName().equals(mChoosedAppName)){
-
-            checkBox.setChecked(true);
-        }
-        else {
-
-            checkBox.setChecked(false);
-        }*/
 
         return view1;
     }

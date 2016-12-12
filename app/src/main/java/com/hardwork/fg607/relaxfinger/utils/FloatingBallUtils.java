@@ -5,28 +5,22 @@ package com.hardwork.fg607.relaxfinger.utils;
  *
  */
 
-import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.le.BluetoothLeScanner;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
@@ -35,27 +29,20 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.InputEvent;
-import android.view.KeyEvent;
+import android.support.annotation.RequiresApi;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
-import com.hardwork.fg607.relaxfinger.SettingActivity;
-import com.hardwork.fg607.relaxfinger.model.AppInfo;
+import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
-import com.hardwork.fg607.relaxfinger.service.FloatingBallService;
+import com.hardwork.fg607.relaxfinger.service.FloatService;
 import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
-import com.hardwork.fg607.relaxfinger.view.BlankActivity;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 
 import net.grandcentrix.tray.TrayAppPreferences;
@@ -66,17 +53,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.StreamCorruptedException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
+
+import static android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE;
 
 
 public class FloatingBallUtils {
@@ -88,18 +71,20 @@ public class FloatingBallUtils {
     public static final TrayAppPreferences multiProcessPreferences = new TrayAppPreferences(context);
     public static SharedPreferences sp = getSharedPreferences();
     public static AudioManager mAudioManager=null;
-    public static ActivityManager mActivitymanager = null;
+    public static WindowManager sWindowManager = null;
     public static  WifiManager mWifiManager = null;
-    public static TelephonyManager mTelephonyManager = null;
     public static ConnectivityManager mConnectivityManager = null;
     public static PowerManager mPowerManager = null;
     public static PowerManager.WakeLock mWakeLock = null;
-   // public static boolean mIsKeepScreenOn = false;
-    public static Method mMethod = null;
+    public static Method msetDataMethod = null;
+    public static Method mgetDataMethod = null;
     public static  Camera mCamera = null;
-    public static boolean iRotationOpen = false;
     public static AudioManager.OnAudioFocusChangeListener listener= null;
     public static  boolean mIsFlashOpened = false;
+
+    public static Object wmgInstnace = null;
+    public static Method trimMemory = null;
+
     /**
      * 获取MainActivity的SharedPreferences共享数据
      * @return
@@ -144,72 +129,6 @@ public class FloatingBallUtils {
         editor.commit();
     }
 
-    /**
-     * 以超级用户权限运行adb命令
-     * @param cmd
-     */
-    public static void runCmd(String cmd) {
-
-        try {
-            if(os == null) {
-                //os = Runtime.getRuntime().exec("su").getOutputStream();
-                os = Runtime.getRuntime().exec("sh").getOutputStream();
-            }
-
-            cmd = cmd +" "+"\n";
-            os.write(cmd.getBytes());
-            os.flush();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-
-    }
-
-
-    /**
-     * 无延时模拟全局按键
-     *
-     * @param keyCode
-     *            键值
-     */
-    public static void simulateKey(int keyCode) {
-
-        //使用KeyEvent模拟按键按下与弹起
-        long l = SystemClock.uptimeMillis();
-        KeyEvent localKeyEvent = new KeyEvent(l,l, KeyEvent.ACTION_DOWN,keyCode,0);
-        KeyEvent localKeyEvent1 = new KeyEvent(l,l, KeyEvent.ACTION_UP,keyCode,0);
-
-
-        try {
-
-
-            Class ipmClass = Class.forName("android.hardware.input.InputManager");
-            Object  ipmInstnace = ipmClass.getMethod("getInstance").invoke(null, (Object[]) null);
-            Method trimMemory = ipmClass.getMethod("injectInputEvent",InputEvent.class,int.class);
-
-
-            trimMemory.invoke(ipmInstnace,localKeyEvent,0);
-
-            trimMemory.invoke(ipmInstnace,localKeyEvent1,0);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i("CLEAR","failed");
-        }
-
-    }
-
-    /**
-     * 按下back
-     */
-
-    public static  void  keyBack(){
-
-        //runCmd("input keyevent KEYCODE_BACK");
-        //simulateKey(KeyEvent.KEYCODE_BACK);
-    }
 
     public static void keyBack(AccessibilityService service){
 
@@ -217,16 +136,7 @@ public class FloatingBallUtils {
     }
 
 
-    /**
-     * 按下menu
-     */
-    public static void  keyMenu(){
-        //runCmd("input keyevent KEYCODE_MENU");
-       simulateKey(KeyEvent.KEYCODE_BACK);
-    }
-
-
-    public static void keyHome(Context context){
+    public static void keyHome(){
 
         Intent i = new Intent(Intent.ACTION_MAIN);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // 如果是服务里调用，必须加入new task标识
@@ -244,18 +154,7 @@ public class FloatingBallUtils {
         service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
     }
 
-    /**
-     *按下电源键
-     */
-
-    public static void  pressPower(Context context){
-
-        //runCmd("input keyevent KEYCODE_POWER");
-       //simulateKey(KeyEvent.KEYCODE_POWER);
-        //AlertWakeLock.turnScreenOff(context);
-
-    }
-    public static void lockScreen(Context context){
+    public static void lockScreen(){
 
         DevicePolicyManager policyManager = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName adminReceiver = new ComponentName(context,
@@ -266,15 +165,6 @@ public class FloatingBallUtils {
         }
     }
 
-    /**
-     * 打开任务面板
-     */
-
-    public static void  openRecnetTask(){
-
-        //runCmd("input keyevent KEYCODE_APP_SWITCH");
-       // simulateKey(KeyEvent.KEYCODE_APP_SWITCH);
-    }
 
     public static void openRecnetTask(AccessibilityService service){
 
@@ -304,6 +194,12 @@ public class FloatingBallUtils {
         service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS);
     }
 
+    public static void screenShot(){
+
+        context.startActivity(new Intent().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setClass(
+                context, ScreenshotActivity.class));
+    }
+
     /**
      * 音量上键
      */
@@ -321,9 +217,6 @@ public class FloatingBallUtils {
             mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
 
         }
-
-       // runCmd("input keyevent KEYCODE_VOLUME_UP");
-       // simulateKey(KeyEvent.KEYCODE_VOLUME_UP);
 
     }
 
@@ -345,28 +238,8 @@ public class FloatingBallUtils {
 
         }
 
-        //runCmd("input keyevent KEYCODE_VOLUME_DOWN");
-       //simulateKey(KeyEvent.KEYCODE_VOLUME_DOWN);
-
     }
 
-    /**
-     * 重启
-     */
-    public static void reboot() {
-
-        runCmd("reboot");
-
-    }
-
-    /**
-     * 关机
-     */
-    public static void shutdown() {
-
-       runCmd("poweroff");
-
-    }
 
     public static void previousApp(){
 
@@ -411,70 +284,6 @@ public class FloatingBallUtils {
 
     }
 
-    public static void nextApp(){
-
-    }
-
-    public static void killCurrentApp(){
-
-        if(mActivitymanager==null){
-
-           mActivitymanager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-
-        }
-
-        if(mActivitymanager!=null){
-
-            ActivityManager.RunningAppProcessInfo info=AppUtils.getCurrentAppInfo();
-
-            keyHome(context);
-
-            if(info!=null){
-
-                android.os.Process.killProcess(info.pid);
-                android.os.Process.sendSignal(info.pid, android.os.Process.SIGNAL_KILL);
-                mActivitymanager.killBackgroundProcesses(AppUtils.getApplicationInfoByProcessName(info.processName).packageName);
-            }
-
-        }
-
-    }
-
-
-    /**
-     * 根据图标信息获取图标
-     * @param
-     * @return
-     */
-  /*  public static Bitmap getBitmap(String iconName) {
-        Bitmap bitmapicon = null;
-        switch (iconName) {
-            case "nor":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.nor))).getBitmap();
-                break;
-            case "iphone":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.iphone))).getBitmap();
-                break;
-            case "windows":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.windows))).getBitmap();
-                break;
-            case "babble":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.babble))).getBitmap();
-                break;
-            case "clover":
-                bitmapicon =   ((BitmapDrawable) (MyApplication.getApplication().getResources().getDrawable(R.drawable.clover))).getBitmap();
-                break;
-            default:
-
-                bitmapicon = scaleBitmap(iconName,100);
-                break;
-
-        }
-
-        return bitmapicon;
-
-
-    }*/
 
     public static boolean isFileExist(String filePath){
 
@@ -553,8 +362,6 @@ public class FloatingBallUtils {
         scanIntent.setData(Uri.fromFile(new File(filePath)));
         context.sendBroadcast(scanIntent);
     }
-
-
 
     /**
      * 通知媒体库更新文件夹
@@ -719,33 +526,32 @@ public class FloatingBallUtils {
         ToolInfo volumeUp = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_13_volume_up),"音量加");
         ToolInfo volumeDown = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_14_volume_down),"音量减");
         ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
-        ToolInfo musicNext = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_16_music_next),"音乐下一曲");
-        ToolInfo musicPrev = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_17_music_prev),"音乐上一曲");
         ToolInfo screenShot = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_shot),"屏幕截图");
         ToolInfo screenOn = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_on),"屏幕常亮");
 
-        if(Build.VERSION.SDK_INT<23){
+        if(Build.VERSION.SDK_INT<21){
 
-            toolList.add(wifi);
-            // toolList.add(data);
-            toolList.add(bluetooth);
-            toolList.add(rotation);
+            toolList.add(data);
+
+        }else {
+
+            toolList.add(powerPanel);
+            toolList.add(settingPanel);
+            toolList.add(screenShot);
         }
 
+        toolList.add(rotation);
+        toolList.add(bluetooth);
+        toolList.add(wifi);
         toolList.add(screenOn);
         toolList.add(flash);
         toolList.add(vibration);
-        toolList.add(screenShot);
         toolList.add(mute);
         toolList.add(lockScreen);
         toolList.add(hideBall);
-        toolList.add(powerPanel);
-        toolList.add(settingPanel);
         toolList.add(volumeUp);
         toolList.add(volumeDown);
         toolList.add(music);
-        toolList.add(musicNext);
-        toolList.add(musicPrev);
 
         return toolList;
     }
@@ -780,12 +586,6 @@ public class FloatingBallUtils {
                 break;
             case "音乐开关":
                 icon = context.getResources().getDrawable(R.drawable.switch_15_music);
-                break;
-            case "音乐上一曲":
-                icon = context.getResources().getDrawable(R.drawable.switch_17_music_prev);
-                break;
-            case "音乐下一曲":
-                icon = context.getResources().getDrawable(R.drawable.switch_16_music_next);
                 break;
             case "屏幕截图":
                 icon = context.getResources().getDrawable(R.drawable.screen_shot);
@@ -892,25 +692,6 @@ public class FloatingBallUtils {
                 }).start();
 
                 break;
-            case "音乐上一曲":
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        prevMusic();
-                    }
-                }).start();
-
-                break;
-            case "音乐下一曲":
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        nextMusic();
-                    }
-                }).start();
-
-                break;
             case "屏幕截图":
                 if(Build.VERSION.SDK_INT > 20){
 
@@ -950,15 +731,12 @@ public class FloatingBallUtils {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        lockScreen(context);
+                        lockScreen();
                     }
                 }).start();
                 break;
             case "隐藏悬浮球":
-                Intent intent = new Intent();
-                intent.putExtra("what",Config.HIDE_TO_NOTIFYBAR);
-                intent.setClass(context, FloatingBallService.class);
-                context.startService(intent);
+                hideToNotifybar();
                 break;
             case "音量加":
                 new Thread(new Runnable() {
@@ -1008,43 +786,11 @@ public class FloatingBallUtils {
 
     }
 
-    private static void prevMusic() {
-
-        simulateKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
-        /*final Intent intent = new Intent(context, BlankActivity.class);
-
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(100);
-                    simulateKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
-                    intent.putExtra("finish",true);
-                    context.startActivity(intent);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();*/
-
-        /*long eventtime = SystemClock.uptimeMillis();
-        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-        KeyEvent downEvent = new KeyEvent(eventtime, eventtime, KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_MEDIA_NEXT, 0);
-        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-        context.sendOrderedBroadcast(downIntent, null);*/
-    }
-
-    private static void nextMusic() {
-
-        simulateKey(KeyEvent.KEYCODE_MEDIA_NEXT);
-       /* long eventtime = SystemClock.uptimeMillis();
-        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-        KeyEvent downEvent = new KeyEvent(eventtime, eventtime, KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_MEDIA_NEXT, 0);
-        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-        context.sendOrderedBroadcast(downIntent, null);*/
+    public static void hideToNotifybar() {
+        Intent intent = new Intent();
+        intent.putExtra("what", Config.HIDE_TO_NOTIFYBAR);
+        intent.setClass(context, FloatService.class);
+        context.startService(intent);
     }
 
     private static void switchMusic() {
@@ -1084,8 +830,15 @@ public class FloatingBallUtils {
 
     private static void switchRotation() {
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-        if(Build.VERSION.SDK_INT < 23) {
+            if(!checkPermissionWrite()){
+
+                return;
+            }
+        }
+
+        //if(Build.VERSION.SDK_INT < 23) {
             ContentResolver resolver = context.getContentResolver();
 
             int gravity = -1;
@@ -1123,7 +876,7 @@ public class FloatingBallUtils {
                });
 
             }
-        }else {
+        }/*else {
 
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
@@ -1136,7 +889,7 @@ public class FloatingBallUtils {
 
         }
 
-    }
+    }*/
 
     private static void muteMode() {
 
@@ -1205,7 +958,6 @@ public class FloatingBallUtils {
 
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static void switchFlashlight() {
 
 
@@ -1256,7 +1008,13 @@ public class FloatingBallUtils {
                     list = manager.getCameraIdList();
                     manager.setTorchMode(list[0], true);
                     mIsFlashOpened = true;
-                } catch (CameraAccessException e) {
+                    MyApplication.getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,"手电筒已打开",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -1268,7 +1026,13 @@ public class FloatingBallUtils {
                     list = manager.getCameraIdList();
                     manager.setTorchMode(list[0], false);
                     mIsFlashOpened = false;
-                } catch (CameraAccessException e) {
+                    MyApplication.getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,"手电筒已关闭",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -1279,100 +1043,138 @@ public class FloatingBallUtils {
 
     private static void switchBluetooth() {
 
-        if(Build.VERSION.SDK_INT < 23){
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter.isEnabled()) {
 
-            if(adapter.isEnabled()){
-
-                adapter.disable();
-
-            }else {
-
-                adapter.enable();
-            }
-
-        }else {
-
+            adapter.disable();
 
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "蓝牙已关闭", Toast.LENGTH_SHORT).show();
                 }
             });
 
-        }
+        } else {
 
+            adapter.enable();
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "蓝牙已开启", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
     }
 
     private static void switchMoblieData() {
 
 
-      /*  boolean isMobileDataEnabled;
-
-        if(mTelephonyManager==null){
-
-            mTelephonyManager=(TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        }
+        boolean isMobileDataEnabled = false;
+        Class[] getArgArray =null;
+        Object[] getArgInvoke =null;
 
         if(mConnectivityManager==null){
 
             mConnectivityManager=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         }
 
-        //判断当前手机是否在使用MobileData(移动数据)
-        if (mTelephonyManager.getDataState()== TelephonyManager.DATA_CONNECTED) {
-            isMobileDataEnabled=true;
-        }else {
-
-            isMobileDataEnabled = false;
-        }
-
         try {
-            if(mMethod == null){
-                mMethod=mConnectivityManager.getClass().getDeclaredMethod("setMobileDataEnabled", boolean.class);
+            if (mgetDataMethod == null) {
+
+                mgetDataMethod = mConnectivityManager.getClass().getDeclaredMethod("getMobileDataEnabled",getArgArray);
             }
 
-            mMethod.setAccessible(true);
-            mMethod.invoke(mConnectivityManager, !isMobileDataEnabled);
+            if (mgetDataMethod != null) {
+
+                //判断当前手机是否在使用MobileData(移动数据)
+                if ((boolean)mgetDataMethod.invoke(mConnectivityManager, getArgInvoke)) {
+                    isMobileDataEnabled = true;
+                } else {
+                    isMobileDataEnabled = false;
+                }
+
+            }else {
+
+                return;
+            }
+
+
+            if(msetDataMethod == null){
+                msetDataMethod=mConnectivityManager.getClass().getDeclaredMethod("setMobileDataEnabled", boolean.class);
+            }
+
+
+            if(msetDataMethod!= null){
+
+                msetDataMethod.setAccessible(true);
+                msetDataMethod.invoke(mConnectivityManager, !isMobileDataEnabled);
+
+                if(isMobileDataEnabled){
+
+                    MyApplication.getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,"数据已关闭",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                }else {
+
+                    MyApplication.getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,"数据已开启",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+
 
         } catch (Exception e) {
 
             e.printStackTrace();
-            Log.e("RelaxFinger","切换移动数据失败！");
-        }*/
-
+        }
 
     }
 
     private static void switchWifi() {
 
-        if(Build.VERSION.SDK_INT < 23) {
-            if (mWifiManager == null) {
-                mWifiManager = (WifiManager) context
-                        .getSystemService(Context.WIFI_SERVICE);
-            }
+        if (mWifiManager == null) {
+            mWifiManager = (WifiManager) context
+                    .getSystemService(Context.WIFI_SERVICE);
+        }
 
-            mWifiManager.setWifiEnabled(!mWifiManager.isWifiEnabled());
+        boolean isWifiEnabled = mWifiManager.isWifiEnabled();
 
-        }else {
+        mWifiManager.setWifiEnabled(!mWifiManager.isWifiEnabled());
+
+        if (isWifiEnabled) {
 
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(context,"6.0不支持该功能",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "WIFI已关闭", Toast.LENGTH_SHORT).show();
                 }
             });
 
+        } else {
 
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "WIFI已开启", Toast.LENGTH_SHORT).show();
+                }
+            });
 
         }
-
     }
 
-    public static void checkPermissionGranted(Activity activity, String permission) {
+    public static boolean checkPermissionGranted(Activity activity, String permission) {
 
 
         if(Build.VERSION.SDK_INT>22){
@@ -1382,9 +1184,37 @@ public class FloatingBallUtils {
             if (grant != PackageManager.PERMISSION_GRANTED) {
                 // We don't have permission so prompt the user
                 activity.requestPermissions(new String[]{permission}, 123);
+
+                return false;
             }
         }
 
+        return true;
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static boolean checkPermissionWrite(){
+
+        if(!Settings.System.canWrite(context)){
+
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+
+            MyApplication.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"屏幕旋转需要修改系统设置权限！",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            return false;
+
+        }else {
+
+            return true;
+        }
     }
 
     public static void switchKeepScreenOn(){
@@ -1443,46 +1273,53 @@ public class FloatingBallUtils {
         return bitmap;
     }
 
-    public static byte[] serialize(Object object){
+
+
+    /**
+     * 将状态数据保存在sharepreferences
+     *
+     * @param name
+     * @param number
+     */
+    public static final void saveStates(String name, int number) {
+
+        multiProcessPreferences.put(name, number);
+
+    }
+
+    public static final void saveStates(String name, boolean isChecked) {
+
+        multiProcessPreferences.put(name, isChecked);
+    }
+
+
+    /**
+     * 清空缓存
+     */
+    public static void clearCache() {
         try {
-            ByteArrayOutputStream mem_out = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(mem_out);
+            if (wmgInstnace == null) {
+                Class wmgClass = Class.forName("android.view.WindowManagerGlobal");
+                wmgInstnace = wmgClass.getMethod("getInstance").invoke(null, (Object[]) null);
+                trimMemory = wmgClass.getMethod("trimMemory", int.class);
+            }
 
-            out.writeObject(object);
+            trimMemory.invoke(wmgInstnace, TRIM_MEMORY_COMPLETE);
 
-            out.close();
-            mem_out.close();
-
-            byte[] bytes =  mem_out.toByteArray();
-            return bytes;
-        } catch (IOException e) {
-            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public static Object deserialize(byte[] bytes){
-        try {
-            ByteArrayInputStream mem_in = new ByteArrayInputStream(bytes);
-            ObjectInputStream in = new ObjectInputStream(mem_in);
+    public static WindowManager getWindowManager(){
 
-            Object object = in.readObject();
+        if(sWindowManager == null){
 
-            in.close();
-            mem_in.close();
-
-            return object;
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }   catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            sWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         }
-    }
 
+        return sWindowManager;
+    }
 
 
 
