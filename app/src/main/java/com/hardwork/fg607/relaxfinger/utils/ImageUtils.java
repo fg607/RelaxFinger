@@ -120,4 +120,19 @@ public class ImageUtils {
 
         return outputbitmap;
     }
+
+    public static void releaseBitmap(Drawable drawable){
+
+        Bitmap bitmap;
+
+        if(drawable instanceof BitmapDrawable){
+
+            bitmap = ((BitmapDrawable)drawable).getBitmap();
+
+            if(bitmap != null && !bitmap.isRecycled()){
+
+                bitmap = null;
+            }
+        }
+    }
 }

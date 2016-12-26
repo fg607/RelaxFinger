@@ -11,22 +11,27 @@ import java.net.URISyntaxException;
 /**
  * Created by fg607 on 16-6-18.
  */
-public class MenuDataSugar extends SugarRecord{
+public class MenuDataSugar extends SugarRecord {
 
     String whichMenu;
     String name;
     int type;
     String action;
+    String activity;
 
     public MenuDataSugar(){}
 
-    public MenuDataSugar(String whichMenu, String name, int type, String action) {
+    public MenuDataSugar(String whichMenu, String name, int type, String action, String activity) {
         this.whichMenu = whichMenu;
         this.name = name;
         this.type = type;
         this.action = action;
+        this.activity = activity;
     }
 
+    public String getActivity() {
+        return activity;
+    }
     public String getWhichMenu() {
         return whichMenu;
     }
@@ -48,22 +53,12 @@ public class MenuDataSugar extends SugarRecord{
         switch (type){
 
             case 0:
-
-           /*     Intent intent = new Intent(MyApplication.getApplication(), BlankActivity.class);
-                intent.putExtra("packageName",action);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getApplication().startActivity(intent);*/
-
-                AppUtils.startApplication(action);
+                AppUtils.startApplication(action,activity);
                 break;
             case 1:
                 FloatingBallUtils.switchButton(name);
                 break;
             case 2:
-               /* Intent intent1 = new Intent(MyApplication.getApplication(), BlankActivity.class);
-                intent1.putExtra("intentUri",action);
-                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getApplication().startActivity(intent1);*/
                 AppUtils.startActivity(action);
                 break;
             default:

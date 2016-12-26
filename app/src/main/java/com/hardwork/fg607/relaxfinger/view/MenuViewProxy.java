@@ -37,6 +37,8 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.hardwork.fg607.relaxfinger.utils.ImageUtils.releaseBitmap;
+
 /**
  * Created by fg607 on 16-11-27.
  */
@@ -245,8 +247,32 @@ public class MenuViewProxy implements View.OnClickListener {
                             mClearCount++;
                             if(mClearCount >= CLEAR_COUNT){
 
-                                mClearCount = 0;
-                                FloatingBallUtils.clearCache();
+                                mClearCount = -1;
+
+                                Drawable drawable;
+
+                                drawable = mMenuA.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuB.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuC.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuD.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuE.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                System.gc();
+                                System.runFinalization();
                             }
 
                         }
@@ -283,8 +309,32 @@ public class MenuViewProxy implements View.OnClickListener {
                             mClearCount++;
                             if(mClearCount >= CLEAR_COUNT){
 
-                                mClearCount = 0;
-                                FloatingBallUtils.clearCache();
+                                mClearCount = -1;
+
+                                Drawable drawable;
+
+                                drawable = mMenuA.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuB.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuC.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuD.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                drawable = mMenuE.getBackground();
+
+                                releaseBitmap(drawable);
+
+                                System.gc();
+                                System.runFinalization();
                             }
                         }
                     },50);
@@ -341,11 +391,7 @@ public class MenuViewProxy implements View.OnClickListener {
         mMenuD.setOnClickListener(this);
         mMenuE.setOnClickListener(this);
 
-        updateMenuIcon(MENU_A);
-        updateMenuIcon(MENU_B);
-        updateMenuIcon(MENU_C);
-        updateMenuIcon(MENU_D);
-        updateMenuIcon(MENU_E);
+        updateMenuIcons();
 
         mMenuLayout = (FrameLayout) mMenuView.findViewById(R.id.menu_layout);
         mMenuLayout.setOnClickListener(this);
@@ -572,6 +618,11 @@ public class MenuViewProxy implements View.OnClickListener {
 
         if(mMenuView.getParent() == null){
 
+            if(mClearCount == -1){
+
+                updateMenuIcons();
+            }
+
             mWindowManager.addView(mMenuView, mWinLayoutParams);
 
             mScaleSpring.addListener(mSpringListener);
@@ -591,6 +642,15 @@ public class MenuViewProxy implements View.OnClickListener {
         }
 
 
+    }
+
+    public void updateMenuIcons() {
+
+        updateMenuIcon(MENU_A);
+        updateMenuIcon(MENU_B);
+        updateMenuIcon(MENU_C);
+        updateMenuIcon(MENU_D);
+        updateMenuIcon(MENU_E);
     }
 
     public void closeMenu() {

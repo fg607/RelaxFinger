@@ -81,6 +81,11 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         initFolderView();
         initBackgroundView();
         initHideAreaView();
+
+        if(mPreferences.getBoolean("floatSwitch", false)){
+
+            showBall();
+        }
     }
 
     private void init() {
@@ -232,8 +237,6 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     private void moveBallToEdge() {
 
-        Log.i("keys","movinn");
-
         if (mIsBallRight) {
 
             moveBallToRight();
@@ -252,8 +255,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         int maxDuration = 350;
 
-        slideToBoundaryAnim.setDuration((int) (ballLayoutParams.x * maxDuration / (FloatingBallUtils
-                .getScreenWidth() / 2 - ballLayoutParams.width / 2)));
+        int duration = (int) (ballLayoutParams.x * maxDuration / (FloatingBallUtils
+                .getScreenWidth() / 2 - ballLayoutParams.width / 2));
+
+        if(duration < 0) duration = 0;
+
+        slideToBoundaryAnim.setDuration(duration);
         slideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
         slideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
@@ -292,8 +299,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         int maxDuration = 200;
 
-        mSlideToBoundaryAnim.setDuration((int) (ballLayoutParams.x * maxDuration / (FloatingBallUtils
-                .getScreenWidth() / 2 - ballLayoutParams.width / 2)));
+        int duration = (int) (ballLayoutParams.x * maxDuration / (FloatingBallUtils
+                .getScreenWidth() / 2 - ballLayoutParams.width / 2));
+
+        if(duration < 0) duration = 0;
+
+        mSlideToBoundaryAnim.setDuration(duration);
         mSlideToBoundaryAnim.setInterpolator(new DecelerateInterpolator());
         mSlideToBoundaryAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
@@ -464,7 +475,6 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     @Override
     public void onBallMoveFinish() {
 
-        Log.i("keys","fini");
         if (!mIsFreeMode) {
 
             if (mIsShowHideArea) {
@@ -567,7 +577,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     }
 
     @Override
-    public void folderItemClick() {
+    public void folderItemClick(String name) {
 
         closeMenu();
     }
@@ -654,7 +664,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         updateBallPos();
 
-        mPreferences.put("moveSwitch", mOriginMoveState);
+        mBallView.cancelFreeMode();
 
         mIsBallFree = false;
 
@@ -662,12 +672,17 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     private void changeBallToFree() {
 
-        mOriginMoveState = mPreferences.getBoolean("moveSwitch", false);
+      /*  mOriginMoveState = mPreferences.getBoolean("moveSwitch", false);
 
         if (!mOriginMoveState) {
 
             mPreferences.put("moveSwitch", true);
         }
+
+        mIsBallFree = true;*/
+
+
+        mBallView.activateFreeMode();
 
         mIsBallFree = true;
 

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="5dp"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="15dp"
+        android:gravity="center_horizontal"
+        android:text="截图保存二维码，使用微信或支付宝扫一扫从相册选取二维码截图捐赠5元支持作者。"/>
+
+    <View
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:background="@drawable/donate"
+        android:id="@+id/view_wechat" />
+
+    <View
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:background="@drawable/alipay"
+        android:visibility="gone"
+        android:id="@+id/view_alipay" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <Button
+            android:id="@+id/btn_alipay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:text="支付宝捐赠"/>
+
+        <Button
+            android:id="@+id/btn_wechat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btn_alipay"
+            android:layout_marginRight="10dp"
+            android:text="微信捐赠"/>
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

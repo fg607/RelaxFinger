@@ -77,7 +77,7 @@ public class SettingActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragment, mSettingFragment).addToBackStack(null).commit();
 
-        SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
+        SettingActivity.this.setTitle(R.string.title_activity_setting);
 
         initAccessibility();
 
@@ -195,7 +195,7 @@ public class SettingActivity extends AppCompatActivity {
         mTransaction.commit();
 
         getFragmentManager().executePendingTransactions();
-        SettingActivity.this.setTitle("快捷菜单设置");
+        SettingActivity.this.setTitle(R.string.title_menu_setting);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -217,7 +217,7 @@ public class SettingActivity extends AppCompatActivity {
         mTransaction.commitAllowingStateLoss();
 
         getFragmentManager().executePendingTransactions();
-        SettingActivity.this.setTitle("手势功能设置");
+        SettingActivity.this.setTitle(R.string.title_gesture_setting);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -229,13 +229,48 @@ public class SettingActivity extends AppCompatActivity {
         if (fm.getBackStackEntryCount() > 1) {
 
             fm.popBackStackImmediate();
-            SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
+            SettingActivity.this.setTitle(R.string.title_activity_setting);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         } else {
 
+            clearMemory();
             finish();
         }
+    }
+
+    public void clearMemory(){
+
+        if(mAppSettingFragment != null){
+
+            mAppSettingFragment.clearMemory();
+
+            mAppSettingFragment = null;
+        }
+
+        if(mSettingFragment != null){
+
+            mSettingFragment.clearMemory();
+
+            mSettingFragment = null;
+        }
+
+        if(mGestureFragment != null){
+
+            mGestureFragment.clearMemory();
+
+            mGestureFragment = null;
+        }
+
+        System.gc();
+        System.runFinalization();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        clearMemory();
+        super.onDestroy();
     }
 
     private void initAccessibility() {
@@ -332,7 +367,7 @@ public class SettingActivity extends AppCompatActivity {
             if (fm.getBackStackEntryCount() > 1) {
 
                 fm.popBackStackImmediate();
-                SettingActivity.this.setTitle("悬浮助手-RelaxFinger");
+                SettingActivity.this.setTitle(R.string.title_activity_setting);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             } else {
 
@@ -349,7 +384,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.5.0(Beta)\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：v1.5.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -382,21 +417,16 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.5.0(Beta)版本更新内容");
+        dialog.setTitle("悬浮助手-1.5.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("(代码重构,建议重新安装!)\r\n" +
-                "1.重构核心功能代码,提高稳定性和运行效率。\r\n" +
-                "2.横屏下可以使用快捷菜单和其他完整功能。\r\n" +
-                "3.优化截屏,截屏更迅速。\r\n" +
-                "4.安卓6.0以上系统可以使用打开Wifi,蓝牙,屏幕旋转等功能。\r\n" +
-                "5.恢复悬浮球不被键盘遮挡。\r\n" +
-                "6.提高双击响应速度。\r\n" +
-                "7.删除崩溃反馈功能。\r\n" +
-                "8.优化获取系统权限机制。\r\n" +
-                "9.添加热门桌面快捷方式权限。\r\n" +
-                "10.切换上一应用排除桌面。\r\n" +
-                "11.修复已知bug。");
+        dialog.setMessage("1.修复快速设置无效的问题。\r\n" +
+                "2.修复7.0以上系统切换声音模式FC的bug。\r\n" +
+                "3.修复设置快捷菜单崩溃的bug。\r\n"+
+                "4.修复悬浮球偶尔会变成自动移动模式的bug。\r\n"+
+                "5.修复设置成边缘吸附崩溃的bug。\r\n"+
+                "6.修复自定义主题时图片过小时闪烁的问题。\r\n"+
+                "7.优化安装包体积。");
         dialog.show();
 
     }

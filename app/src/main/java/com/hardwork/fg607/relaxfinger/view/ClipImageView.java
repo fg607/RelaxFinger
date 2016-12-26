@@ -40,7 +40,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 
 	public static final float DEFAULT_MAX_SCALE = 4.0f;
 	public static final float DEFAULT_MID_SCALE = 2.0f;
-	public static final float DEFAULT_MIN_SCALE = 0.5f;
+	public static final float DEFAULT_MIN_SCALE = 0.1f;
 
 	private float minScale = DEFAULT_MIN_SCALE;
 	private float midScale = DEFAULT_MID_SCALE;
@@ -382,7 +382,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 	}
 
 	private void checkMatrixBounds() {
-		final RectF rect = getDisplayRect(getDisplayMatrix());
+		/*final RectF rect = getDisplayRect(getDisplayMatrix());
 		if (null == rect) {
 			return;
 		}
@@ -404,7 +404,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 			deltaX = (viewWidth + borderlength) / 2 - rect.right;
 		}
 		// Finally actually translate the matrix
-		suppMatrix.postTranslate(deltaX, deltaY);
+		suppMatrix.postTranslate(deltaX, deltaY);*/
 	}
 
 	/**

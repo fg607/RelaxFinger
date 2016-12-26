@@ -98,5 +98,9 @@
         android:key="appSetting"
         android:title="快捷菜单设置"/>
 
+    <com.jenzz.materialpreference.Preference
+        android:key="donation"
+        android:title="捐赠支持悬浮助手"/>
+
 
 </PreferenceScreen>

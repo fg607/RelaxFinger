@@ -1,14 +1,11 @@
 package com.hardwork.fg607.relaxfinger.view;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,7 +13,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
 
@@ -27,9 +23,6 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 
 import net.grandcentrix.tray.TrayAppPreferences;
-
-import static android.R.attr.animation;
-import static android.R.attr.breadCrumbShortTitle;
 
 /**
  * Created by fg607 on 16-11-24.
@@ -88,6 +81,7 @@ public class BallView extends View {
     private int mDownY;
     private boolean mIsDoubleTapping;
     private boolean mGestureActive = false;
+    private boolean mIsFreeMode = false;
 
     private boolean mInLongPress;
     private Handler mHandler = new Handler(){
@@ -152,6 +146,16 @@ public class BallView extends View {
 
             mWindowManager.updateViewLayout(mParentLayout,mWinLayoutParams);
         }
+    }
+
+    public void activateFreeMode() {
+
+        mIsFreeMode = true;
+    }
+
+    public void cancelFreeMode(){
+
+        mIsFreeMode = false;
     }
 
 
@@ -302,22 +306,7 @@ public class BallView extends View {
 
     private void initParentLayout() {
 
-        mParentLayout = new LinearLayout(mContext){
-
-            //获取home键和多任务键事件
-            public void onCloseSystemDialogs(String reason) {
-
-                if (reason != null && reason.equals("homekey")) {
-
-                    mHandler.sendEmptyMessage(HOME_KEY_PRESSED);
-
-                } else if (reason != null && reason.equals("recentapps")) {
-
-                    mHandler.sendEmptyMessage(RECENT_KEY_PRESSED);
-                }
-
-            }
-        };
+        mParentLayout = new InnerLinearLayout(mContext);
 
         mLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
@@ -408,7 +397,7 @@ public class BallView extends View {
                     mHandler.removeMessages(LONGPRESS);
 
                     //移动悬浮球
-                    if(mCanMove && mGestureListener != null){
+                    if((mCanMove || mIsFreeMode) && mGestureListener != null){
 
                         mWinLayoutParams.x = (int)(event.getRawX()) - mSize/2;
                         mWinLayoutParams.y = (int)(event.getRawY()) - mSize/2;
@@ -583,6 +572,28 @@ public class BallView extends View {
             mParentLayout.removeView(BallView.this);
         }
 
+    }
+
+    public class InnerLinearLayout extends LinearLayout{
+
+
+        public InnerLinearLayout(Context context) {
+            super(context);
+        }
+
+        //获取home键和多任务键事件
+        public void onCloseSystemDialogs(String reason) {
+
+            if (reason != null && reason.equals("homekey")) {
+
+                mHandler.sendEmptyMessage(HOME_KEY_PRESSED);
+
+            } else if (reason != null && reason.equals("recentapps")) {
+
+                mHandler.sendEmptyMessage(RECENT_KEY_PRESSED);
+            }
+
+        }
     }
 
 }

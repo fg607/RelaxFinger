@@ -8,6 +8,7 @@ package com.hardwork.fg607.relaxfinger.utils;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
@@ -43,6 +44,7 @@ import com.hardwork.fg607.relaxfinger.model.ToolInfo;
 import com.hardwork.fg607.relaxfinger.receiver.ScreenOffAdminReceiver;
 import com.hardwork.fg607.relaxfinger.service.FloatService;
 import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
+import com.hardwork.fg607.relaxfinger.view.CombinationImageView;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 
 import net.grandcentrix.tray.TrayAppPreferences;
@@ -74,6 +76,8 @@ public class FloatingBallUtils {
     public static WindowManager sWindowManager = null;
     public static  WifiManager mWifiManager = null;
     public static ConnectivityManager mConnectivityManager = null;
+    public static NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     public static PowerManager mPowerManager = null;
     public static PowerManager.WakeLock mWakeLock = null;
     public static Method msetDataMethod = null;
@@ -700,7 +704,7 @@ public class FloatingBallUtils {
                         public void run() {
 
                             try {
-                                Thread.sleep(600);
+                                Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -897,6 +901,19 @@ public class FloatingBallUtils {
             mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(intent);
+
+            return;
+        }
+
         if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
@@ -931,8 +948,20 @@ public class FloatingBallUtils {
             mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
 
-        if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_VIBRATE){
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(intent);
+
+            return;
+        }
+
+        if(mAudioManager.getRingerMode()==AudioManager.RINGER_MODE_NORMAL){
 
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             MyApplication.getMainThreadHandler().post(new Runnable() {

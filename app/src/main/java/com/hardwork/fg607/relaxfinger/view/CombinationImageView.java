@@ -1,4 +1,4 @@
-package com.hardwork.fg607.relaxfinger.utils;
+package com.hardwork.fg607.relaxfinger.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

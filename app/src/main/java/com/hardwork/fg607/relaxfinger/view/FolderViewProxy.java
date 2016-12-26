@@ -2,6 +2,7 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +22,8 @@ import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import java.util.List;
+
+import static com.hardwork.fg607.relaxfinger.utils.ImageUtils.releaseBitmap;
 
 /**
  * Created by fg607 on 16-11-28.
@@ -91,6 +94,21 @@ public class FolderViewProxy {
                         public void run() {
 
                             FloatingBallUtils.getWindowManager().removeViewImmediate(mFolderView);
+
+                            int count = mGridView.getChildCount();
+
+                            for(int i = 0;i<count;i++){
+
+                                View view = mGridView.getChildAt(i);
+
+                                MenuFolderAdapter.MyHolder holder = (MenuFolderAdapter.MyHolder) view.getTag();
+
+                                Drawable drawable = holder.icon.getBackground();
+                                releaseBitmap(drawable);
+                            }
+
+                            System.gc();
+                            System.runFinalization();
                         }
                     },50);
 

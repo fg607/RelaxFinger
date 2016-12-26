@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn com.orm.**
+-keep class com.orm.** { *; }
+-keep class com.hardwork.fg607.relaxfinger.model.MenuDataSugar { *; }
+-keep public class * extends android.view.View{ *; }

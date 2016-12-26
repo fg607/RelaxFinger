@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
     <!--常见桌面权限-->
@@ -37,6 +38,7 @@
     <uses-permission android:name="com.huawei.android.launcher.permission.READ_SETTINGS"/>
     <uses-permission android:name="org.adw.launcher.permission.READ_SETTINGS"/>
     <uses-permission android:name="home.solo.launcher.free.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.motorola.motolauncher.READ_SETTINGS"/>
 
 
     <application

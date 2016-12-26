@@ -1,7 +1,7 @@
 package com.hardwork.fg607.relaxfinger.adapter;
 
 import android.content.Context;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -13,6 +13,9 @@ import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.model.AppInfo;
 
 import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by fg607 on 15-11-26.
@@ -66,36 +69,45 @@ public class AppAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
 
 
-        ImageView icon;
-        TextView name;
-        CheckBox checkBox;
-
-        View view1 = null;
+        MyHolder holder = null;
 
         if(view == null){
 
-            view1 = View.inflate(mContext, R.layout.choosekey_item, null);
+            view = View.inflate(mContext, R.layout.choosekey_item, null);
+
+            holder = new MyHolder(view);
+
+            view.setTag(holder);
 
         }else {
 
-            view1 = view;
+            holder = (MyHolder) view.getTag();
         }
 
-        icon = (ImageView) view1.findViewById(R.id.image);
-        name = (TextView) view1.findViewById(R.id.text);
-        checkBox = (CheckBox) view1.findViewById(R.id.checkbox);
-        icon.setImageDrawable(mAppList.get(i).getAppIcon());
-        name.setText(mAppList.get(i).getAppName());
+        holder.icon.setImageDrawable(mAppList.get(i).getAppIcon());
+        holder.name.setText(mAppList.get(i).getAppName());
 
         if(mChoosedNameList.contains(mAppList.get(i).getAppPackage())){
 
-            checkBox.setChecked(true);
+            holder.checkBox.setChecked(true);
         }else {
 
-            checkBox.setChecked(false);
+            holder.checkBox.setChecked(false);
         }
 
-        return view1;
+        return view;
+    }
+
+    public class MyHolder extends RecyclerView.ViewHolder{
+
+        @BindView(R.id.image) ImageView icon;
+        @BindView(R.id.text) TextView name;
+        @BindView(R.id.checkbox) CheckBox checkBox;
+
+        public MyHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this,itemView);
+        }
     }
 
 

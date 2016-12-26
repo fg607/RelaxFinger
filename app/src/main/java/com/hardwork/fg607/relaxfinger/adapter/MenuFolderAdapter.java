@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,6 +20,9 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by fg607 on 16-6-19.
  */
@@ -31,7 +35,7 @@ public class MenuFolderAdapter extends BaseAdapter {
 
     public interface OnFolderItemClickListener{
 
-        void folderItemClick();
+        void folderItemClick(String name);
     }
 
     public MenuFolderAdapter(Context context){
@@ -68,26 +72,19 @@ public class MenuFolderAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
-        ImageView icon;
-        TextView name;
-
-        View view = null;
+        MyHolder holder = null;
 
         if(convertView == null){
 
-            view = View.inflate(mContext, R.layout.menu_folder_item, null);
+            convertView = View.inflate(mContext, R.layout.menu_folder_item, null);
 
+            holder = new MyHolder(convertView);
+            convertView.setTag(holder);
         }else {
 
-            view = convertView;
+            holder = (MyHolder) convertView.getTag();
         }
 
-        icon = (ImageView) view.findViewById(R.id.image);
-        name = (TextView) view.findViewById(R.id.text);
-
-        name.setTextColor(Color.WHITE);
-        name.setTextSize(12);
-        name.setSingleLine();
 
         MenuDataSugar menuDataSugar = mMenuDataList.get(position);
         int type = menuDataSugar.getType();
@@ -100,7 +97,7 @@ public class MenuFolderAdapter extends BaseAdapter {
                 drawable = AppUtils.getAppIcon(menuDataSugar.getAction());
                 break;
             case 1:
-                icon.setBackgroundResource(R.drawable.path_blue_oval);
+                holder.icon.setBackgroundResource(R.drawable.path_blue_oval);
                 drawable = FloatingBallUtils.getSwitcherIcon(menuDataSugar.getName());
                 break;
             case 2:
@@ -115,11 +112,13 @@ public class MenuFolderAdapter extends BaseAdapter {
             MenuDataSugar.executeQuery("delete from MENU_DATA_SUGAR where ACTION='" + mMenuDataList.get(position).getAction()+"'");
         }
 
-        icon.setImageDrawable(drawable);
+        holder.icon.setImageDrawable(drawable);
 
-        name.setText(mMenuDataList.get(position).getName());
+        holder.name.setText(mMenuDataList.get(position).getName());
 
-        view.setOnClickListener(new View.OnClickListener() {
+        final MyHolder finalHolder = holder;
+
+        convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -138,12 +137,28 @@ public class MenuFolderAdapter extends BaseAdapter {
 
                 if(mItemClickListener!=null){
 
-                    mItemClickListener.folderItemClick();
+                    mItemClickListener.folderItemClick(finalHolder.name.getText().toString());
                 }
 
             }
         });
 
-        return view;
+        return convertView;
+    }
+
+    public class MyHolder extends RecyclerView.ViewHolder{
+
+        @BindView(R.id.image) public ImageView icon;
+        @BindView(R.id.text) public TextView name;
+
+        public MyHolder(View itemView) {
+            super(itemView);
+
+            ButterKnife.bind(this,itemView);
+
+            name.setTextColor(Color.WHITE);
+            name.setTextSize(12);
+            name.setSingleLine();
+        }
     }
 }

@@ -69,7 +69,7 @@ public class AppUtils {
                    name = info.applicationInfo.loadLabel(pm).toString();
                    packageName = info.packageName;
 
-                   AppInfo appInfo = new AppInfo(icon,name,packageName);
+                   AppInfo appInfo = new AppInfo(icon,name,"",packageName);
 
                    list.add(appInfo);
                }
@@ -89,6 +89,7 @@ public class AppUtils {
         Drawable icon;
         String name;
         String packageName;
+        String activityName;
 
         Intent intent = new Intent();
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -102,8 +103,10 @@ public class AppUtils {
             icon = info.loadIcon(pm);
             name = info.loadLabel(pm).toString();
             packageName  = info.activityInfo.packageName;
+            activityName = info.activityInfo.name;
 
-            AppInfo appInfo = new AppInfo(icon,name,packageName);
+
+            AppInfo appInfo = new AppInfo(icon,name,activityName,packageName);
 
             list.add(appInfo);
         }
@@ -176,6 +179,28 @@ public class AppUtils {
             intent1.setComponent(new ComponentName(packageName, className));
 
             context.startActivity(intent1);
+
+            return true;
+
+        }else {
+
+            throw new  ActivityNotFoundException();
+        }
+
+    }
+
+    public static boolean startApplication(String packageName,String className) throws ActivityNotFoundException{
+
+
+        if (className != null) {
+
+            //解决直接用pm.getLaunchIntentForPackage(packageName)会重新打开APP的问题
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setComponent(new ComponentName(packageName, className));
+
+            context.startActivity(intent);
 
             return true;
 

@@ -60,6 +60,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hardwork.fg607.relaxfinger.utils.ImageUtils.releaseBitmap;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_A;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_B;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_C;
@@ -497,7 +498,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             Dialog dialog = builder.create();
 
-            dialog.setCanceledOnTouchOutside(true);
+            dialog.setCanceledOnTouchOutside(false);
 
             dialog.setTitle("选择快捷功能");
 
@@ -684,7 +685,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                             if (checkBox.isChecked()) {
 
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
-                                        name, 2, action);
+                                        name, 2, action,null);
 
                                 currentMenuMap.put(action, data);
                                 sMenuChoosedList.add(action);
@@ -760,7 +761,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                             if (checkBox.isChecked()) {
 
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
-                                        name, 1, name);
+                                        name, 1, name,null);
 
                                 currentMenuMap.put(name, data);
                                 sMenuChoosedList.add(name);
@@ -836,10 +837,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                             String action = appList.get(i).getAppPackage();
 
+                            String activity = appList.get(i).getAppActivity();
+
                             if (checkBox.isChecked()) {
 
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
-                                        name, 0, action);
+                                        name, 0, action,activity);
 
                                 currentMenuMap.put(action, data);
 
@@ -908,6 +911,79 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
     public interface OnOperateFinishListener {
 
         public void onOperateFinish();
+
+    }
+
+    public void clearMemory(){
+
+
+        Drawable drawable;
+
+        if(appList != null && appList.size() > 0){
+
+            for(AppInfo info:appList){
+
+                drawable = info.getAppIcon();
+
+                releaseBitmap(drawable);
+            }
+
+            appList.clear();
+            appList = null;
+        }
+
+        if(shortcutList != null && shortcutList.size() > 0){
+
+            for(ShortcutInfo info:shortcutList){
+
+
+                drawable = info.getShortcutIcon();
+
+                releaseBitmap(drawable);
+            }
+
+            shortcutList.clear();
+            shortcutList = null;
+
+        }
+
+        if(toolList != null && toolList.size() > 0){
+
+            for (ToolInfo info:toolList){
+
+                drawable = info.getToolIcon();
+
+                releaseBitmap(drawable);
+            }
+
+            toolList.clear();
+            toolList = null;
+        }
+
+        if(mAppIcon1 != null){
+
+            drawable = mAppIcon1.getBackground();
+
+            releaseBitmap(drawable);
+
+            drawable = mAppIcon2.getBackground();
+
+            releaseBitmap(drawable);
+
+            drawable = mAppIcon3.getBackground();
+
+            releaseBitmap(drawable);
+
+            drawable = mAppIcon4.getBackground();
+
+            releaseBitmap(drawable);
+
+            drawable = mAppIcon5.getBackground();
+
+            releaseBitmap(drawable);
+
+        }
+
 
     }
 

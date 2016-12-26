@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -52,6 +54,7 @@ import butterknife.ButterKnife;
 
 import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.checkAccessibility;
 import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isServiceRunning;
+import static com.hardwork.fg607.relaxfinger.utils.ImageUtils.releaseBitmap;
 
 public class SettingFragment extends PreferenceFragment implements OnPreferenceChangeListener,View.OnClickListener {
 
@@ -70,6 +73,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private com.jenzz.materialpreference.Preference mFloatBallTheme;
     private com.jenzz.materialpreference.Preference mFloatBallSize;
     private com.jenzz.materialpreference.Preference mFloatBallAlpha;
+    private com.jenzz.materialpreference.Preference mDonation;
 
     private boolean mIsAdmin;
     private DevicePolicyManager mDeviceManager;
@@ -97,6 +101,11 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private String mThemeChoosed;
 
     private AlertDialog mThemeDialog;
+    private View mDonateView;
+    private View mWeChatCodeView;
+    private View mAliPayCodeView;
+    private AlertDialog mDonationDialog;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -215,6 +224,62 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         });
 
         mFloatBallTheme.setSummary(mPreferences.getString("theme","默认"));
+
+        mDonation = (com.jenzz.materialpreference.Preference) findPreference("donation");
+        mDonation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                showDonation();
+                return true;
+            }
+        });
+    }
+
+    private void initDonateView() {
+
+        mDonateView = LayoutInflater.from(mContext).inflate(R.layout.donation,null);
+
+        mWeChatCodeView = mDonateView.findViewById(R.id.view_wechat);
+        mAliPayCodeView = mDonateView.findViewById(R.id.view_alipay);
+
+        Button weChat = (Button) mDonateView.findViewById(R.id.btn_wechat);
+
+        Button aliPay = (Button) mDonateView.findViewById(R.id.btn_alipay);
+
+        weChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mAliPayCodeView.setVisibility(View.GONE);
+                mWeChatCodeView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        aliPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mAliPayCodeView.setVisibility(View.VISIBLE);
+                mWeChatCodeView.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
+    private void showDonation() {
+
+        if (mDonationDialog == null) {
+
+            if (mDonateView == null) initDonateView();
+
+            mDonationDialog = new AlertDialog.Builder(mContext)
+                    .setTitle("捐赠支持悬浮助手")
+                    .setView(mDonateView)
+                    .create();
+        }
+
+        mDonationDialog.show();
     }
 
     private void showThemeDialog() {
@@ -933,5 +998,65 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         super.onAttach(activity);
         mContext = activity;
         mActivity = (SettingActivity) getActivity();
+    }
+
+    public void clearMemory(){
+
+        Drawable drawable;
+
+        if(mImg1 != null){
+
+            drawable= mImg1.getBackground();
+
+            releaseBitmap(drawable);
+
+            mImg1.setBackground(null);
+
+            drawable= mImg2.getBackground();
+
+            releaseBitmap(drawable);
+
+            mImg2.setBackground(null);
+
+            drawable= mImg3.getBackground();
+
+            releaseBitmap(drawable);
+
+            mImg3.setBackground(null);
+
+            drawable= mImg4.getBackground();
+
+            releaseBitmap(drawable);
+
+            mImg4.setBackground(null);
+        }
+
+        if(mImg5 != null){
+
+            drawable= mImg5.getBackground();
+
+            releaseBitmap(drawable);
+
+            mImg5.setBackground(null);
+        }
+
+
+        if(mWeChatCodeView != null){
+
+            drawable = mWeChatCodeView.getBackground();
+
+            releaseBitmap(drawable);
+
+            mWeChatCodeView.setBackground(null);
+
+            drawable = mAliPayCodeView.getBackground();
+
+            releaseBitmap(drawable);
+
+            mAliPayCodeView.setBackground(null);
+        }
+
+
+
     }
 }
