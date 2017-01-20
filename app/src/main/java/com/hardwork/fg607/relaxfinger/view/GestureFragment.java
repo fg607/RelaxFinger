@@ -195,6 +195,6 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
     public void clearMemory(){
 
 
-    } 
+    }
 
 }

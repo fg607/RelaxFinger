@@ -144,6 +144,15 @@ public class FloatService extends Service{
                 case Config.RECOVER_FLOATBALL:
                     mFloatManager.recoveryFromNotifyBar();
                     break;
+                case Config.NEW_NOTIFICATION:
+                    String pkg = intent.getStringExtra("pkg");
+                    int newId = intent.getIntExtra("notifyId",-1);
+                    mFloatManager.newNotification(pkg,newId);
+                    break;
+                case Config.CANCEL_NOTIFICATION:
+                    int cancelId = intent.getIntExtra("notifyId",-1);
+                    mFloatManager.cancelNotification(cancelId);
+                    break;
                 default:
                     break;
             }

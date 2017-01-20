@@ -9,8 +9,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +25,10 @@ import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.adapter.MenuFolderAdapter;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.model.Config;
+import com.hardwork.fg607.relaxfinger.model.NotificationInfo;
+import com.hardwork.fg607.relaxfinger.model.NotificationStack;
+import com.hardwork.fg607.relaxfinger.service.NotificationService;
+import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.view.BackgroundView;
@@ -32,6 +39,7 @@ import com.hardwork.fg607.relaxfinger.view.MenuViewProxy;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -69,11 +77,13 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     private boolean mIsHomePressed;
     private boolean mIsMoving = false;
     private boolean mIsBallShowing = false;
+    private NotificationStack mNotifyStack;
 
     public FloatViewManager(Context context) {
 
 
         mContext = context;
+        mNotifyStack = new NotificationStack();
 
         init();
         initBallView();
@@ -824,6 +834,87 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     public void closeHideArea() {
 
         mHideAreaView.close();
+
+    }
+
+    public void newNotification(String pkg,int notifyId){
+
+        NotificationInfo notify = new NotificationInfo(pkg,notifyId);
+
+        mNotifyStack.push(notify);
+
+        Drawable notifyIcon = AppUtils.getAppIcon(pkg);
+
+        if(notifyIcon != null){
+
+            mBallView.showNotification(notifyIcon);
+        }
+    }
+
+    public void openNotification(){
+
+        NotificationInfo notify = mNotifyStack.pop();
+
+        Intent intent = new Intent(mContext, NotificationService.class);
+
+        intent.putExtra("what",Config.OPEN_NOTIFICATION);
+
+        intent.putExtra("notifyId",notify.getId());
+
+        mContext.startService(intent);
+    }
+
+
+    public void showNextNotify() {
+
+        if(hasNotification()){
+
+            NotificationInfo notify = mNotifyStack.getTop();
+
+            Drawable notifyIcon = AppUtils.getAppIcon(notify.getPkg());
+
+            if(notifyIcon != null){
+
+                mBallView.showNotification(notifyIcon);
+            }
+
+        }else {
+
+            mBallView.clearNotification();
+        }
+    }
+
+    public boolean hasNotification(){
+
+        return !mNotifyStack.isEmpty();
+    }
+
+    public void ignoreNotification() {
+
+        mNotifyStack.pop();
+    }
+
+    public void ignoreAllNotification() {
+
+        mNotifyStack.clear();
+
+        mBallView.clearNotification();
+    }
+
+    public void cancelNotification(int id){
+
+        NotificationInfo info = mNotifyStack.getTop();
+
+        if( info != null && info.getId() == id){
+
+            mNotifyStack.pop();
+
+            showNextNotify();
+
+        }else {
+
+            mNotifyStack.invalidNotification(id);
+        }
 
     }
 }

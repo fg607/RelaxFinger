@@ -35,4 +35,7 @@ public class Config {
     public static final int HIDE_AREA_SWITCH = 27;
     public static final int AUTO_HIDE_SWITCH = 28;
     public static final int SCREEN_SHOT = 29;
+    public static final int OPEN_NOTIFICATION = 30;
+    public static final int NEW_NOTIFICATION = 31;
+    public static final int CANCEL_NOTIFICATION = 32;
 }

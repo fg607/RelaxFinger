@@ -1,8 +1,11 @@
 package com.hardwork.fg607.relaxfinger.view;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +26,8 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 
 import net.grandcentrix.tray.TrayAppPreferences;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by fg607 on 16-11-24.
@@ -82,8 +87,8 @@ public class BallView extends View {
     private boolean mIsDoubleTapping;
     private boolean mGestureActive = false;
     private boolean mIsFreeMode = false;
-
     private boolean mInLongPress;
+
     private Handler mHandler = new Handler(){
 
         @Override
@@ -223,6 +228,8 @@ public class BallView extends View {
 
     public void setTheme(String theme) {
 
+        mTheme = theme;
+
         switch (theme) {
             case "默认":
                 setBackground(getResources().getDrawable(R.drawable.nor));
@@ -242,9 +249,8 @@ public class BallView extends View {
 
                     String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()
                             + "/RelaxFinger/DIY.png";
-                    Bitmap icon = ImageUtils.scaleBitmap(filePath, mSize, mSize);
 
-                    setBackground(ImageUtils.bitmap2Drawable(icon));
+                    setBackground(BitmapDrawable.createFromPath(filePath));
 
                 }else{
 
@@ -258,6 +264,25 @@ public class BallView extends View {
         }
 
         getBackground().setAlpha(mAlpha);
+    }
+
+    public void showNotification(Drawable notifyIcon) {
+
+        setBackground(ImageUtils.toRoundDrawable(notifyIcon));
+
+        showNotifyAnim();
+    }
+
+    public void clearNotification(){
+
+        setTheme(mTheme);
+    }
+
+    public void showNotifyAnim(){
+
+        ObjectAnimator shakeAnim = FloatingBallUtils.shakeAnim(this,1.0f);
+
+        shakeAnim.start();
     }
 
     private void initAnimation() {

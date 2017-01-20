@@ -117,7 +117,17 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
             checkFeedback();
 
-            executeAction(mCurrentFuncList.get(SINGLE_TAP));
+            //显示通知时点击打开通知
+            if(mManager.hasNotification()){
+
+                mManager.openNotification();
+                mManager.showNextNotify();
+
+            }else {
+
+                executeAction(mCurrentFuncList.get(SINGLE_TAP));
+            }
+
         }
 
 
@@ -152,14 +162,35 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
     public void onScrollUp() {
 
         checkFeedback();
-        executeAction(mCurrentFuncList.get(SWIPE_UP));
+
+        //显示通知时上滑忽略通知
+        if(mManager.hasNotification()){
+
+            mManager.ignoreNotification();
+            mManager.showNextNotify();
+
+        }else {
+
+            executeAction(mCurrentFuncList.get(SWIPE_UP));
+        }
+
     }
 
     @Override
     public void onScrollDown() {
 
         checkFeedback();
-        executeAction(mCurrentFuncList.get(SWIPE_DOWN));
+
+        //显示通知时下滑忽略所有通知
+        if(mManager.hasNotification()){
+
+            mManager.ignoreAllNotification();
+
+        }else {
+
+            executeAction(mCurrentFuncList.get(SWIPE_DOWN));
+        }
+
     }
 
     @Override

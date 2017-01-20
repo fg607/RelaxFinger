@@ -6,6 +6,9 @@ package com.hardwork.fg607.relaxfinger.utils;
  */
 
 import android.accessibilityservice.AccessibilityService;
+import android.animation.Keyframe;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -1350,6 +1353,53 @@ public class FloatingBallUtils {
         return sWindowManager;
     }
 
+    public static ObjectAnimator shakeAnim(View view, float shakeFactor) {
+
+        PropertyValuesHolder pvhScaleX = PropertyValuesHolder.ofKeyframe(View.SCALE_X,
+                Keyframe.ofFloat(0f, 1f),
+                Keyframe.ofFloat(.1f, .9f),
+                Keyframe.ofFloat(.2f, .9f),
+                Keyframe.ofFloat(.3f, 1f),
+                Keyframe.ofFloat(.4f, 1f),
+                Keyframe.ofFloat(.5f, 1f),
+                Keyframe.ofFloat(.6f, 1f),
+                Keyframe.ofFloat(.7f, 1f),
+                Keyframe.ofFloat(.8f, 1f),
+                Keyframe.ofFloat(.9f, 1f),
+                Keyframe.ofFloat(1f, .9f)
+        );
+
+        PropertyValuesHolder pvhScaleY = PropertyValuesHolder.ofKeyframe(View.SCALE_Y,
+                Keyframe.ofFloat(0f, 1f),
+                Keyframe.ofFloat(.1f, .9f),
+                Keyframe.ofFloat(.2f, .9f),
+                Keyframe.ofFloat(.3f, 1f),
+                Keyframe.ofFloat(.4f, 1f),
+                Keyframe.ofFloat(.5f, 1f),
+                Keyframe.ofFloat(.6f, 1f),
+                Keyframe.ofFloat(.7f, 1f),
+                Keyframe.ofFloat(.8f, 1f),
+                Keyframe.ofFloat(.9f, 1f),
+                Keyframe.ofFloat(1f, .9f)
+        );
+
+        PropertyValuesHolder pvhRotate = PropertyValuesHolder.ofKeyframe(View.ROTATION,
+                Keyframe.ofFloat(0f, 0f),
+                Keyframe.ofFloat(.1f, -10f * shakeFactor),
+                Keyframe.ofFloat(.2f, -10f * shakeFactor),
+                Keyframe.ofFloat(.3f, 10f * shakeFactor),
+                Keyframe.ofFloat(.4f, -10f * shakeFactor),
+                Keyframe.ofFloat(.5f, 10f * shakeFactor),
+                Keyframe.ofFloat(.6f, -10f * shakeFactor),
+                Keyframe.ofFloat(.7f, 10f * shakeFactor),
+                Keyframe.ofFloat(.8f, -10f * shakeFactor),
+                Keyframe.ofFloat(.9f, 10f * shakeFactor),
+                Keyframe.ofFloat(1f, 0)
+        );
+
+        return ObjectAnimator.ofPropertyValuesHolder(view, pvhScaleX, pvhScaleY, pvhRotate).
+                setDuration(1000);
+    }
 
 
 
