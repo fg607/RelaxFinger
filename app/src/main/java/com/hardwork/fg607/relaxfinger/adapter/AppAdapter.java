@@ -25,7 +25,7 @@ public class AppAdapter extends BaseAdapter {
     private ArrayList<AppInfo> mAppList;
     private Context mContext;
     private String mChoosedAppName;
-    private ArrayList<String> mChoosedNameList;
+    private ArrayList<String> mChoosedNameList = new ArrayList<>();
 
     public AppAdapter(Context context){
         this.mContext = context;

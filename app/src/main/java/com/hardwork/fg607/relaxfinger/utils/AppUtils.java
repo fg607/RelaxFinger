@@ -6,15 +6,19 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.drawable.Drawable;
@@ -46,6 +50,7 @@ public class AppUtils {
 
     public static  ContentResolver cr = null;
     public static  Uri shortcutUri = null;
+    public static List<ResolveInfo> resolveInfos = null;
 
     public static ArrayList<AppInfo> getAppInfos(){
 
@@ -566,7 +571,7 @@ public class AppUtils {
         }
     }
 
-    public static ArrayList<ShortcutInfo> getShortcuts() throws SecurityException,SQLiteException {
+    public static ArrayList<ShortcutInfo> getShortcutsA() throws SecurityException,SQLiteException {
 
 
         ArrayList<ShortcutInfo> list = new ArrayList<>();
@@ -585,7 +590,7 @@ public class AppUtils {
 
         try{
 
-            Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent" },
+            Cursor c = cr.query(shortcutUri, new String[] {"icon", "title", "intent"},
                     null, null, null);
 
             if (c != null && c.getCount() > 0) {
@@ -606,6 +611,7 @@ public class AppUtils {
                                 title,intent);
 
                         list.add(shortcutInfo);
+
                     }
 
                 }
@@ -622,6 +628,68 @@ public class AppUtils {
         return list;
 
     }
+
+    public static List<ResolveInfo> getResolveInfos(){
+
+        Intent shortcutsIntent = new Intent(Intent.ACTION_CREATE_SHORTCUT);
+        List<ResolveInfo> resolveInfos = pm.queryIntentActivities(
+                shortcutsIntent, 0);
+
+        return resolveInfos;
+    }
+
+    public static ArrayList<ShortcutInfo> getShortcutsB(){
+
+        ArrayList<ShortcutInfo> list = new ArrayList<>();
+
+        resolveInfos = getResolveInfos();
+
+        if(resolveInfos != null){
+
+            for(ResolveInfo resolveInfo:resolveInfos){
+
+                ShortcutInfo shortcutInfo = new ShortcutInfo(resolveInfo.loadIcon(pm),
+                        (String)resolveInfo.loadLabel(pm),getIntentUri(resolveInfo));
+
+                list.add(shortcutInfo);
+            }
+        }
+
+        return list;
+    }
+
+    public static ArrayList<ShortcutInfo> getShortcuts(){
+
+        ArrayList<ShortcutInfo> list = getShortcutsA();
+
+        list.addAll(getShortcutsB());
+
+        return list;
+    }
+
+    public static String getIntentUri(ResolveInfo resolveInfo){
+
+
+        Intent intent = new Intent();
+
+        String pkgName = resolveInfo.activityInfo.packageName;
+        String clsName = resolveInfo.activityInfo.name;
+
+        intent.setComponent(new ComponentName(pkgName,clsName));
+
+        return intent.toUri(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    public static String getIntentUri(AppWidgetProviderInfo widgetInfo){
+
+
+        Intent intent = new Intent();
+
+        intent.setComponent(widgetInfo.configure);
+
+        return intent.toUri(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
 
     public static Drawable getShortcutIcon(String title){
 
@@ -655,7 +723,35 @@ public class AppUtils {
 
         }
 
+        if(drawable == null){
+
+            return getShortcutIconA(title);
+        }
+
         return  drawable;
+    }
+
+    public static Drawable getShortcutIconA(String title){
+
+        Drawable drawable = null;
+
+        if(resolveInfos == null){
+
+            resolveInfos = getResolveInfos();
+        }
+
+        if(resolveInfos != null){
+
+            for (ResolveInfo info:resolveInfos){
+
+                if(title.equals((String)info.loadLabel(pm))){
+
+                    drawable = info.loadIcon(pm);
+                }
+            }
+        }
+
+        return drawable;
     }
 
 }

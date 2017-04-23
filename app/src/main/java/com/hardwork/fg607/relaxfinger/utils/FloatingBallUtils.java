@@ -535,6 +535,13 @@ public class FloatingBallUtils {
         ToolInfo music = new ToolInfo(context.getResources().getDrawable(R.drawable.switch_15_music),"音乐开关");
         ToolInfo screenShot = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_shot),"屏幕截图");
         ToolInfo screenOn = new ToolInfo(context.getResources().getDrawable(R.drawable.screen_on),"屏幕常亮");
+        ToolInfo back = new ToolInfo(context.getResources().getDrawable(R.drawable.back),"返回键");
+        ToolInfo home = new ToolInfo(context.getResources().getDrawable(R.drawable.home),"Home键");
+        ToolInfo appSwitch = new ToolInfo(context.getResources().getDrawable(R.drawable.app_switch),"最近任务键");
+
+        toolList.add(back);
+        toolList.add(home);
+        toolList.add(appSwitch);
 
         if(Build.VERSION.SDK_INT<21){
 
@@ -570,6 +577,15 @@ public class FloatingBallUtils {
 
         switch (name){
 
+            case "返回键":
+                icon = context.getResources().getDrawable(R.drawable.back);
+                break;
+            case "Home键":
+                icon = context.getResources().getDrawable(R.drawable.home);
+                break;
+            case "最近任务键":
+                icon = context.getResources().getDrawable(R.drawable.app_switch);
+                break;
             case "WIFI":
                 icon = context.getResources().getDrawable(R.drawable.switch_1_wifi);
                 break;
@@ -630,6 +646,15 @@ public class FloatingBallUtils {
 
         switch (name){
 
+            case "返回键":
+                keyBack(NavAccessibilityService.instance);
+                break;
+            case "Home键":
+                keyHome();
+                break;
+            case "最近任务键":
+                openRecnetTask(NavAccessibilityService.instance);
+                break;
             case "WIFI":
                 new Thread(new Runnable() {
                     @Override

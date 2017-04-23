@@ -17,6 +17,7 @@ import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.action.GestureImpl;
 import com.hardwork.fg607.relaxfinger.manager.FloatViewManager;
 import com.hardwork.fg607.relaxfinger.model.Config;
+import com.orm.SugarRecord;
 
 import java.util.List;
 
@@ -56,6 +57,9 @@ public class FloatService extends Service{
                     break;
                 case Config.MOVE_SWITCH:
                     mFloatManager.setMove(mBundle.getBoolean("canmove", false));
+                    break;
+                case Config.AUTO_MOVE_SWITCH:
+                    mFloatManager.setAvoidKeyboard(mBundle.getBoolean("isAutoMove", false));
                     break;
                 case Config.VIBRATOR_SWITCH:
                     mGestureImpl.setVibrator(mBundle.getBoolean("isVibrate", true));
@@ -107,8 +111,6 @@ public class FloatService extends Service{
 
         mGestureImpl = new GestureImpl(mFloatManager);
 
-        Log.i("floatservice","create");
-
     }
 
     @Override
@@ -122,6 +124,7 @@ public class FloatService extends Service{
                     mFloatManager.setFloatState(intent.getBooleanExtra("ballstate", false));
                     if(!intent.getBooleanExtra("ballstate", false)){
 
+                        stopAccessibilityService();
                         stopSelf();
 
                     }else {
@@ -136,7 +139,12 @@ public class FloatService extends Service{
                     mFloatManager.setBallHide(intent.getBooleanExtra("hide", false));
                     break;
                 case Config.FLOAT_AUTOMOVE://避让软键盘进入自由移动模式
-                    mFloatManager.setFloatAutoMove(intent.getBooleanExtra("move", false));
+                    if(mFloatManager.isAvoidKeyboard()){
+
+                        boolean isKeyboardShow = intent.getBooleanExtra("move", false);
+                        mFloatManager.setKeyboardShowing(isKeyboardShow);
+                        mFloatManager.setFloatAutoMove(isKeyboardShow);
+                    }
                     break;
                 case Config.HIDE_TO_NOTIFYBAR:
                     mFloatManager.hideToNotifyBar();
@@ -153,6 +161,16 @@ public class FloatService extends Service{
                     int cancelId = intent.getIntExtra("notifyId",-1);
                     mFloatManager.cancelNotification(cancelId);
                     break;
+                case Config.FOREGROUND_APP_CHANGE:
+                    String appPkg = intent.getStringExtra("pkg");
+                    mFloatManager.checkHideInApp(appPkg);
+                    break;
+                case Config.HIDE_APP_CHANGE:
+                    mFloatManager.updateHideAppList();
+                    break;
+                case Config.KEY_BACK_PRESSED:
+                    mFloatManager.closeMenu();
+                    break;
                 default:
                     break;
             }
@@ -160,6 +178,14 @@ public class FloatService extends Service{
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void stopAccessibilityService() {
+
+        Intent intent = new Intent();
+        intent.putExtra("what",Config.STOP_SELF);
+        intent.setClass(this, NavAccessibilityService.class);
+        startService(intent);
     }
 
     @Override
@@ -202,6 +228,5 @@ public class FloatService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("floatservice","destory");
     }
 }

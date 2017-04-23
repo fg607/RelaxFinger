@@ -99,6 +99,14 @@
         android:title="快捷菜单设置"/>
 
     <com.jenzz.materialpreference.Preference
+        android:key="notifySetting"
+        android:title="接收消息列表"/>
+
+    <com.jenzz.materialpreference.Preference
+        android:key="hideSetting"
+        android:title="应用隐藏列表"/>
+
+    <com.jenzz.materialpreference.Preference
         android:key="donation"
         android:title="捐赠支持悬浮助手"/>
 

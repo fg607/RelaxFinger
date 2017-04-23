@@ -29,10 +29,14 @@ public final class ShortcutSuperUtils {
 
     public static Uri getUriFromLauncher(Context context) {
         StringBuilder uriStr = new StringBuilder();
-        String authority = LauncherUtil.getAuthorityFromPermissionDefault(context);
+       /* String authority = LauncherUtil.getAuthorityFromPermissionDefault(context);
+
         if (authority == null || authority.trim().equals("")) {
             authority = LauncherUtil.getAuthorityFromPermission(context, LauncherUtil.getCurrentLauncherPackageName(context) + ".permission.READ_SETTINGS");
-        }
+        }*/
+
+        String authority = LauncherUtil.getAuthorityFromPermission(context, LauncherUtil.getCurrentLauncherPackageName(context) + ".permission.READ_SETTINGS");
+
         uriStr.append("content://");
         if (TextUtils.isEmpty(authority)) {
             int sdkInt = android.os.Build.VERSION.SDK_INT;

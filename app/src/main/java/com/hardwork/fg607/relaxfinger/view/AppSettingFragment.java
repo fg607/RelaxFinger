@@ -1,12 +1,10 @@
 package com.hardwork.fg607.relaxfinger.view;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
@@ -19,7 +17,6 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -35,7 +32,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.adapter.AppAdapter;
@@ -50,8 +46,6 @@ import com.hardwork.fg607.relaxfinger.utils.AppUtils;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
-
-import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +62,6 @@ import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_D;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_E;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.TYPE_APP;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.TYPE_DEFAULT;
-import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.TYPE_FOLDER;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.TYPE_SHORTCUT;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.TYPE_SWITCH_BUTTON;
 
@@ -628,7 +621,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 protected void onPreExecute() {
                     super.onPreExecute();
 
-                    mShortcutView = View.inflate(getActivity(), R.layout.activity_choose_app, null);
+                    mShortcutView = View.inflate(getActivity(), R.layout.fragment_choose_app, null);
 
                     listView = (ListView) mShortcutView.findViewById(R.id.lv_app);
 
@@ -720,7 +713,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 protected void onPreExecute() {
                     super.onPreExecute();
 
-                    mButtonView = View.inflate(getActivity(), R.layout.activity_choose_app, null);
+                    mButtonView = View.inflate(getActivity(), R.layout.fragment_choose_app, null);
 
                     listView = (ListView) mButtonView.findViewById(R.id.lv_app);
 
@@ -797,7 +790,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 protected void onPreExecute() {
                     super.onPreExecute();
 
-                    mAppView = View.inflate(getActivity(), R.layout.activity_choose_app, null);
+                    mAppView = View.inflate(getActivity(), R.layout.fragment_choose_app, null);
 
                     listView = (ListView) mAppView.findViewById(R.id.lv_app);
 

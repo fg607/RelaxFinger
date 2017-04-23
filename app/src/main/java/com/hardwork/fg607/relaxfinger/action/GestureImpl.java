@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.manager.FloatViewManager;
+import com.hardwork.fg607.relaxfinger.model.HideAppInfo;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.service.FloatService;
 import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
@@ -22,6 +23,7 @@ import com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.view.BallView;
 import com.hardwork.fg607.relaxfinger.view.MenuViewProxy;
+import com.orm.SugarRecord;
 
 import net.grandcentrix.tray.TrayAppPreferences;
 
@@ -59,10 +61,12 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
     private boolean mIsDoubletapNone = false;
     private boolean mIsLongPressVibrate;
     private boolean mIsGestureFeedback;
-
     private Context mContext;
 
     public GestureImpl(FloatViewManager manager){
+
+        SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS HIDE_APP_INFO (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, APP_NAME TEXT, PACKAGE_NAME TEXT UNIQUE)");
 
         mContext = MyApplication.getApplication();
 
@@ -117,6 +121,18 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
             checkFeedback();
 
+            //点击关闭临时移动模式
+            if(mManager.isBallFreeMode()){
+
+                if(mManager.isKeyboardShowing()){
+
+                    executeAction(mCurrentFuncList.get(SINGLE_TAP));
+                }
+                mManager.setFloatAutoMove(false);
+
+                return;
+            }
+
             //显示通知时点击打开通知
             if(mManager.hasNotification()){
 
@@ -139,7 +155,25 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
         if(mIsDoubletapNone){
 
             checkFeedback();
-            executeAction(mCurrentFuncList.get(SINGLE_TAP));
+
+            //点击关闭临时移动模式
+            if(mManager.isBallFreeMode()){
+
+                mManager.setFloatAutoMove(false);
+
+                return;
+            }
+
+            //显示通知时点击打开通知
+            if(mManager.hasNotification()){
+
+                mManager.openNotification();
+                mManager.showNextNotify();
+
+            }else {
+
+                executeAction(mCurrentFuncList.get(SINGLE_TAP));
+            }
 
         }
     }
@@ -254,6 +288,9 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
         switch (action) {
             case "移动(固定)悬浮球":
                 mManager.setBallMove(true);
+                break;
+            case "临时移动":
+                mManager.setFloatAutoMove(true);
                 break;
             case "快捷应用":
                 if (mManager.isExistMenuItem()) {

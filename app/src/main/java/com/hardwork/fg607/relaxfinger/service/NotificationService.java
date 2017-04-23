@@ -1,7 +1,5 @@
 package com.hardwork.fg607.relaxfinger.service;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -14,23 +12,46 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.hardwork.fg607.relaxfinger.model.Config;
-import com.hardwork.fg607.relaxfinger.model.NotificationInfo;
+import com.hardwork.fg607.relaxfinger.model.NotifyAppInfo;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
+import com.orm.SugarRecord;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class NotificationService extends NotificationListenerService {
 
     private Context context;
     private SharedPreferences sp;
     private SparseArray<StatusBarNotification> mNotificationArray;
+    private List<String> mNotifyPkgList = new ArrayList<>();
+    public static List<String> sKeyboardTitleList = new ArrayList<>(Arrays.asList(new String[] {
+            "选择输入法","更改键盘","选择键盘","更改输入法"}));
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS NOTIFY_APP_INFO (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, APP_NAME TEXT, PACKAGE_NAME TEXT UNIQUE)");
+
         context = getApplicationContext();
         sp = FloatingBallUtils.getSharedPreferences();
         mNotificationArray = new SparseArray<>();
+        updateNotifyAppList();
+    }
+
+    private void updateNotifyAppList() {
+
+        List<NotifyAppInfo> notifyAppList = NotifyAppInfo.listAll(NotifyAppInfo.class);
+
+        mNotifyPkgList.clear();
+
+        for(NotifyAppInfo info:notifyAppList){
+
+            mNotifyPkgList.add(info.getPackageName());
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -54,7 +75,7 @@ public class NotificationService extends NotificationListenerService {
             }
         }
 
-        if(validSbn != null && !validSbn.getPackageName().equals("android")
+        if(validSbn != null && mNotifyPkgList.contains(validSbn.getPackageName()) && !validSbn.getPackageName().equals("android")
                 && validSbn.getNotification().contentIntent != null){
 
             StatusBarNotification notify = mNotificationArray.get(validSbn.getId());
@@ -74,8 +95,7 @@ public class NotificationService extends NotificationListenerService {
 
             if (title == null) return;
 
-            if(title.contains("选择输入法") || title.contains("更改键盘")
-                    || title.contains("选择键盘")){
+            if(sKeyboardTitleList.contains(title)){
 
                 if(sp.getBoolean("floatSwitch",false)){
 
@@ -90,6 +110,8 @@ public class NotificationService extends NotificationListenerService {
         }
 
     }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -110,8 +132,7 @@ public class NotificationService extends NotificationListenerService {
 
             if (title == null) return;
 
-            if(title.equals("选择输入法") || title.contains("更改键盘")
-                    || title.contains("选择键盘")){
+            if(sKeyboardTitleList.contains(title)){
 
                 if(sp.getBoolean("floatSwitch",false)){
 
@@ -140,6 +161,9 @@ public class NotificationService extends NotificationListenerService {
 
                         openNotification(id);
                     }
+                    break;
+                case Config.NOTIFY_APP_CHANGE:
+                    updateNotifyAppList();
                     break;
                 default:
                     break;

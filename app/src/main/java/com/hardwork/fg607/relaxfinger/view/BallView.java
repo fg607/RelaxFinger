@@ -232,16 +232,16 @@ public class BallView extends View {
 
         switch (theme) {
             case "默认":
-                setBackground(getResources().getDrawable(R.drawable.nor));
+                setBackground(getResources().getDrawable(R.drawable.theme1));
                 break;
-            case "彩虹":
-                setBackground(getResources().getDrawable(R.drawable.color));
+            case "主题二":
+                setBackground(getResources().getDrawable(R.drawable.theme2));
                 break;
-            case "Google":
-                setBackground(getResources().getDrawable(R.drawable.red));
+            case "主题三":
+                setBackground(getResources().getDrawable(R.drawable.theme3));
                 break;
-            case "苹果":
-                setBackground(getResources().getDrawable(R.drawable.iphone));
+            case "主题四":
+                setBackground(getResources().getDrawable(R.drawable.theme4));
                 break;
             case "自定义":
 
@@ -254,12 +254,14 @@ public class BallView extends View {
 
                 }else{
 
-                    setBackground(getResources().getDrawable(R.drawable.nor));
+                    setBackground(getResources().getDrawable(R.drawable.theme1));
                     mPreferences.put("theme", "默认");
                 }
 
                 break;
             default:
+                setBackground(getResources().getDrawable(R.drawable.theme1));
+                mPreferences.put("theme", "默认");
                 break;
         }
 
@@ -488,6 +490,7 @@ public class BallView extends View {
                     mHandler.sendEmptyMessage(MOVE_FINISH);
                     mHasMoved = false;
                 }
+                mGestureActive = false;
                 break;
         }
 

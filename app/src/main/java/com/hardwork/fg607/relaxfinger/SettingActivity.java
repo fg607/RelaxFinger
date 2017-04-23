@@ -1,7 +1,6 @@
 package com.hardwork.fg607.relaxfinger;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
@@ -13,11 +12,12 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.accessibility.AccessibilityManager;
+import android.view.View;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.service.FloatService;
@@ -26,6 +26,8 @@ import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.view.AppSettingFragment;
 import com.hardwork.fg607.relaxfinger.view.GestureFragment;
+import com.hardwork.fg607.relaxfinger.view.HideSettingFragment;
+import com.hardwork.fg607.relaxfinger.view.NotifySettingFragment;
 import com.hardwork.fg607.relaxfinger.view.SettingFragment;
 
 import net.grandcentrix.tray.TrayAppPreferences;
@@ -35,15 +37,18 @@ import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isServiceRu
 
 public class SettingActivity extends AppCompatActivity {
 
-    private AccessibilityManager mManager;
     private AlertDialog mAlertDialog;
     private SettingFragment mSettingFragment;
     private GestureFragment mGestureFragment;
     private AppSettingFragment mAppSettingFragment;
+    private HideSettingFragment mHideSettingFragment;
+    private NotifySettingFragment mNotifySettingFragment;
     private FragmentTransaction mTransaction;
     private TrayAppPreferences mPreferences;
     public static Messenger sMessenger = null;
     private boolean mBound = false;
+    private FloatingActionButton mFab;
+    private boolean mIsAlertShowing = false;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -59,8 +64,6 @@ public class SettingActivity extends AppCompatActivity {
         }
     };
 
-    private boolean mIsAlertShowing = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,14 +75,16 @@ public class SettingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+
+        mFab.hide();
+
         initFragments();
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragment, mSettingFragment).addToBackStack(null).commit();
 
         SettingActivity.this.setTitle(R.string.title_activity_setting);
-
-        initAccessibility();
 
     }
 
@@ -172,6 +177,19 @@ public class SettingActivity extends AppCompatActivity {
 
 
             }
+
+            @Override
+            public void onNotifySettingClick() {
+
+                showNotifySetting();
+            }
+
+            @Override
+            public void onHideSettingClick() {
+
+                showHideSetting();
+
+            }
         });
 
     }
@@ -219,6 +237,57 @@ public class SettingActivity extends AppCompatActivity {
         getFragmentManager().executePendingTransactions();
         SettingActivity.this.setTitle(R.string.title_gesture_setting);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void showNotifySetting(){
+
+
+        if (mNotifySettingFragment == null) {
+
+
+            mNotifySettingFragment = new NotifySettingFragment();
+
+        }
+
+        mTransaction = getFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        mTransaction.replace(R.id.fragment, mNotifySettingFragment);
+
+        mTransaction.addToBackStack(null);
+
+        mTransaction.commit();
+
+        getFragmentManager().executePendingTransactions();
+        SettingActivity.this.setTitle(R.string.title_notify_setting);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        showFab();
+    }
+
+    private void showHideSetting(){
+
+        if (mHideSettingFragment == null) {
+
+
+            mHideSettingFragment = new HideSettingFragment();
+
+        }
+
+        mTransaction = getFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        mTransaction.replace(R.id.fragment, mHideSettingFragment);
+
+        mTransaction.addToBackStack(null);
+
+        mTransaction.commit();
+
+        getFragmentManager().executePendingTransactions();
+        SettingActivity.this.setTitle(R.string.title_hide_setting);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        showFab();
     }
 
 
@@ -273,11 +342,6 @@ public class SettingActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void initAccessibility() {
-
-        mManager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-    }
-
 
     private void hideAlertDialog() {
 
@@ -299,10 +363,9 @@ public class SettingActivity extends AppCompatActivity {
     public void openAlertDialog() {
 
         mAlertDialog = new android.app.AlertDialog.Builder(this).create();
-        mAlertDialog.setTitle("激活导航服务");
-        mAlertDialog.setMessage("您还没有激活导航服务。" + "在设置中：系统 → 辅助功能 → 服务 中激活" + getResources().getString(R.string.app_name)
-                + "后，便可进行快捷导航");
-        mAlertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "去激活", new DialogInterface.OnClickListener() {
+        mAlertDialog.setTitle("开启辅助功能");
+        mAlertDialog.setMessage("辅助功能未开启，悬浮助手后台服务需要使用辅助功能，是否开启？");
+        mAlertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "前往开启", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -321,7 +384,7 @@ public class SettingActivity extends AppCompatActivity {
 
             }
         });
-        mAlertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
+        mAlertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "退出", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -384,49 +447,52 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：v1.5.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
     public void questionsAnswer() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("常见问题解答");
+        dialog.setTitle("帮助说明");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.什么是自由模式：当切换到横屏或者弹出软键盘时会切换到自由模式，自由模式下" +
-                "悬浮球可以自由移动，点击为返回键，双击回到桌面，长按屏幕截图（可在设置界面取消长按截图）" +
-                "，其它手势不可用。\r\n" +
-                "2.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
-                "3.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
-                "4.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
-                "5.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。" +
+        dialog.setMessage("1.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
+                "2.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
+                "3.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
+                "4.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。" +
                 "如果仍然无效,打开输入法,把通知栏打开看一下选择输入法通知的标题,反馈给我,我加到软件里面就可以了。\r\n" +
-                "6.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
+                "5.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
                 "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
-                "7.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
+                "6.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
                 "，确保新图片名称依然是DIY.png即可。\r\n" +
-                "8.若频繁需要重新激活,系统设置->安全->应用程序许可->RelaxFinger->启用自动运行," +
+                "7.若频繁需要重新激活,系统设置->安全->应用程序许可->RelaxFinger->启用自动运行," +
                 "部分国产手机->电池管理->受保护应用->启用悬浮助手,任务管理器中的一键清除也会杀掉悬浮助手," +
                 "可以在任务管理界面,给悬浮助手加上锁即可,手机不同加锁方法自行百度," +
                 "华为是任务管理器界面按住悬浮助手往下拉，MIUI好像是就有个锁，点一下就好了。\r\n" +
-                "9.安卓6.0及以上系统出现叠加层解决方法:在系统设置->开发者选项->停用HW叠加层即可。");
+                "8.临时移动模式：悬浮球会向上移动一段距离，可自由移动，点击退出临时移动模式。打开关闭输入法会自动"+
+                "进入和退出临时移动模式。\r\n"+
+                "9.显示消息通知：当接收到消息时，悬浮球会变成相应的APP图标，并晃动提示，点击打开消息，上滑忽略"+
+                "当前消息，下滑忽略所有消息。\r\n"+
+                "10.安卓6.0及以上系统出现叠加层解决方法:在系统设置->开发者选项->停用HW叠加层即可。");
         dialog.show();
     }
 
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-1.5.1版本更新内容");
+        dialog.setTitle("悬浮助手-2.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("1.修复快速设置无效的问题。\r\n" +
-                "2.修复7.0以上系统切换声音模式FC的bug。\r\n" +
-                "3.修复设置快捷菜单崩溃的bug。\r\n"+
-                "4.修复悬浮球偶尔会变成自动移动模式的bug。\r\n"+
-                "5.修复设置成边缘吸附崩溃的bug。\r\n"+
-                "6.修复自定义主题时图片过小时闪烁的问题。\r\n"+
-                "7.优化安装包体积。");
+        dialog.setMessage("" +
+                "1.避让软键盘后点击悬浮球关闭输入法并退出避让模式。\r\n" +
+                "2.更新了一个悬浮球主题。\r\n" +
+                "3.添加完全退出悬浮球提示。\r\n"+
+                "4.修复触发休眠后，亮屏第一次手势无效的bug。\r\n" +
+                "5.修复某些情况下悬浮球消失的bug。\r\n"+
+                "6.修复避让软键盘关闭无效的bug。\r\n" +
+                "7.修复其他已知bug。\r\n"+
+                "");
         dialog.show();
 
     }
@@ -448,5 +514,20 @@ public class SettingActivity extends AppCompatActivity {
     public boolean isAlertShowing() {
 
         return mIsAlertShowing;
+    }
+
+    public void showFab(){
+
+        mFab.show();
+    }
+
+    public void hideFab(){
+
+        mFab.hide();
+    }
+
+    public void setFabClickListener(View.OnClickListener listener){
+
+        mFab.setOnClickListener(listener);
     }
 }

@@ -70,6 +70,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mHideAreaSwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
+    private com.jenzz.materialpreference.Preference mNotifySetting;
+    private com.jenzz.materialpreference.Preference mHideSetting;
     private com.jenzz.materialpreference.Preference mFloatBallTheme;
     private com.jenzz.materialpreference.Preference mFloatBallSize;
     private com.jenzz.materialpreference.Preference mFloatBallAlpha;
@@ -112,7 +114,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         super.onCreate(savedInstanceState);
 
         SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS MENU_DATA_SUGAR (" +
-                "ID INTEGER PRIMARY KEY AUTOINCREMENT, WHICH_MENU TEXT, NAME TEXT, TYPE TEXT, ACTION TEXT)");
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, WHICH_MENU TEXT, NAME TEXT, TYPE TEXT, ACTION TEXT , ACTIVITY TEXT)");
+
+        SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS HIDE_APP_INFO (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, APP_NAME TEXT, PACKAGE_NAME TEXT UNIQUE)");
+
+        SugarRecord.executeQuery("CREATE TABLE IF NOT EXISTS NOTIFY_APP_INFO (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, APP_NAME TEXT, PACKAGE_NAME TEXT UNIQUE)");
 
         addPreferencesFromResource(R.xml.preferences_setting);
 
@@ -178,6 +186,48 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 if (mClickListener != null) {
 
                     mClickListener.onAppSettingClick();
+
+                }
+                return true;
+            }
+        });
+
+        mNotifySetting = (com.jenzz.materialpreference.Preference) findPreference("notifySetting");
+        mNotifySetting.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                if (mClickListener != null) {
+
+                    if(Build.VERSION.SDK_INT > 18){
+
+                        if(!canAccessNotification()){
+
+                            openNotificationAccess();
+
+                        }else {
+
+                            mClickListener.onNotifySettingClick();
+                        }
+
+                    }else {
+
+                        Toast.makeText(mContext, "显示消息功能适用于4.4以上系统！", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+                return true;
+            }
+        });
+
+        mHideSetting = (com.jenzz.materialpreference.Preference) findPreference("hideSetting");
+        mHideSetting.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                if (mClickListener != null) {
+
+                    mClickListener.onHideSettingClick();
 
                 }
                 return true;
@@ -284,6 +334,15 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     private void showThemeDialog() {
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+            if(!FloatingBallUtils.checkPermissionGranted(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE)){
+
+                return;
+            }
+
+        }
+
         if (mThemeDialog == null) {
 
             if (mThemeView == null) initThemeView();
@@ -342,13 +401,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "默认":
                 imageView = mCheck1;
                 break;
-            case "彩虹":
+            case "主题二":
                 imageView = mCheck2;
                 break;
-            case "Google":
+            case "主题三":
                 imageView = mCheck3;
                 break;
-            case "苹果":
+            case "主题四":
                 imageView = mCheck4;
                 break;
             case "自定义":
@@ -482,6 +541,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 if(Build.VERSION.SDK_INT > 18){
 
                     autoMoveChange((boolean) newValue);
+
                 }else {
                     if((boolean)newValue) {
 
@@ -527,7 +587,14 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     private void autoMoveChange(boolean newValue) {
 
-        openNotificationAccess();
+        mPreferences.put("autoMoveSwitch",newValue);
+
+        sendMsg(Config.AUTO_MOVE_SWITCH,"isAutoMove",newValue);
+
+        if(newValue && !canAccessNotification()){
+
+            openNotificationAccess();
+        }
 
     }
 
@@ -548,7 +615,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
      * 检测是否拥有通知使用权
      * @return
      */
-    private boolean canAvoidKeyborad() {
+    private boolean canAccessNotification() {
 
         if(Build.VERSION.SDK_INT < 19){
 
@@ -635,6 +702,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
             exitFloatService();
 
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N){
+
+                openAccessibitySettings();
+
+                Toast.makeText(mContext, "退出后台运行，需要在辅助功能中手动关闭悬浮助手！", Toast.LENGTH_LONG).show();
+            }
+
         }else {
 
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
@@ -650,6 +724,19 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         }
 
 
+    }
+
+    private void openAccessibitySettings(){
+
+        try {
+            startActivity(new Intent("android.settings.ACCESSIBILITY_SETTINGS"));
+
+        } catch (ActivityNotFoundException e) {
+
+            e.printStackTrace();
+
+            Toast.makeText(mActivity, "没有找到辅助功能设置界面，请手动开启！", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void exitFloatService() {
@@ -763,13 +850,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 mThemeChoosed="默认";
                 break;
             case R.id.img2:
-                mThemeChoosed="彩虹";
+                mThemeChoosed="主题二";
                 break;
             case R.id.img3:
-                mThemeChoosed="Google";
+                mThemeChoosed="主题三";
                 break;
             case R.id.img4:
-                mThemeChoosed="苹果";
+                mThemeChoosed="主题四";
                 break;
             case R.id.img5:
                 mThemeChoosed="自定义";
@@ -935,11 +1022,18 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         public void onGestureSettingClick();
 
         public void onAppSettingClick();
+
+        void onNotifySettingClick();
+
+        void onHideSettingClick();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        mActivity.hideFab();
+        mActivity.setFabClickListener(null);
 
         if (!mDeviceManager.isAdminActive(mComponentName)) {
 
@@ -951,7 +1045,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mMoveSwitch.setChecked(canMove);
 
 
-        if(!canAvoidKeyborad()){
+        if(!canAccessNotification()){
 
             mAutoMoveSwitch.setChecked(false);
         }

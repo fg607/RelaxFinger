@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeViewClicked|typeViewFocused|typeWindowStateChanged"
+    android:accessibilityFlags="flagIncludeNotImportantViews|flagRequestFilterKeyEvents"
     android:accessibilityFeedbackType="feedbackGeneric"
-    android:packageNames="com.hardwork.fg607.floatingball.service.NavAccessibilityService"
+    android:canRetrieveWindowContent="true"
+    android:canRequestFilterKeyEvents="true"
     android:settingsActivity="com.hardwork.fg607.floatingball.MainActivity"
     android:description="@string/accessibility" />
-  <!--  android:accessibilityEventTypes="typeAllMask"
-    android:accessibilityFlags="flagDefault"
-    android:notificationTimeout="100"
-    android:accessibilityEventTypes="typeWindowContentChanged"
-        android:packageNames="com.hardwork.fg607.floatingball.service.NavAccessibilityService"
-    android:canRetrieveWindowContent="true"-->

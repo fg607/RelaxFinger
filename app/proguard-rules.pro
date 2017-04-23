@@ -19,4 +19,7 @@
 -dontwarn com.orm.**
 -keep class com.orm.** { *; }
 -keep class com.hardwork.fg607.relaxfinger.model.MenuDataSugar { *; }
+-keep class com.hardwork.fg607.relaxfinger.model.HideAppInfo { *; }
+-keep class com.hardwork.fg607.relaxfinger.model.NotifyAppInfo { *; }
+-keep class cn.pedant.SweetAlert.Rotate3dAnimation { *; }
 -keep public class * extends android.view.View{ *; }

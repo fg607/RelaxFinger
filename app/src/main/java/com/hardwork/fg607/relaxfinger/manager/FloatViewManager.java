@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.SparseArray;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.facebook.rebound.SpringConfigRegistry;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.adapter.MenuFolderAdapter;
+import com.hardwork.fg607.relaxfinger.model.HideAppInfo;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.model.NotificationInfo;
@@ -77,7 +79,15 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     private boolean mIsHomePressed;
     private boolean mIsMoving = false;
     private boolean mIsBallShowing = false;
+    private boolean mIsKeyboardShowing = false;
     private NotificationStack mNotifyStack;
+    private boolean mIsHideInApp = false;
+    private List<String> mHidePkgList = new ArrayList<>();
+    private String mPrevNormalPkg = null;
+    private String mPrevHidePkg = null;
+    private boolean mJustRecovery = false;
+    private long mLastCloseTime = 0;
+    private boolean mIsAvoidKeyboard = false;
 
     public FloatViewManager(Context context) {
 
@@ -91,6 +101,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         initFolderView();
         initBackgroundView();
         initHideAreaView();
+        updateHideAppList();
 
         if(mPreferences.getBoolean("floatSwitch", false)){
 
@@ -107,6 +118,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         mIsBallToEdge = FloatingBallUtils.multiProcessPreferences.getBoolean("toEdgeSwitch", false);
         mIsShowHideArea = FloatingBallUtils.multiProcessPreferences.getBoolean("hideAreaSwitch", true);
         mIsLandscapeHide = FloatingBallUtils.multiProcessPreferences.getBoolean("autoHideSwitch", false);
+        mIsAvoidKeyboard = mPreferences.getBoolean("autoMoveSwitch", false);
     }
 
     private void initBallView() {
@@ -152,6 +164,21 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     }
 
+    public void updateHideAppList() {
+
+        List<HideAppInfo> hideAppList = HideAppInfo.listAll(HideAppInfo.class);
+
+        mHidePkgList.clear();
+
+        //授权界面自动隐藏悬浮球
+        mHidePkgList.add("com.android.packageinstaller");
+
+        for(HideAppInfo info:hideAppList){
+
+            mHidePkgList.add(info.getPackageName());
+        }
+    }
+
     public void setGestureListener(BallView.OnGestureListener listener) {
 
         mBallView.setOnGestureListener(listener);
@@ -176,12 +203,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             return;
         }
 
-        if (mIsHomePressed) {
+       /* if (mIsHomePressed) {
 
             Toast.makeText(mContext, "按下系统自带Home键后打开应用程序会有5秒延迟！",
                     Toast.LENGTH_LONG).show();
         }
-
+*/
         if (mMenuViewProxy.getMenuView().getParent() == null) {
 
             showBackground();
@@ -193,6 +220,14 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
 
     public void closeMenu() {
+
+        //防止多次关闭影响关闭动画
+        if((System.currentTimeMillis() - mLastCloseTime)<150){
+
+            return;
+        }
+
+        mLastCloseTime = System.currentTimeMillis();
 
         mFolderViewProxy.hideFolder();
         mMenuViewProxy.closeMenu();
@@ -225,6 +260,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         if (mBackgroundView.getParent() == null) {
 
             mWindowManager.addView(mBackgroundView, mBackgroundView.getWindowLayoutParams());
+
+            mPreferences.put("isBkgShowing",true);
         }
 
     }
@@ -241,6 +278,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         if (mBackgroundView.getParent() != null) {
 
             mWindowManager.removeViewImmediate(mBackgroundView);
+
+            mPreferences.put("isBkgShowing",false);
         }
 
     }
@@ -350,7 +389,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         if (mIsBallShowing) {
 
-            mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            //mBallView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
             createShowNotification();
 
@@ -369,11 +408,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("RelaxFinger")
+                        .setTicker("悬浮球隐藏到通知栏啦，点击显示!")
                         .setContentText("点击显示悬浮球");
 
         Intent resultIntent = new Intent(Config.ACTION_SHOW_FLOATBALL);
 
-        PendingIntent resultPendingIntent = PendingIntent.getBroadcast(mContext, 0, resultIntent, 0);
+        PendingIntent resultPendingIntent = PendingIntent.getBroadcast(mContext,(int) SystemClock.uptimeMillis(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentIntent(resultPendingIntent);
 
@@ -410,6 +450,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         mIsBallHiding = false;
 
         mPreferences.put("hideState", mIsBallHiding);
+
+        mJustRecovery = true;
 
     }
 
@@ -642,6 +684,16 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         }
     }
 
+    public void setKeyboardShowing(boolean isShowing){
+
+        mIsKeyboardShowing = isShowing;
+    }
+
+    public boolean isKeyboardShowing(){
+
+        return mIsKeyboardShowing;
+    }
+
     public void setFloatAutoMove(boolean isFreeMode) {
 
         mIsFreeMode = isFreeMode;
@@ -669,8 +721,20 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         WindowManager.LayoutParams params = mBallView.getWindowLayoutParams();
 
-        params.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - params.width / 2);
-        params.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - params.width / 2);
+        //横屏下处理方式
+        if(mIsLandscape){
+
+            int screenWidth = DensityUtil.getScreenWidth(mContext);
+            int screenHeight = DensityUtil.getScreenHeight(mContext);
+
+            params.x = screenWidth - mBallParams.width;
+            params.y = screenHeight / 2 - mBallParams.width / 2;
+
+        }else {
+
+            params.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - params.width / 2);
+            params.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - params.width / 2);
+        }
 
         updateBallPos();
 
@@ -916,5 +980,65 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             mNotifyStack.invalidNotification(id);
         }
 
+    }
+
+    public void checkHideInApp(String foregroundAppPkg) {
+
+        if(foregroundAppPkg.equals("com.android.systemui")){
+
+            mPrevNormalPkg = foregroundAppPkg;
+
+            mJustRecovery = false;
+
+            return;
+        }
+
+
+
+        if(mHidePkgList.contains(foregroundAppPkg)){
+
+
+            if(mJustRecovery && mPrevNormalPkg.equals("com.android.systemui") &&  mPrevHidePkg.equals(foregroundAppPkg)){
+
+                mJustRecovery = false;
+
+                return;
+            }
+
+
+         if(!mIsBallHiding){
+
+                hideToNotifyBar();
+
+                mIsHideInApp = true;
+            }
+
+            mPrevHidePkg = foregroundAppPkg;
+
+
+        }else{
+
+            if(mIsBallHiding && mIsHideInApp){
+
+                recoveryFromNotifyBar();
+
+                mIsHideInApp = false;
+            }
+
+            mPrevNormalPkg = foregroundAppPkg;
+
+        }
+
+        mJustRecovery = false;
+    }
+
+    public void setAvoidKeyboard(boolean isAvoid) {
+
+        mIsAvoidKeyboard = isAvoid;
+    }
+
+    public boolean isAvoidKeyboard(){
+
+        return mIsAvoidKeyboard;
     }
 }

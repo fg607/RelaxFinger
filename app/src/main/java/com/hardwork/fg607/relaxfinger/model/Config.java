@@ -30,7 +30,7 @@ public class Config {
     public static final int SHOTSCREEN_SWITCH = 23;
     public static final int SCREEN_ON = 24;
     public static final int HIDE_TO_NOTIFYBAR = 25;
-    public static final int ANIMATE_SWITCH = 26;
+    public static final int AUTO_MOVE_SWITCH = 26;
     public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.showFloatBall";
     public static final int HIDE_AREA_SWITCH = 27;
     public static final int AUTO_HIDE_SWITCH = 28;
@@ -38,4 +38,12 @@ public class Config {
     public static final int OPEN_NOTIFICATION = 30;
     public static final int NEW_NOTIFICATION = 31;
     public static final int CANCEL_NOTIFICATION = 32;
+    public static final int FOREGROUND_APP_CHANGE = 33;
+    public static final int NOTIFY_APP_CHANGE = 34;
+    public static final int HIDE_APP_CHANGE = 35;
+    public static final int KEY_BACK_PRESSED = 36;
+    public static final int STOP_SELF = 37;
+
+    public static final int FROM_NOTIFY_APP = 202;
+    public static final int FROM_HIDE_APP = 203;
 }

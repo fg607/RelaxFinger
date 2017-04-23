@@ -44,6 +44,7 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
+        tools:replace="android:icon"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -118,6 +119,9 @@
             android:launchMode="singleInstance"
             android:theme="@style/Theme.Transparent" />
         <activity android:name=".view.ClipImageActivity" />
+
+        <activity android:name=".view.AppChooseActivity"></activity>
+
     </application>
 
 </manifest>

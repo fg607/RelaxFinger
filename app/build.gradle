@@ -10,8 +10,8 @@ android {
         minSdkVersion 18
         targetSdkVersion 25
         resValue "string", "tray__authority", "${applicationId}.tray"
-        versionCode 21
-        versionName "1.5.1"
+        versionCode 23
+        versionName "2.1"
     }
 
     signingConfigs {
@@ -20,9 +20,6 @@ android {
             storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
             keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
             keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
-            //storePassword "${System.env.KEYSTORE_PASSWORD}"
-            //keyAlias "${System.env.FINANCE_ALIAS}"
-            //keyPassword "${System.env.ALIAS_PASSWORD}"
         }
     }
 
@@ -56,4 +53,5 @@ dependencies {
     compile 'com.jenzz:materialpreference:1.3'
     compile 'com.facebook.rebound:rebound:0.3.8'
     compile 'com.github.satyan:sugar:1.5'
+    compile 'cn.pedant.sweetalert:library:1.3'
 }
