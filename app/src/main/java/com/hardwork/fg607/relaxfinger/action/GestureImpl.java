@@ -25,6 +25,7 @@ import com.hardwork.fg607.relaxfinger.view.BallView;
 import com.hardwork.fg607.relaxfinger.view.MenuViewProxy;
 import com.orm.SugarRecord;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
     private FloatViewManager mManager;
     private ArrayList<String> mCurrentFuncList = new ArrayList<>();
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
 
     private boolean mIsDoubletapNone = false;
     private boolean mIsLongPressVibrate;
@@ -130,6 +131,12 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                 }
                 mManager.setFloatAutoMove(false);
 
+                if(mManager.isHalfHideMode()){
+
+                    mManager.resetHalfHideTime();
+                }
+
+
                 return;
             }
 
@@ -142,6 +149,11 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             }else {
 
                 executeAction(mCurrentFuncList.get(SINGLE_TAP));
+            }
+
+            if(mManager.isHalfHideMode()){
+
+                mManager.resetHalfHideTime();
             }
 
         }
@@ -161,6 +173,16 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
                 mManager.setFloatAutoMove(false);
 
+                if(mManager.isKeyboardShowing()){
+
+                    FloatingBallUtils.keyBack(NavAccessibilityService.instance);
+                }
+
+                if(mManager.isHalfHideMode()){
+
+                    mManager.resetHalfHideTime();
+                }
+
                 return;
             }
 
@@ -175,6 +197,11 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                 executeAction(mCurrentFuncList.get(SINGLE_TAP));
             }
 
+            if(mManager.isHalfHideMode()){
+
+                mManager.resetHalfHideTime();
+            }
+
         }
     }
 
@@ -183,6 +210,11 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
         checkFeedback();
         executeAction(mCurrentFuncList.get(DOUBLE_TAP));
+
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
     }
 
     @Override
@@ -190,12 +222,20 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
         checkLongPressVibrate();
         executeAction(mCurrentFuncList.get(LONGPRESS));
+
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
     }
 
     @Override
     public void onScrollUp() {
 
+
         checkFeedback();
+
+        mManager.showFromEdge();
 
         //显示通知时上滑忽略通知
         if(mManager.hasNotification()){
@@ -208,12 +248,19 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             executeAction(mCurrentFuncList.get(SWIPE_UP));
         }
 
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
+
     }
 
     @Override
     public void onScrollDown() {
 
         checkFeedback();
+
+        mManager.showFromEdge();
 
         //显示通知时下滑忽略所有通知
         if(mManager.hasNotification()){
@@ -225,20 +272,42 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             executeAction(mCurrentFuncList.get(SWIPE_DOWN));
         }
 
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
+
     }
 
     @Override
     public void onScrollLeft() {
 
         checkFeedback();
-        executeAction(mCurrentFuncList.get(SWIPE_LEFT));
+
+        if(!mManager.isHalfHideMode() || !mManager.showFromEdge()){
+
+            executeAction(mCurrentFuncList.get(SWIPE_LEFT));
+        }
+
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
     }
 
     @Override
     public void onScrollRight() {
 
         checkFeedback();
-        executeAction(mCurrentFuncList.get(SWIPE_RIGHT));
+        if(!mManager.isHalfHideMode() || !mManager.showFromEdge()){
+
+            executeAction(mCurrentFuncList.get(SWIPE_RIGHT));
+        }
+
+        if(mManager.isHalfHideMode()){
+
+            mManager.resetHalfHideTime();
+        }
     }
 
     @Override
@@ -279,12 +348,6 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
     private void executeAction(String action){
 
-        if (!checkAccessibility()) {
-
-            AccessibilityUtil.openSettingActivity();
-            return;
-        }
-
         switch (action) {
             case "移动(固定)悬浮球":
                 mManager.setBallMove(true);
@@ -304,6 +367,11 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
                 break;
             case "返回键":
+                if (!checkAccessibility()) {
+
+                    AccessibilityUtil.openSettingActivity();
+                    return;
+                }
                 mManager.closeMenu();
                 FloatingBallUtils.keyBack(NavAccessibilityService.instance);
                 break;
@@ -312,6 +380,11 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                 FloatingBallUtils.keyHome();
                 break;
             case "最近任务键":
+                if (!checkAccessibility()) {
+
+                    AccessibilityUtil.openSettingActivity();
+                    return;
+                }
                 FloatingBallUtils.openRecnetTask(NavAccessibilityService.instance);
                 break;
             case "切换上一个应用":
@@ -321,15 +394,30 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                 FloatingBallUtils.lockScreen();
                 break;
             case "电源面板":
+                if (!checkAccessibility()) {
+
+                    AccessibilityUtil.openSettingActivity();
+                    return;
+                }
                 FloatingBallUtils.openPowerDialog(NavAccessibilityService.instance);
                 break;
             case "快速设置":
+                if (!checkAccessibility()) {
+
+                    AccessibilityUtil.openSettingActivity();
+                    return;
+                }
                 FloatingBallUtils.openQuickSetting(NavAccessibilityService.instance);
                 break;
             case "屏幕截图":
                FloatingBallUtils.screenShot();
                 break;
             case "通知栏":
+                if (!checkAccessibility()) {
+
+                    AccessibilityUtil.openSettingActivity();
+                    return;
+                }
                 FloatingBallUtils.openNotificationBar(NavAccessibilityService.instance);
                 break;
             case "音量键加":

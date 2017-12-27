@@ -18,6 +18,7 @@ import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isUsageAccess;
@@ -33,7 +34,7 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
     private Preference mSwipeDown;
     private Preference mSwipeLeft;
     private Preference mSwipeRight;
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
 
 
     @Override

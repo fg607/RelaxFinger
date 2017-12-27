@@ -2,8 +2,8 @@ package com.hardwork.fg607.relaxfinger.service;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Build;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityEvent;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
-import net.grandcentrix.tray.TrayAppPreferences;
+import net.grandcentrix.tray.AppPreferences;
 
 /**
  * Created by fg607 on 16-1-23.
@@ -19,8 +19,7 @@ import net.grandcentrix.tray.TrayAppPreferences;
 public class NavAccessibilityService extends AccessibilityService {
 
     public  static AccessibilityService instance = null;
-
-    public static TrayAppPreferences sp;
+    private AppPreferences sp;
 
     @Override
     protected void onServiceConnected() {
@@ -41,13 +40,16 @@ public class NavAccessibilityService extends AccessibilityService {
         }
 
         setServiceInfo(config);*/
+
+
     }
 
 
     @Override
     public void onAccessibilityEvent(final AccessibilityEvent accessibilityEvent) {
 
-        if(accessibilityEvent.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED){
+        if (accessibilityEvent.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+
 
             String foregroundPackageName = accessibilityEvent.getPackageName().toString();
 

@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger.view;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -137,7 +138,14 @@ public class FolderViewProxy {
     private void initLayoutParams() {
         mWinLayoutParams = new WindowManager.LayoutParams();
 
-        mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        }else {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+        }
 
 
         mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;//| WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM

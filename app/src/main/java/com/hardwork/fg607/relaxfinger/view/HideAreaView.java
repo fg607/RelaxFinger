@@ -104,7 +104,14 @@ public class HideAreaView extends TextView {
     private void initLayoutParams() {
         mWinLayoutParams = new WindowManager.LayoutParams();
 
-        mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        }else {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+        }
 
         mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS

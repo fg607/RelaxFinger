@@ -2,7 +2,7 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,7 +10,8 @@ import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
-public class ClipImageActivity extends ActionBarActivity {
+
+public class ClipImageActivity extends AppCompatActivity {
 
     private ClipImageView mImageView;
 

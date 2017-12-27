@@ -34,6 +34,7 @@ public class Config {
     public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.showFloatBall";
     public static final int HIDE_AREA_SWITCH = 27;
     public static final int AUTO_HIDE_SWITCH = 28;
+    public static final int HALF_HIDE_SWITCH = 39;
     public static final int SCREEN_SHOT = 29;
     public static final int OPEN_NOTIFICATION = 30;
     public static final int NEW_NOTIFICATION = 31;
@@ -46,4 +47,6 @@ public class Config {
 
     public static final int FROM_NOTIFY_APP = 202;
     public static final int FROM_HIDE_APP = 203;
+    public static final int HALF_HIDE = 38;
+
 }

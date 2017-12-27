@@ -2,8 +2,13 @@ package com.hardwork.fg607.relaxfinger.service;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,6 +22,7 @@ import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.action.GestureImpl;
 import com.hardwork.fg607.relaxfinger.manager.FloatViewManager;
 import com.hardwork.fg607.relaxfinger.model.Config;
+import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.orm.SugarRecord;
 
 import java.util.List;
@@ -31,6 +37,9 @@ public class FloatService extends Service{
     private GestureImpl mGestureImpl;
     private AccessibilityManager mAccessibilityManger;
     private Bundle mBundle;
+    private BroadcastReceiver mReceiver;
+
+    public static FloatService instance = null;
 
     private Messenger mMessenger = new Messenger(new MyHandler());
 
@@ -51,6 +60,9 @@ public class FloatService extends Service{
 
                 case Config.TO_EDGE_SWITCH:
                     mFloatManager.setBallToEdge(mBundle.getBoolean("isToEdge",false));
+                    break;
+                case Config.HALF_HIDE_SWITCH:
+                    mFloatManager.setHalfHide(mBundle.getBoolean("halfHide",false));
                     break;
                 case Config.GESTURE_FUNCTION:
                     mGestureImpl.loadFunction();
@@ -107,9 +119,41 @@ public class FloatService extends Service{
     public void onCreate() {
         super.onCreate();
 
+        instance = this;
+
         mFloatManager = new FloatViewManager(this);
 
         mGestureImpl = new GestureImpl(mFloatManager);
+
+        final IntentFilter filter = new IntentFilter();
+
+        filter.addAction(Config.ACTION_SHOW_FLOATBALL);
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                String action = intent.getAction();
+
+                if(Config.ACTION_SHOW_FLOATBALL.equals(action)){
+
+                    if(FloatingBallUtils.getSharedPreferences().getBoolean("floatSwitch",false)){
+
+                        mFloatManager.recoveryFromNotifyBar();
+                    }
+
+
+                }
+            }
+        };
+
+        registerReceiver(mReceiver, filter);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            FloatJobService.scheduleService(this.getApplicationContext());
+            startService(new Intent(this.getApplicationContext(), FloatJobService.class));
+        }
 
     }
 
@@ -155,7 +199,8 @@ public class FloatService extends Service{
                 case Config.NEW_NOTIFICATION:
                     String pkg = intent.getStringExtra("pkg");
                     int newId = intent.getIntExtra("notifyId",-1);
-                    mFloatManager.newNotification(pkg,newId);
+                    Icon icon = intent.getParcelableExtra("icon");
+                    mFloatManager.newNotification(pkg,newId,icon);
                     break;
                 case Config.CANCEL_NOTIFICATION:
                     int cancelId = intent.getIntExtra("notifyId",-1);
@@ -228,5 +273,7 @@ public class FloatService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        unregisterReceiver(mReceiver);
     }
 }

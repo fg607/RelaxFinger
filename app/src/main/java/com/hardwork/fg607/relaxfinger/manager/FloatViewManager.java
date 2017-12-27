@@ -4,24 +4,25 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Toast;
-
-import com.facebook.rebound.SpringConfigRegistry;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.adapter.MenuFolderAdapter;
 import com.hardwork.fg607.relaxfinger.model.HideAppInfo;
@@ -39,12 +40,14 @@ import com.hardwork.fg607.relaxfinger.view.FolderViewProxy;
 import com.hardwork.fg607.relaxfinger.view.HideAreaView;
 import com.hardwork.fg607.relaxfinger.view.MenuViewProxy;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.hardwork.fg607.relaxfinger.model.Config.HALF_HIDE;
 import static com.hardwork.fg607.relaxfinger.view.BallView.MAX_BALL_ALPHA;
 import static com.hardwork.fg607.relaxfinger.view.BallView.MAX_BALL_SIZE;
 import static com.hardwork.fg607.relaxfinger.view.BallView.MIN_BALL_ALPHA;
@@ -58,7 +61,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         MenuFolderAdapter.OnFolderItemClickListener {
 
     private Context mContext;
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
     private WindowManager mWindowManager;
     private BallView mBallView;
     private WindowManager.LayoutParams mBallParams;
@@ -88,6 +91,28 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     private boolean mJustRecovery = false;
     private long mLastCloseTime = 0;
     private boolean mIsAvoidKeyboard = false;
+    private boolean mIsHalfHide = false;
+    private boolean mHalfHideMode = false;
+    private boolean mBgShowing = false;
+
+    private Handler mHandler = new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch (msg.what){
+
+                case HALF_HIDE:
+                    attacheToEdge();
+                    break;
+                default:
+                        break;
+            }
+        }
+    };
+
+
 
     public FloatViewManager(Context context) {
 
@@ -114,11 +139,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 
         mPreferences = FloatingBallUtils.getMultiProcessPreferences();
-        mIsBallRight = FloatingBallUtils.multiProcessPreferences.getBoolean("floatRight", true);
-        mIsBallToEdge = FloatingBallUtils.multiProcessPreferences.getBoolean("toEdgeSwitch", false);
-        mIsShowHideArea = FloatingBallUtils.multiProcessPreferences.getBoolean("hideAreaSwitch", true);
-        mIsLandscapeHide = FloatingBallUtils.multiProcessPreferences.getBoolean("autoHideSwitch", false);
+        mIsBallRight = mPreferences.getBoolean("floatRight", true);
+        mIsBallToEdge = mPreferences.getBoolean("toEdgeSwitch", false);
+        mIsShowHideArea = mPreferences.getBoolean("hideAreaSwitch", true);
+        mIsLandscapeHide = mPreferences.getBoolean("autoHideSwitch", false);
         mIsAvoidKeyboard = mPreferences.getBoolean("autoMoveSwitch", false);
+        mHalfHideMode = mPreferences.getBoolean("halfHideSwitch",false);
     }
 
     private void initBallView() {
@@ -170,8 +196,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         mHidePkgList.clear();
 
-        //授权界面自动隐藏悬浮球
-        mHidePkgList.add("com.android.packageinstaller");
+        //授权界面自动隐藏悬浮球(android O会自动隐藏悬浮窗)
+        //mHidePkgList.add("com.android.packageinstaller");
 
         for(HideAppInfo info:hideAppList){
 
@@ -194,6 +220,13 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         mBallView.show();
 
         mIsBallShowing = true;
+
+        if(mHalfHideMode){
+
+            mIsHalfHide = false;//半隐藏状态失效
+            resetHalfHideTime();
+        }
+
     }
 
     public void popUpMenu() {
@@ -262,6 +295,9 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             mWindowManager.addView(mBackgroundView, mBackgroundView.getWindowLayoutParams());
 
             mPreferences.put("isBkgShowing",true);
+
+            mBgShowing = true;
+
         }
 
     }
@@ -280,6 +316,14 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             mWindowManager.removeViewImmediate(mBackgroundView);
 
             mPreferences.put("isBkgShowing",false);
+
+            mBgShowing = false;
+
+            if(mHalfHideMode){
+
+                resetHalfHideTime();
+            }
+
         }
 
     }
@@ -379,6 +423,64 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     }
 
+    private void attacheToEdge() {
+
+        if(!mIsHalfHide && !mBgShowing){
+
+            WindowManager.LayoutParams ballLayoutParams = mBallView.getWindowLayoutParams();
+
+            if(mIsBallRight){
+
+                ballLayoutParams.x = FloatingBallUtils.getScreenWidth() - ballLayoutParams.width / 2;
+
+            }else {
+
+                ballLayoutParams.x = - ballLayoutParams.width / 2;
+            }
+
+            updateBallPos();
+
+            mIsHalfHide = true;
+
+        }
+
+    }
+
+    public boolean showFromEdge() {
+
+        if(mIsHalfHide){
+
+            WindowManager.LayoutParams ballLayoutParams = mBallView.getWindowLayoutParams();
+
+            if(mIsLandscape){
+
+                ballLayoutParams.x = mPreferences.getInt("ballWmParamsX_ls", FloatingBallUtils.getScreenWidth() - ballLayoutParams.width);
+            }else {
+
+                ballLayoutParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - ballLayoutParams.width);
+            }
+
+
+            updateBallPos();
+
+            mIsHalfHide = false;
+
+            return true;
+        }
+
+        return false;
+
+
+    }
+
+    public void resetHalfHideTime() {
+
+        if (mHandler.hasMessages(HALF_HIDE)) mHandler.removeMessages(HALF_HIDE);
+
+        mHandler.sendEmptyMessageDelayed(HALF_HIDE,5000);
+
+    }
+
     private void updateBallPos() {
 
         mBallView.updatePosition();
@@ -404,12 +506,40 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     private void createShowNotification() {
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("RelaxFinger")
-                        .setTicker("悬浮球隐藏到通知栏啦，点击显示!")
-                        .setContentText("点击显示悬浮球");
+        NotificationManager mNF = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder mBuilder;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            String name = "com_hardwork_fg607_relaxfinger_channel";
+            String id = "悬浮助手";
+            String description = "悬浮助手channel";
+
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+            mChannel.setDescription(description);
+            mChannel.enableVibration(true);
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mNF.createNotificationChannel(mChannel);
+
+            mBuilder =
+                    new NotificationCompat.Builder(mContext,id)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("RelaxFinger")
+                            .setTicker("悬浮球隐藏到通知栏啦，点击显示!")
+                            .setContentText("点击显示悬浮球");
+
+        }else{
+
+             mBuilder =
+                    new NotificationCompat.Builder(mContext)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("RelaxFinger")
+                            .setTicker("悬浮球隐藏到通知栏啦，点击显示!")
+                            .setContentText("点击显示悬浮球");
+
+        }
 
         Intent resultIntent = new Intent(Config.ACTION_SHOW_FLOATBALL);
 
@@ -417,11 +547,10 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         mBuilder.setContentIntent(resultPendingIntent);
 
+
         Notification notification = mBuilder.build();
 
         notification.flags |= Notification.FLAG_NO_CLEAR;
-
-        NotificationManager mNF = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
 
         mNF.notify(R.string.app_name, notification);
 
@@ -431,12 +560,12 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         if (!mIsLandscape) {
 
-            mBallParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mBallParams.width / 2);
+            mBallParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mBallParams.width);
             mBallParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - mBallParams.width / 2);
         } else {
 
-            mBallParams.x = DensityUtil.getScreenWidth(mContext) - mBallParams.width;
-            mBallParams.y = DensityUtil.getScreenHeight(mContext) / 2 - mBallParams.width / 2;
+            mBallParams.x = mPreferences.getInt("ballWmParamsX_ls", FloatingBallUtils.getScreenWidth() - mBallParams.width);
+            mBallParams.y = mPreferences.getInt("ballWmParamsY_ls", FloatingBallUtils.getScreenHeight() / 2 - mBallParams.width / 2);
         }
 
         showBall();
@@ -550,6 +679,15 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         }
 
+        if(mHalfHideMode){
+
+            mIsHalfHide = false;//移动后半隐藏状态失效
+            resetHalfHideTime();
+        }
+
+
+
+
 
     }
 
@@ -596,17 +734,29 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         mMenuViewProxy.setIsBallRight(mIsBallRight);
 
-
         FloatingBallUtils.saveStates("floatRight", mIsBallRight);
+
+
 
     }
 
     private void doIfSavePosition() {
 
-        if (!mIsFreeMode && !mIsLandscape) {
+        if (!mIsFreeMode) {
 
-            FloatingBallUtils.getMultiProcessPreferences().put("ballWmParamsX", mBallParams.x);
-            FloatingBallUtils.getMultiProcessPreferences().put("ballWmParamsY", mBallParams.y);
+            if(mIsLandscape){
+
+                mPreferences.put("ballWmParamsX_ls", mBallParams.x);
+                mPreferences.put("ballWmParamsY_ls", mBallParams.y);
+
+            }else {
+
+                mPreferences.put("ballWmParamsX", mBallParams.x);
+                mPreferences.put("ballWmParamsY", mBallParams.y);
+
+            }
+
+
         }
 
     }
@@ -640,6 +790,13 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         if (mIsBallToEdge) {
             moveBallToEdge();
+
+
+            if(mHalfHideMode){
+
+                mIsHalfHide = false;//半隐藏状态失效
+                resetHalfHideTime();
+            }
         }
 
     }
@@ -712,6 +869,14 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             if (mIsBallFree) {
 
                 changeBallToOrigin();
+
+                if(mHalfHideMode){
+
+                    mIsHalfHide = false;//半隐藏状态失效
+
+                    resetHalfHideTime();
+                }
+
             }
         }
 
@@ -724,15 +889,13 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         //横屏下处理方式
         if(mIsLandscape){
 
-            int screenWidth = DensityUtil.getScreenWidth(mContext);
-            int screenHeight = DensityUtil.getScreenHeight(mContext);
+            params.x = mPreferences.getInt("ballWmParamsX_ls", FloatingBallUtils.getScreenWidth() - params.width);
+            params.y = mPreferences.getInt("ballWmParamsY_ls", FloatingBallUtils.getScreenHeight() / 2 - params.width/ 2);
 
-            params.x = screenWidth - mBallParams.width;
-            params.y = screenHeight / 2 - mBallParams.width / 2;
 
         }else {
 
-            params.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - params.width / 2);
+            params.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - params.width);
             params.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - params.width / 2);
         }
 
@@ -809,6 +972,13 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             changeToPortrait();
         }
 
+        if(mHalfHideMode){
+
+            mIsHalfHide = false;//半隐藏状态失效
+            resetHalfHideTime();
+        }
+
+
     }
 
     private void changeToPortrait() {
@@ -846,7 +1016,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     private void updateBallInPortrait() {
 
-        mBallParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mBallParams.width / 2);
+        mBallParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mBallParams.width);
         mBallParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - mBallParams.width / 2);
 
         updateBallPos();
@@ -856,11 +1026,9 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     private void updateBallInLandscape() {
 
-        int screenWidth = DensityUtil.getScreenWidth(mContext);
-        int screenHeight = DensityUtil.getScreenHeight(mContext);
 
-        mBallParams.x = screenWidth - mBallParams.width;
-        mBallParams.y = screenHeight / 2 - mBallParams.width / 2;
+        mBallParams.x = mPreferences.getInt("ballWmParamsX_ls", FloatingBallUtils.getScreenWidth() - mBallParams.width);
+        mBallParams.y = mPreferences.getInt("ballWmParamsY_ls", FloatingBallUtils.getScreenHeight() / 2 - mBallParams.width / 2);
 
         updateBallPos();
         doIfBallRight();
@@ -901,15 +1069,37 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     }
 
-    public void newNotification(String pkg,int notifyId){
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void newNotification(String pkg, int notifyId, Icon icon){
 
-        NotificationInfo notify = new NotificationInfo(pkg,notifyId);
+        NotificationInfo notify = new NotificationInfo(pkg,notifyId,icon!=null?icon.loadDrawable(mContext):null);
 
         mNotifyStack.push(notify);
 
-        Drawable notifyIcon = AppUtils.getAppIcon(pkg);
+        if(mIsHalfHide){
+
+            showFromEdge();
+
+            resetHalfHideTime();
+        }
+
+        Drawable notifyIcon = null;
+
+        if(icon != null){
+
+          notifyIcon = icon.loadDrawable(mContext);
+
+
+        }else {
+
+
+            notifyIcon    = AppUtils.getAppIcon(pkg);
+
+        }
+
 
         if(notifyIcon != null){
+
 
             mBallView.showNotification(notifyIcon);
         }
@@ -935,7 +1125,18 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
             NotificationInfo notify = mNotifyStack.getTop();
 
-            Drawable notifyIcon = AppUtils.getAppIcon(notify.getPkg());
+            Drawable notifyIcon = null;
+
+            if(notify.getIcon()!= null){
+
+                notifyIcon = notify.getIcon();
+
+            }else {
+
+                notifyIcon = AppUtils.getAppIcon(notify.getPkg());
+            }
+
+
 
             if(notifyIcon != null){
 
@@ -1040,5 +1241,30 @@ public class FloatViewManager implements BallView.OnBallEventListener,
     public boolean isAvoidKeyboard(){
 
         return mIsAvoidKeyboard;
+    }
+
+    public void setHalfHide(boolean halfHide) {
+
+        mHalfHideMode = halfHide;
+
+        if(halfHide){
+
+            mHandler.sendEmptyMessageDelayed(Config.HALF_HIDE,5000);
+
+        }else {
+
+            if(mHandler.hasMessages(Config.HALF_HIDE)){
+
+                mHandler.removeMessages(Config.HALF_HIDE);
+            }
+
+            showFromEdge();
+        }
+
+    }
+
+    public boolean isHalfHideMode() {
+
+        return mHalfHideMode;
     }
 }

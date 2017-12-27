@@ -45,6 +45,7 @@ import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.jenzz.materialpreference.SwitchPreference;
 import com.orm.SugarRecord;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.io.IOException;
@@ -63,11 +64,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private SwitchPreference mToEdgeSwitch;
     private SwitchPreference mLockScreenSwitch;
     private SwitchPreference mAutoMoveSwitch;
-    private SwitchPreference mAutoStartSwitch;
+   // private SwitchPreference mAutoStartSwitch;
     private SwitchPreference mVibratorSwitch;
     private SwitchPreference mFeedbackSwitch;
     private SwitchPreference mAutoHideSwitch;
     private SwitchPreference mHideAreaSwitch;
+    private SwitchPreference mHalfHideSwitch;
     private com.jenzz.materialpreference.Preference mGestureSetting;
     private com.jenzz.materialpreference.Preference mAppSetting;
     private com.jenzz.materialpreference.Preference mNotifySetting;
@@ -81,7 +83,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
     private DevicePolicyManager mDeviceManager;
     private ComponentName mComponentName;
     private OnSettingClickListener mClickListener;
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
     private SharedPreferences mSharePreferences;
 
     private Context mContext;
@@ -158,12 +160,15 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
         mLockScreenSwitch.setOnPreferenceChangeListener(this);
         mAutoMoveSwitch = (SwitchPreference) findPreference("autoMoveSwitch");
         mAutoMoveSwitch.setOnPreferenceChangeListener(this);
-        mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
-        mAutoStartSwitch.setOnPreferenceChangeListener(this);
+        //mAutoStartSwitch = (SwitchPreference) findPreference("autoStartSwitch");
+        //mAutoStartSwitch.setOnPreferenceChangeListener(this);
         mAutoHideSwitch = (SwitchPreference) findPreference("autoHideSwitch");
         mAutoHideSwitch.setOnPreferenceChangeListener(this);
         mHideAreaSwitch = (SwitchPreference) findPreference("hideAreaSwitch");
         mHideAreaSwitch.setOnPreferenceChangeListener(this);
+        mHalfHideSwitch = (SwitchPreference) findPreference("halfHideSwitch");
+        mHalfHideSwitch.setOnPreferenceChangeListener(this);
+
         mGestureSetting = (com.jenzz.materialpreference.Preference) findPreference("gestureSetting");
         mGestureSetting.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -534,11 +539,23 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             case "toEdgeSwitch":
                 toEdgeChange((boolean) newValue);
                 break;
+            case "halfHideSwitch":
+                halfHideChange((boolean) newValue);
+                break;
             case "lockScreenSwitch":
                 lockScreenChange((boolean) newValue);
                 break;
             case "autoMoveSwitch":
-                if(Build.VERSION.SDK_INT > 18){
+                if(Build.VERSION.SDK_INT >25){
+
+                    if((boolean)newValue) {
+
+                        Toast.makeText(mContext, "安卓8.0系统目前无法使用避让功能！", Toast.LENGTH_SHORT).show();
+
+                        return false;
+                    }
+
+                }else if(Build.VERSION.SDK_INT > 18){
 
                     autoMoveChange((boolean) newValue);
 
@@ -552,9 +569,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 }
 
                 break;
-            case "autoStartSwitch":
+            /*case "autoStartSwitch":
                 autoStartChange((boolean) newValue);
-                break;
+                break;*/
             case "autoHideSwitch":
                 autoHideChange((boolean) newValue);
                 break;
@@ -568,6 +585,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
 
         return true;
+    }
+
+    private void halfHideChange(boolean newValue) {
+
+        mPreferences.put("halfHideSwitch",newValue);
+
+        sendMsg(Config.HALF_HIDE_SWITCH,"halfHide",newValue);
     }
 
     private void hideAreaChange(boolean newValue) {
@@ -661,11 +685,11 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     }
 
-    private void autoStartChange(boolean newValue) {
+    /*private void autoStartChange(boolean newValue) {
 
         mPreferences.put("autoStartSwitch", newValue);
 
-    }
+    }*/
 
     private void lockScreenChange(boolean newValue) {
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 import com.ogaclejapan.arclayout.ArcLayout;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ public class MenuViewProxy implements View.OnClickListener {
     private Context mContext;
     private View mMenuView;
     private WindowManager.LayoutParams mWinLayoutParams;
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
     private boolean mIsBallRight;
     private OnMenuItemClickListener mItemClickListener;
     private CircleImageView mMenuA;
@@ -359,10 +361,16 @@ public class MenuViewProxy implements View.OnClickListener {
 
         mWinLayoutParams = new WindowManager.LayoutParams();
 
-        mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        }else {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+        }
+
+        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mWinLayoutParams.width = MENU_WINDOW_WIDTH;

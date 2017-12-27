@@ -4,7 +4,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.os.Build;
+import android.os.Parcelable;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.RequiresApi;
@@ -84,7 +86,17 @@ public class NotificationService extends NotificationListenerService {
 
                 mNotificationArray.put(validSbn.getId(),validSbn);
 
-                notifyNewNotify(validSbn);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+
+                    Icon icon = validSbn.getNotification().getLargeIcon();
+
+                    notifyNewNotify(validSbn,icon);
+
+                }else {
+
+                    notifyNewNotify(validSbn,null);
+                }
+
             }
 
         }
@@ -207,11 +219,12 @@ public class NotificationService extends NotificationListenerService {
         startService(intent);
     }
 
-    public  void notifyNewNotify(StatusBarNotification sbn) {
+    public  void notifyNewNotify(StatusBarNotification sbn, Parcelable icon) {
         Intent intent = new Intent();
         intent.putExtra("what",Config.NEW_NOTIFICATION);
         intent.putExtra("notifyId",sbn.getId());
         intent.putExtra("pkg",sbn.getPackageName());
+        if(icon != null)intent.putExtra("icon",icon);
         intent.setClass(this, FloatService.class);
         startService(intent);
     }

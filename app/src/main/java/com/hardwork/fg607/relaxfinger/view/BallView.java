@@ -2,10 +2,10 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +13,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -25,9 +24,8 @@ import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
 
+import net.grandcentrix.tray.AppPreferences;
 import net.grandcentrix.tray.TrayAppPreferences;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by fg607 on 16-11-24.
@@ -67,11 +65,10 @@ public class BallView extends View {
     private boolean mCanMove = true;
     private boolean mHasScrolled = false;
     private boolean mHasMoved = false;
-    private TrayAppPreferences mPreferences;
+    private AppPreferences mPreferences;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWinLayoutParams;
     private LinearLayout mParentLayout;
-    private LinearLayout.LayoutParams mLayoutParams;
 
     private ScaleAnimation mZoomInAnim;
     private ScaleAnimation mZoomOutAnim;
@@ -334,21 +331,27 @@ public class BallView extends View {
     private void initParentLayout() {
 
         mParentLayout = new InnerLinearLayout(mContext);
-
-        mLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     private void initLayoutParams() {
 
         mWinLayoutParams = new WindowManager.LayoutParams();
 
-        mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        }else {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+        }
+
+
+
+        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
-        mWinLayoutParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mSize / 2 );
+        mWinLayoutParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mSize);
         mWinLayoutParams.y = mPreferences.getInt("ballWmParamsY", FloatingBallUtils.getScreenHeight() / 2 - mSize / 2);
 
         mWinLayoutParams.width = mSize;
@@ -372,6 +375,7 @@ public class BallView extends View {
         setScaleX(1);
         setScaleY(1);
         getBackground().setAlpha(mAlpha);
+
     }
 
     @Override
@@ -380,6 +384,7 @@ public class BallView extends View {
         switch (event.getAction()){
 
             case MotionEvent.ACTION_DOWN:
+
                 touchDownFeedback();
                 //判断是否双击
                 boolean hadTapMessage = mHandler.hasMessages(SINGLE_TAP);
@@ -482,6 +487,7 @@ public class BallView extends View {
                 }
 
                 mGestureActive = false;
+
                 break;
             default:
                 touchUpFeedback();
@@ -622,6 +628,6 @@ public class BallView extends View {
             }
 
         }
-    }
 
+    }
 }

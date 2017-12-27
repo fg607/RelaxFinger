@@ -1,9 +1,12 @@
 package com.hardwork.fg607.relaxfinger;
 
 import android.app.Application;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.hardwork.fg607.relaxfinger.service.FloatJobService;
 import com.orm.SugarApp;
 import com.orm.SugarContext;
 

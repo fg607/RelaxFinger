@@ -2,7 +2,10 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -24,13 +27,21 @@ public class BackgroundView extends View {
         mContext = context;
 
         init();
+
     }
 
     private void init() {
 
         mWinLayoutParams = new WindowManager.LayoutParams();
 
-        mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        }else {
+
+            mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
+        }
 
         mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;

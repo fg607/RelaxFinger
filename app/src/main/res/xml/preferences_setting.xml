@@ -42,6 +42,13 @@
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="false"
+        android:key="halfHideSwitch"
+        android:summaryOff="空闲半隐藏模式已关闭"
+        android:summaryOn="无操作5秒悬浮球将贴边半隐藏"
+        android:title="空闲半隐藏模式" />
+
+    <com.jenzz.materialpreference.SwitchPreference
+        android:defaultValue="false"
         android:key="autoMoveSwitch"
         android:summaryOff="自动避让已关闭"
         android:summaryOn="自动避让已开启"
@@ -53,12 +60,12 @@
         android:summaryOn="锁屏功能已开启"
         android:title="开启锁屏" />
 
-    <com.jenzz.materialpreference.SwitchPreference
+   <!-- <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="true"
         android:key="autoStartSwitch"
         android:summaryOff="重启后需手动开启悬浮球!"
         android:summaryOn="悬浮球随开机启动"
-        android:title="开机启动" />
+        android:title="开机启动" />-->
 
     <com.jenzz.materialpreference.SwitchPreference
         android:defaultValue="false"

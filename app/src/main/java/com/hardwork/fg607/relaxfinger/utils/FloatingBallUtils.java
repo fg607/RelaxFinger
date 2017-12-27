@@ -50,7 +50,7 @@ import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
 import com.hardwork.fg607.relaxfinger.view.CombinationImageView;
 import com.hardwork.fg607.relaxfinger.view.ScreenshotActivity;
 
-import net.grandcentrix.tray.TrayAppPreferences;
+import net.grandcentrix.tray.AppPreferences;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,7 +73,7 @@ public class FloatingBallUtils {
     public static Bitmap bitmap;
     public static Context context = MyApplication.getApplication();
 
-    public static final TrayAppPreferences multiProcessPreferences = new TrayAppPreferences(context);
+    public static final AppPreferences multiProcessPreferences = new AppPreferences(context);
     public static SharedPreferences sp = getSharedPreferences();
     public static AudioManager mAudioManager=null;
     public static WindowManager sWindowManager = null;
@@ -101,7 +101,7 @@ public class FloatingBallUtils {
         return PreferenceManager.getDefaultSharedPreferences(context);
 
     }
-    public static TrayAppPreferences getMultiProcessPreferences(){
+    public static AppPreferences getMultiProcessPreferences(){
 
         return multiProcessPreferences;
     }

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -522,21 +523,22 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 				(int) dst_right, (int) dst_bottom);
 		final RectF rectF = new RectF(dst);
 
+		canvas.drawARGB(0, 0, 0, 0);
+
 		paint.setAntiAlias(true);
 		paint.setFilterBitmap(true);
 		paint.setDither(true);
-
-		canvas.drawARGB(0, 0, 0, 0);
-
-
 		paint.setColor(color);
+
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+
 		canvas.drawBitmap(bitmap, src, dst, paint);
 
+
 		//加白边
-		final int bordercolor = 0x7f171717;
+		/*final int bordercolor = 0x7f171717;
 		Paint mBorderPaint = new Paint();
 		mBorderPaint.setStyle(Paint.Style.STROKE);
 		mBorderPaint.setAntiAlias(true);
@@ -544,7 +546,7 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		mBorderPaint.setStrokeWidth(10);
 		mBorderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		float mBorderRadius = Math.min((float) width / 2 - 30, (float) height / 2 - 30);
-	//	canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);
+		canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);*/
 
 		//加阴影
 		final int shadercolor = 0x00ffffff;
