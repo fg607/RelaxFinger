@@ -31,7 +31,7 @@ public class Config {
     public static final int SCREEN_ON = 24;
     public static final int HIDE_TO_NOTIFYBAR = 25;
     public static final int AUTO_MOVE_SWITCH = 26;
-    public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.showFloatBall";
+    public static final String ACTION_SHOW_FLOATBALL = "com.hardwork.fg607.relaxfinger.showFloatBall";
     public static final int HIDE_AREA_SWITCH = 27;
     public static final int AUTO_HIDE_SWITCH = 28;
     public static final int HALF_HIDE_SWITCH = 39;
@@ -49,4 +49,5 @@ public class Config {
     public static final int FROM_HIDE_APP = 203;
     public static final int HALF_HIDE = 38;
 
+    public static final int TEMP_MOVE = 40;
 }

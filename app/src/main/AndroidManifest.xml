@@ -55,6 +55,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -118,8 +119,10 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.Transparent" />
-        <activity android:name=".view.ClipImageActivity" />
-        <activity android:name=".view.AppChooseActivity" />
+        <activity android:name=".view.ClipImageActivity"
+            android:excludeFromRecents="true"/>
+        <activity android:name=".view.AppChooseActivity"
+            android:excludeFromRecents="true"/>
 
         <service
             android:name=".service.FloatJobService"

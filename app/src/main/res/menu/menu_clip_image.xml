@@ -8,6 +8,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:showAsAction="always"
-        android:icon="@drawable/pic_ok"
-        android:title="设置" />
+        android:title="完成" />
 </menu>

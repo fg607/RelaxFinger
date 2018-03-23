@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.SettingActivity;
+import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
 
 import java.util.List;
 
@@ -31,23 +33,40 @@ public class AccessibilityUtil {
     public static AccessibilityManager mAccessibilityManger;
 
     public static boolean checkAccessibility() {
-
-
-        if(mAccessibilityManger == null){
-
-            mAccessibilityManger = (AccessibilityManager)context.getSystemService(ACCESSIBILITY_SERVICE);
+        int accessibilityEnabled = 0;
+        final String service = context.getPackageName() + "/" + NavAccessibilityService.class.getCanonicalName();
+        boolean accessibilityFound = false;
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(
+                    context.getApplicationContext().getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e("ACBU","Error finding setting, default accessibility to not found: "
+                    + e.getMessage());
         }
 
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
-        List<AccessibilityServiceInfo> mList = mAccessibilityManger.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
+        if (accessibilityEnabled == 1) {
+            String settingValue = Settings.Secure.getString(
+                    context.getApplicationContext().getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                TextUtils.SimpleStringSplitter splitter = mStringColonSplitter;
+                splitter.setString(settingValue);
+                while (splitter.hasNext()) {
+                    String accessabilityService = splitter.next();
 
-        for (int i = 0; i < mList.size(); i++) {
-            if ("com.hardwork.fg607.relaxfinger/.service.NavAccessibilityService".equals(mList.get(i).getId())) {
-                return true;
+                    if (accessabilityService.equalsIgnoreCase(service)) {
+                        return true;
+                    }
+                }
             }
+        } else {
+            Log.i("ACBU","***ACCESSIBILIY IS DISABLED***");
         }
 
-        return false;
+        return accessibilityFound;
     }
 
     public static void openSettingActivity() {

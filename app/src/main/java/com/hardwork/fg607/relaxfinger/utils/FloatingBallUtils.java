@@ -538,6 +538,7 @@ public class FloatingBallUtils {
         ToolInfo back = new ToolInfo(context.getResources().getDrawable(R.drawable.back),"返回键");
         ToolInfo home = new ToolInfo(context.getResources().getDrawable(R.drawable.home),"Home键");
         ToolInfo appSwitch = new ToolInfo(context.getResources().getDrawable(R.drawable.app_switch),"最近任务键");
+        ToolInfo tempMove = new ToolInfo(context.getResources().getDrawable(R.drawable.temp_move),"临时移动");
 
         toolList.add(back);
         toolList.add(home);
@@ -553,6 +554,8 @@ public class FloatingBallUtils {
             toolList.add(settingPanel);
             toolList.add(screenShot);
         }
+
+        toolList.add(tempMove);
 
         toolList.add(rotation);
         toolList.add(bluetooth);
@@ -633,6 +636,9 @@ public class FloatingBallUtils {
                 break;
             case "快速设置":
                 icon = context.getResources().getDrawable(R.drawable.switch_setting);
+                break;
+            case "临时移动":
+                icon = context.getResources().getDrawable(R.drawable.temp_move);
                 break;
             default:
                 break;
@@ -811,11 +817,21 @@ public class FloatingBallUtils {
                     }
                 }).start();
                 break;
-
+            case "临时移动":
+                tempMove();
+                break;
             default:
                 break;
         }
 
+    }
+
+    private static void tempMove() {
+
+        Intent intent = new Intent();
+        intent.putExtra("what", Config.TEMP_MOVE);
+        intent.setClass(context, FloatService.class);
+        context.startService(intent);
     }
 
     public static void hideToNotifybar() {

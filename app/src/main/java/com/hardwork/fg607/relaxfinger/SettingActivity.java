@@ -448,7 +448,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -482,19 +482,13 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.2.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.支持安卓8.0系统。\r\n" +
-                "2.收到QQ微信消息时小球会变成好友头像。\r\n" +
-                "3.添加保存悬浮球横屏位置。\r\n" +
-                "4.添加空闲半隐藏模式(无操作5秒后悬浮球会隐藏到屏幕边缘，只显示一半)。\r\n"+
-                "5.删除开机自启开关，默认开机自启。"+
-                "6.提高开机自启速度和后台服务生存能力。"+
-                "7.删除弹出权限框时悬浮球自动隐藏的功能。\r\n" +
-                "8.修复某些情况下悬浮球被其他窗口遮挡的问题。\r\n"+
-                "9.修复其他已知bug。\r\n"+
+                "1.进入临时移动模式悬浮球会变成飞碟主题。\r\n" +
+                "2.修复避让软键盘位置过高的问题。\r\n"+
+                "3.修复其他细节问题。"+
                 "");
         dialog.show();
 

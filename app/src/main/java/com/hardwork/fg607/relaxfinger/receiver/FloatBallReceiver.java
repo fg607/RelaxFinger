@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.service.FloatService;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;

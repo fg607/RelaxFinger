@@ -116,7 +116,6 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     public FloatViewManager(Context context) {
 
-
         mContext = context;
         mNotifyStack = new NotificationStack();
 
@@ -129,6 +128,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         updateHideAppList();
 
         if(mPreferences.getBoolean("floatSwitch", false)){
+
+
 
             showBall();
         }
@@ -597,6 +598,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     public void setBallSize(int ballSizePercent) {
 
+        showFromEdge();
+
         int ballSize = (int) (MIN_BALL_SIZE + (float) ((MAX_BALL_SIZE - MIN_BALL_SIZE) * ballSizePercent / 100));
 
         mBallView.setBallSize(ballSize);
@@ -606,6 +609,11 @@ public class FloatViewManager implements BallView.OnBallEventListener,
         updateBallPos();
 
         doIfMoveToEdge();
+
+        if(isHalfHideMode()){
+
+            resetHalfHideTime();
+        }
 
     }
 
@@ -862,6 +870,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
                 avoidKeyboard();
 
                 changeBallToFree();
+
+                mBallView.setAutoMoveTheme(true);
             }
 
         } else {
@@ -869,6 +879,8 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             if (mIsBallFree) {
 
                 changeBallToOrigin();
+
+                mBallView.setAutoMoveTheme(false);
 
                 if(mHalfHideMode){
 
@@ -930,7 +942,7 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
         WindowManager.LayoutParams params = mBallView.getWindowLayoutParams();
 
-        int y = (int) (DensityUtil.getScreenHeight(mContext) / 2 - params.width * 1.5);
+        int y = (int) (DensityUtil.getScreenHeight(mContext) / 2 - params.width /2);
 
         if (params.y > y) {
 
@@ -1069,10 +1081,23 @@ public class FloatViewManager implements BallView.OnBallEventListener,
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void newNotification(String pkg, int notifyId, Icon icon){
+    public void newNotification(String pkg, int notifyId, Object icon){
 
-        NotificationInfo notify = new NotificationInfo(pkg,notifyId,icon!=null?icon.loadDrawable(mContext):null);
+
+        Drawable notifyIcon = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && icon != null) {
+
+            notifyIcon = ((Icon) icon).loadDrawable(mContext);
+
+        } else {
+
+
+            notifyIcon = AppUtils.getAppIcon(pkg);
+
+        }
+
+        NotificationInfo notify = new NotificationInfo(pkg,notifyId,notifyIcon);
 
         mNotifyStack.push(notify);
 
@@ -1081,20 +1106,6 @@ public class FloatViewManager implements BallView.OnBallEventListener,
             showFromEdge();
 
             resetHalfHideTime();
-        }
-
-        Drawable notifyIcon = null;
-
-        if(icon != null){
-
-          notifyIcon = icon.loadDrawable(mContext);
-
-
-        }else {
-
-
-            notifyIcon    = AppUtils.getAppIcon(pkg);
-
         }
 
 

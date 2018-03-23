@@ -34,6 +34,10 @@ public class MyApplication extends SugarApp {
         mMainLooper = getMainLooper();
         mInstance = this;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            FloatJobService.scheduleService(this.getApplicationContext());
+        }
         //mMainThread.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
     }
 

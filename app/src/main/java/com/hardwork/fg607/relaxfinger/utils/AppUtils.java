@@ -444,12 +444,13 @@ public class AppUtils {
         //i=1因为第一个是当前应用
         for(int i = 1;i<queryUsageStats.size();i++){
 
+
             packageName = queryUsageStats.get(i).getPackageName();
 
             Intent intent = pm.getLaunchIntentForPackage(packageName);
 
            if(intent != null && !packageName.equals("com.hardwork.fg607.relaxfinger")
-                   && !packageName.contains("input")
+                   && !packageName.contains("input") && !packageName.contains("com.android.systemui")
                    && !packageName.contains("keyboard") && !packageName.contains("launcher")){
 
                //Log.i("usage",packageName);

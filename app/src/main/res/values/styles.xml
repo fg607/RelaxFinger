@@ -28,6 +28,7 @@
     </style>
 
     <style name="BottomDialog" parent="AppTheme">
+        <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <!-- Dialog进入及退出动画 -->

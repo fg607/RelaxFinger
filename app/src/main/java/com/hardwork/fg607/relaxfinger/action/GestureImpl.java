@@ -1,23 +1,13 @@
 package com.hardwork.fg607.relaxfinger.action;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
-import android.os.Handler;
 import android.os.Parcelable;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 import android.widget.Toast;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.manager.FloatViewManager;
-import com.hardwork.fg607.relaxfinger.model.HideAppInfo;
 import com.hardwork.fg607.relaxfinger.model.MenuDataSugar;
-import com.hardwork.fg607.relaxfinger.service.FloatService;
 import com.hardwork.fg607.relaxfinger.service.NavAccessibilityService;
 import com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
@@ -26,10 +16,8 @@ import com.hardwork.fg607.relaxfinger.view.MenuViewProxy;
 import com.orm.SugarRecord;
 
 import net.grandcentrix.tray.AppPreferences;
-import net.grandcentrix.tray.TrayAppPreferences;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -92,7 +80,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             mCurrentFuncList.add(mPreferences.getString("longPress", "移动(固定)悬浮球"));
             mCurrentFuncList.add(mPreferences.getString("swipeUp", "通知栏"));
             mCurrentFuncList.add(mPreferences.getString("swipeDown", "Home键"));
-            mCurrentFuncList.add(mPreferences.getString("swipeLeft", "快捷应用"));
+            mCurrentFuncList.add(mPreferences.getString("swipeLeft", "快捷菜单"));
             mCurrentFuncList.add(mPreferences.getString("swipeRight", "隐藏悬浮球"));
         } else {
             mCurrentFuncList.set(SINGLE_TAP, mPreferences.getString("click", "返回键"));
@@ -100,7 +88,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             mCurrentFuncList.set(LONGPRESS, mPreferences.getString("longPress", "移动(固定)悬浮球"));
             mCurrentFuncList.set(SWIPE_UP, mPreferences.getString("swipeUp", "通知栏"));
             mCurrentFuncList.set(SWIPE_DOWN, mPreferences.getString("swipeDown", "Home键"));
-            mCurrentFuncList.set(SWIPE_LEFT, mPreferences.getString("swipeLeft", "快捷应用"));
+            mCurrentFuncList.set(SWIPE_LEFT, mPreferences.getString("swipeLeft", "快捷菜单"));
             mCurrentFuncList.set(SWIPE_RIGHT, mPreferences.getString("swipeRight", "隐藏悬浮球"));
         }
 
@@ -116,7 +104,6 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
     @Override
     public void onSingleTap() {
-
 
         if(!mIsDoubletapNone){
 
@@ -284,7 +271,17 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
         checkFeedback();
 
-        if(!mManager.isHalfHideMode() || !mManager.showFromEdge()){
+        //显示通知时左滑忽略通知
+        if(mManager.hasNotification()){
+
+            mManager.ignoreNotification();
+            mManager.showNextNotify();
+
+            return;
+
+        }
+
+        if(!mManager.showFromEdge()){
 
             executeAction(mCurrentFuncList.get(SWIPE_LEFT));
         }
@@ -299,7 +296,18 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
     public void onScrollRight() {
 
         checkFeedback();
-        if(!mManager.isHalfHideMode() || !mManager.showFromEdge()){
+
+        //显示通知时右滑忽略通知
+        if(mManager.hasNotification()){
+
+            mManager.ignoreNotification();
+            mManager.showNextNotify();
+
+            return;
+
+        }
+
+        if(!mManager.showFromEdge()){
 
             executeAction(mCurrentFuncList.get(SWIPE_RIGHT));
         }
@@ -343,7 +351,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
     private boolean checkAccessibility(){
 
-        return NavAccessibilityService.instance == null?false:true;
+        return AccessibilityUtil.checkAccessibility();
     }
 
     private void executeAction(String action){
@@ -355,7 +363,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
             case "临时移动":
                 mManager.setFloatAutoMove(true);
                 break;
-            case "快捷应用":
+            case "快捷菜单":
                 if (mManager.isExistMenuItem()) {
 
                     mManager.popUpMenu();

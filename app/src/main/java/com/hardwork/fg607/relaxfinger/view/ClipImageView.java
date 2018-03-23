@@ -3,7 +3,9 @@ package com.hardwork.fg607.relaxfinger.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -15,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -34,7 +37,7 @@ import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
  * @author AC
  *
  */
-public class ClipImageView extends ImageView implements View.OnTouchListener,
+public class ClipImageView extends AppCompatImageView implements View.OnTouchListener,
 		ViewTreeObserver.OnGlobalLayoutListener {
 
 	private static final int BORDERDISTANCE = ClipView.BORDERDISTANCE;
@@ -512,19 +515,21 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 			dst_bottom = height;
 		}
 
-		Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
+		Bitmap output = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
 
 		final int color = 0xff424242;
-		final Paint paint = new Paint();
+
 		final Rect src = new Rect((int) left, (int) top, (int) right,
 				(int) bottom);
 		final Rect dst = new Rect((int) dst_left, (int) dst_top,
 				(int) dst_right, (int) dst_bottom);
 		final RectF rectF = new RectF(dst);
 
+		Canvas canvas = new Canvas(output);
+
 		canvas.drawARGB(0, 0, 0, 0);
 
+		final Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setFilterBitmap(true);
 		paint.setDither(true);
@@ -537,19 +542,8 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		canvas.drawBitmap(bitmap, src, dst, paint);
 
 
-		//加白边
-		/*final int bordercolor = 0x7f171717;
-		Paint mBorderPaint = new Paint();
-		mBorderPaint.setStyle(Paint.Style.STROKE);
-		mBorderPaint.setAntiAlias(true);
-		mBorderPaint.setColor(bordercolor);
-		mBorderPaint.setStrokeWidth(10);
-		mBorderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-		float mBorderRadius = Math.min((float) width / 2 - 30, (float) height / 2 - 30);
-		canvas.drawCircle(width/ 2, height / 2, mBorderRadius, mBorderPaint);*/
-
 		//加阴影
-		final int shadercolor = 0x00ffffff;
+		final int shadercolor = 0x60746c6c;
 		Paint mShaderPaint = new Paint();
 		mShaderPaint.setStyle(Paint.Style.STROKE);
 		mShaderPaint.setAntiAlias(true);
@@ -560,6 +554,8 @@ public class ClipImageView extends ImageView implements View.OnTouchListener,
 		mShaderPaint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		float mShaderRadius = Math.min( width / 2 - strokeWidth/2, height / 2 -strokeWidth/2);
 		canvas.drawCircle(width / 2,  height / 2, mShaderRadius, mShaderPaint);
+
+
 		return output;
 	}
 }

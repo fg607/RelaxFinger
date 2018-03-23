@@ -1,6 +1,5 @@
 package com.hardwork.fg607.relaxfinger.view;
 
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -15,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -110,6 +110,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
     static String mCurrentMenu;
     static HashMap<String, MenuDataSugar> currentMenuMap = null;
+    static HashMap<String, MenuDataSugar> currentMenuMapTemp = null;
     static ArrayList<AppInfo> appList = null;
     static ArrayList<ToolInfo> toolList = null;
     static ArrayList<ShortcutInfo> shortcutList = null;
@@ -482,6 +483,28 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                 mDilagView = inflater.inflate(R.layout.function_dialog_layout, null);
 
+                FloatingActionButton fab = mDilagView.findViewById(R.id.fab);
+
+                fab.setOnClickListener(view -> {
+
+                            getDialog().hide();
+
+                            //更新菜单内容
+                            currentMenuMap.clear();
+
+                            for (String key : currentMenuMapTemp.keySet()) {
+
+                                currentMenuMap.put(key, currentMenuMapTemp.get(key));
+                            }
+
+
+                            mClickListener.onOperateFinish();
+
+                            currentMenuMapTemp.clear();
+                        }
+                );
+
+
                 ButterKnife.bind(this, mDilagView);
             }
 
@@ -493,7 +516,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             dialog.setCanceledOnTouchOutside(false);
 
-            dialog.setTitle("选择快捷功能");
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
             dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                 @Override
@@ -503,13 +526,7 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
                         getDialog().hide();
 
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                mClickListener.onOperateFinish();
-                            }
-                        });
+                        currentMenuMapTemp.clear();
 
                         return true;
                     }
@@ -545,14 +562,13 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
 
             // 设置宽度为屏宽、靠近屏幕底部。
             Window window = dialog.getWindow();
-            WindowManager.LayoutParams wlp = window.getAttributes();
-            wlp.gravity = Gravity.BOTTOM;
-            wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            window.setAttributes(wlp);
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.gravity = Gravity.BOTTOM;
+            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(params);
 
             return dialog;
         }
-
 
         private void setOperateFinishListener(OnOperateFinishListener listener) {
 
@@ -606,6 +622,10 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                 mShortcutAdapter.notifyDataSetChanged();
             }
 
+            if(currentMenuMap!=null){
+
+                currentMenuMapTemp = (HashMap<String, MenuDataSugar>) currentMenuMap.clone();
+            }
 
         }
 
@@ -680,16 +700,12 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
                                         name, 2, action,null);
 
-                                currentMenuMap.put(action, data);
-                                sMenuChoosedList.add(action);
+                                currentMenuMapTemp.put(action, data);
 
                             } else {
 
-                                currentMenuMap.remove(action);
-                                sMenuChoosedList.remove(action);
+                                currentMenuMapTemp.remove(action);
                             }
-
-                            mShortcutAdapter.setShortcutChecked(sMenuChoosedList);
 
                         }
                     });
@@ -756,15 +772,11 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
                                         name, 1, name,null);
 
-                                currentMenuMap.put(name, data);
-                                sMenuChoosedList.add(name);
+                                currentMenuMapTemp.put(name, data);
                             } else {
 
-                                currentMenuMap.remove(name);
-                                sMenuChoosedList.remove(name);
+                                currentMenuMapTemp.remove(name);
                             }
-
-                            mToolAdapter.setToolChecked(sMenuChoosedList);
 
 
                         }
@@ -837,18 +849,14 @@ public class AppSettingFragment extends Fragment implements View.OnClickListener
                                 MenuDataSugar data = new MenuDataSugar(mCurrentMenu,
                                         name, 0, action,activity);
 
-                                currentMenuMap.put(action, data);
+                                currentMenuMapTemp.put(action, data);
 
-                                sMenuChoosedList.add(action);
 
                             } else {
 
-                                currentMenuMap.remove(action);
+                                currentMenuMapTemp.remove(action);
 
-                                sMenuChoosedList.remove(action);
                             }
-
-                            adapter.setAppChecked(sMenuChoosedList);
 
                         }
                     });

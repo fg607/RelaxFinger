@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Icon;
 import android.os.Build;
@@ -22,8 +23,11 @@ import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.action.GestureImpl;
 import com.hardwork.fg607.relaxfinger.manager.FloatViewManager;
 import com.hardwork.fg607.relaxfinger.model.Config;
+import com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.orm.SugarRecord;
+
+import net.grandcentrix.tray.AppPreferences;
 
 import java.util.List;
 
@@ -38,8 +42,6 @@ public class FloatService extends Service{
     private AccessibilityManager mAccessibilityManger;
     private Bundle mBundle;
     private BroadcastReceiver mReceiver;
-
-    public static FloatService instance = null;
 
     private Messenger mMessenger = new Messenger(new MyHandler());
 
@@ -119,8 +121,6 @@ public class FloatService extends Service{
     public void onCreate() {
         super.onCreate();
 
-        instance = this;
-
         mFloatManager = new FloatViewManager(this);
 
         mGestureImpl = new GestureImpl(mFloatManager);
@@ -128,6 +128,8 @@ public class FloatService extends Service{
         final IntentFilter filter = new IntentFilter();
 
         filter.addAction(Config.ACTION_SHOW_FLOATBALL);
+
+        final AppPreferences sp = FloatingBallUtils.getMultiProcessPreferences();
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -137,7 +139,7 @@ public class FloatService extends Service{
 
                 if(Config.ACTION_SHOW_FLOATBALL.equals(action)){
 
-                    if(FloatingBallUtils.getSharedPreferences().getBoolean("floatSwitch",false)){
+                    if(sp.getBoolean("floatSwitch",false)){
 
                         mFloatManager.recoveryFromNotifyBar();
                     }
@@ -148,12 +150,6 @@ public class FloatService extends Service{
         };
 
         registerReceiver(mReceiver, filter);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-            FloatJobService.scheduleService(this.getApplicationContext());
-            startService(new Intent(this.getApplicationContext(), FloatJobService.class));
-        }
 
     }
 
@@ -173,7 +169,7 @@ public class FloatService extends Service{
 
                     }else {
 
-                        if (!checkAccessibility()) {
+                        if (!AccessibilityUtil.checkAccessibility()) {
 
                             openSettingActivity();
                         }
@@ -199,7 +195,7 @@ public class FloatService extends Service{
                 case Config.NEW_NOTIFICATION:
                     String pkg = intent.getStringExtra("pkg");
                     int newId = intent.getIntExtra("notifyId",-1);
-                    Icon icon = intent.getParcelableExtra("icon");
+                    Object icon = intent.getParcelableExtra("icon");
                     mFloatManager.newNotification(pkg,newId,icon);
                     break;
                 case Config.CANCEL_NOTIFICATION:
@@ -215,6 +211,9 @@ public class FloatService extends Service{
                     break;
                 case Config.KEY_BACK_PRESSED:
                     mFloatManager.closeMenu();
+                    break;
+                case Config.TEMP_MOVE:
+                    mFloatManager.setFloatAutoMove(true);
                     break;
                 default:
                     break;
@@ -253,21 +252,6 @@ public class FloatService extends Service{
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    private boolean checkAccessibility() {
-
-        mAccessibilityManger = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-
-        List<AccessibilityServiceInfo> mList = mAccessibilityManger.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
-
-        for (int i = 0; i < mList.size(); i++) {
-            if ("com.hardwork.fg607.relaxfinger/.service.NavAccessibilityService".equals(mList.get(i).getId())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override

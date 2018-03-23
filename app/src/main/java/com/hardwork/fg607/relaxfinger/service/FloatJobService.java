@@ -1,5 +1,6 @@
 package com.hardwork.fg607.relaxfinger.service;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
@@ -9,8 +10,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
+
+import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class FloatJobService extends JobService {
@@ -18,24 +24,16 @@ public class FloatJobService extends JobService {
     private static final int JOB_ID = 1100;
 
     public FloatJobService() {
-    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return START_NOT_STICKY;
     }
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
 
-        if(FloatService.instance == null){
 
-            Intent intent = new Intent();
-            intent.setClass(this, FloatService.class);
-            startService(intent);
-        }
-
+        Intent intent = new Intent();
+        intent.setClass(this, FloatService.class);
+        startService(intent);
 
         return false;
     }

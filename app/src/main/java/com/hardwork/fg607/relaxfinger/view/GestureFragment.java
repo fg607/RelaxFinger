@@ -56,7 +56,7 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
         mLongPress.setSummary(mPreferences.getString("longPress","移动(固定)悬浮球"));
         mSwipeUp.setSummary(mPreferences.getString("swipeUp", "通知栏"));
         mSwipeDown.setSummary(mPreferences.getString("swipeDown", "Home键"));
-        mSwipeLeft.setSummary(mPreferences.getString("swipeLeft", "快捷应用"));
+        mSwipeLeft.setSummary(mPreferences.getString("swipeLeft", "快捷菜单"));
         mSwipeRight.setSummary(mPreferences.getString("swipeRight", "隐藏悬浮球"));
     }
 

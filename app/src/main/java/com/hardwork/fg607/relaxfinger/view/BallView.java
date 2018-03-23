@@ -2,7 +2,14 @@ package com.hardwork.fg607.relaxfinger.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -17,28 +24,31 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
+import com.yinglan.shadowimageview.RoundImageView;
+import com.yinglan.shadowimageview.ShadowImageView;
 
 import net.grandcentrix.tray.AppPreferences;
-import net.grandcentrix.tray.TrayAppPreferences;
 
 /**
  * Created by fg607 on 16-11-24.
  */
 
-public class BallView extends View {
+public class BallView extends RoundImageView {
 
     public static final String TAG = "BallView";
     public static final int MIN_BALL_ALPHA = 255;
     public static final int MAX_BALL_ALPHA = 10;
-    public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 30);
-    public static final int MAX_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 60);
+    public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 35);
+    public static final int MAX_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 70);
 
+    public static final int FEED_ZOOM = 10;
     public static final int SINGLE_TAP = 0;
     public static final int DOUBLE_TAP = 1;
     public static final int LONGPRESS = 2;
@@ -51,12 +61,13 @@ public class BallView extends View {
     public static final int QUICK_SINGLE_TAP = 9;
     public static final int MOVE_FINISH = 10;
 
-    public static final int TAP = 11;
     public static final int LONG_PRESS_TIMEOUT = 200;
 
     public static final int DOUBLE_TAP_TIMEOUT = 130;
     private static final int HOME_KEY_PRESSED = 11;
     private static final int RECENT_KEY_PRESSED = 12;
+    private static final int SET_ALPHA = 13;
+    private static final int FEEDBACK = 14;
 
     private Context mContext;
     private int mSize;
@@ -72,7 +83,6 @@ public class BallView extends View {
 
     private ScaleAnimation mZoomInAnim;
     private ScaleAnimation mZoomOutAnim;
-    private ScaleAnimation mFeedbackAnim;
 
     private OnGestureListener mGestureListener;
     private OnBallEventListener mBallEventListener;
@@ -123,7 +133,6 @@ public class BallView extends View {
                     if(mGestureListener != null) mGestureListener.onMove();
                     break;
                 case DOWN:
-                    //BallView.this.startAnimation(mFeedbackAnim);
                     if(mGestureListener != null) mGestureListener.onDown();
                     break;
                 case MOVE_FINISH:
@@ -134,6 +143,12 @@ public class BallView extends View {
                     break;
                 case RECENT_KEY_PRESSED:
                     if(mBallEventListener != null) mBallEventListener.onRecentKeyPressed();
+                    break;
+                case SET_ALPHA:
+                    getBackground().setAlpha(mAlpha);
+                    break;
+                case FEEDBACK:
+                    mParentLayout.setPadding(FEED_ZOOM,FEED_ZOOM,FEED_ZOOM,FEED_ZOOM);
                     break;
                 default:
                     break;
@@ -214,9 +229,12 @@ public class BallView extends View {
         mSize = mPreferences.getInt("ballsize", (MIN_BALL_SIZE + MAX_BALL_SIZE) / 2);
         mAlpha = mPreferences.getInt("ballalpha", (MIN_BALL_ALPHA + MAX_BALL_ALPHA) / 2);
         mTheme = mPreferences.getString("theme", "默认");
+
+
         setTheme(mTheme);
 
         initParentLayout();
+
         initLayoutParams();
         initAnimation();
 
@@ -235,10 +253,13 @@ public class BallView extends View {
                 setBackground(getResources().getDrawable(R.drawable.theme2));
                 break;
             case "主题三":
-                setBackground(getResources().getDrawable(R.drawable.theme3));
+               setBackground(getResources().getDrawable(R.drawable.theme3));
                 break;
             case "主题四":
                 setBackground(getResources().getDrawable(R.drawable.theme4));
+                break;
+            case "UFO":
+                setBackground(getResources().getDrawable(R.drawable.ufo));
                 break;
             case "自定义":
 
@@ -252,6 +273,7 @@ public class BallView extends View {
                 }else{
 
                     setBackground(getResources().getDrawable(R.drawable.theme1));
+
                     mPreferences.put("theme", "默认");
                 }
 
@@ -262,7 +284,11 @@ public class BallView extends View {
                 break;
         }
 
+
+
         getBackground().setAlpha(mAlpha);
+
+
     }
 
     public void showNotification(Drawable notifyIcon) {
@@ -277,6 +303,20 @@ public class BallView extends View {
         setTheme(mTheme);
     }
 
+    public void setAutoMoveTheme(boolean isAutoMove){
+
+        if(isAutoMove){
+
+            setBackground(getResources().getDrawable(R.drawable.ufo));
+
+            getBackground().setAlpha(mAlpha);
+
+        }else {
+
+            setTheme(mTheme);
+        }
+    }
+
     public void showNotifyAnim(){
 
         ObjectAnimator shakeAnim = FloatingBallUtils.shakeAnim(this,1.0f);
@@ -285,10 +325,6 @@ public class BallView extends View {
     }
 
     private void initAnimation() {
-
-        mFeedbackAnim = new ScaleAnimation(1,0.8f,1,0.8f,
-                Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-        mFeedbackAnim.setFillAfter(true);
 
         mZoomInAnim = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         mZoomInAnim.setDuration(100);
@@ -331,6 +367,10 @@ public class BallView extends View {
     private void initParentLayout() {
 
         mParentLayout = new InnerLinearLayout(mContext);
+
+        mParentLayout.setPadding(FEED_ZOOM,FEED_ZOOM,FEED_ZOOM,FEED_ZOOM);
+
+
     }
 
     private void initLayoutParams() {
@@ -346,9 +386,8 @@ public class BallView extends View {
             mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
         }
 
-
-
-        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mWinLayoutParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mSize);
@@ -365,16 +404,36 @@ public class BallView extends View {
         return mWinLayoutParams;
     }
 
+    private long lastTime = 0;
+
     private void touchDownFeedback() {
-        setScaleX(0.8f);
-        setScaleY(0.8f);
+
         getBackground().setAlpha(255);
+
+        mParentLayout.setPadding(0,0,0,0);
+
+
+        lastTime = System.currentTimeMillis();
+
+        if(mHandler.hasMessages(SET_ALPHA)){
+
+            mHandler.removeMessages(SET_ALPHA);
+        }
+        mHandler.sendEmptyMessageDelayed(SET_ALPHA,3000);
+
     }
 
     private void touchUpFeedback() {
-        setScaleX(1);
-        setScaleY(1);
-        getBackground().setAlpha(mAlpha);
+
+        if(System.currentTimeMillis()-lastTime < 50){
+
+            mHandler.sendEmptyMessageDelayed(FEEDBACK,20);
+
+
+        }else {
+
+            mParentLayout.setPadding(FEED_ZOOM,FEED_ZOOM,FEED_ZOOM,FEED_ZOOM);
+        }
 
     }
 
@@ -550,6 +609,7 @@ public class BallView extends View {
         mAlpha = alpha;
 
         getBackground().setAlpha(mAlpha);
+
 
     }
 

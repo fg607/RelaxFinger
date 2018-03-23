@@ -630,7 +630,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
         }catch (ActivityNotFoundException e){
 
-            e.printStackTrace();
+            Toast.makeText(mContext, "未找到通知权限界面，请手动打开读取通知权限！", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -785,14 +785,27 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
     @TargetApi(Build.VERSION_CODES.M)
     public void requestDrawOverLays() {
-        if (!Settings.canDrawOverlays(mActivity)) {
-            Toast.makeText(mContext, "悬浮助手需要开启在其他应用上层显示权限!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + mActivity.getPackageName()));
-            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-        }else {
 
-            activateFloatService();
+        try {
+
+            if (!Settings.canDrawOverlays(mActivity)) {
+                Toast.makeText(mContext, "悬浮助手需要开启在其他应用上层显示权限!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + mActivity.getPackageName()));
+                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+            }else {
+
+                activateFloatService();
+            }
+
+        }catch (Exception e){
+
+            e.printStackTrace();
+
+            Toast.makeText(mActivity, "没有找到在其他应用上层显示设置界面，请手动开启悬浮窗权限！", Toast.LENGTH_SHORT).show();
+
+
         }
+
     }
 
     public void sendMsg(int what, String name, int msg) {
