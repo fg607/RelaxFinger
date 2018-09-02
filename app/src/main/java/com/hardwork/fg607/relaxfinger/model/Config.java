@@ -50,4 +50,5 @@ public class Config {
     public static final int HALF_HIDE = 38;
 
     public static final int TEMP_MOVE = 40;
+    public static final int AS_DEAD = 41;
 }

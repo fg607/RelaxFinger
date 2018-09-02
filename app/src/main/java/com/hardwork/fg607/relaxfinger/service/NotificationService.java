@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
+import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.os.Parcelable;
 import android.service.notification.NotificationListenerService;
@@ -12,6 +13,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.inputmethod.InputMethodManager;
 
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.model.NotifyAppInfo;
@@ -42,6 +44,7 @@ public class NotificationService extends NotificationListenerService {
         sp = FloatingBallUtils.getSharedPreferences();
         mNotificationArray = new SparseArray<>();
         updateNotifyAppList();
+
     }
 
     private void updateNotifyAppList() {

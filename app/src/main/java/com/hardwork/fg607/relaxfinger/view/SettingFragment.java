@@ -546,7 +546,9 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 lockScreenChange((boolean) newValue);
                 break;
             case "autoMoveSwitch":
-                if(Build.VERSION.SDK_INT >25){
+
+                //8.0以后选择输入法不在通知栏显示,无法通过通知栏检测输入法状态
+                /*if(Build.VERSION.SDK_INT >25){
 
                     if((boolean)newValue) {
 
@@ -555,7 +557,8 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                         return false;
                     }
 
-                }else if(Build.VERSION.SDK_INT > 18){
+                }*/
+                if(Build.VERSION.SDK_INT > 18){
 
                     autoMoveChange((boolean) newValue);
 
@@ -739,10 +742,13 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
                 requestDrawOverLays();
 
-            }else {
+            }else{
 
                 activateFloatService();
+
             }
+
+
 
 
         }
@@ -1108,7 +1114,12 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }
 
         }else {
-            if(!mActivity.isAlertShowing()){
+
+            if(!checkAccessibility()){
+
+                mActivity.openAlertDialog();
+
+            }else{
 
                 mActivity.startFloatService();
                 mActivity.bindFloatService();

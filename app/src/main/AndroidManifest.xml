@@ -55,7 +55,6 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:excludeFromRecents="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -89,7 +88,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver
+     <!--   <receiver
             android:name=".receiver.ScreenOffAdminReceiver"
             android:description="@string/admin"
             android:label="@string/admin"
@@ -101,7 +100,7 @@
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
 
         <service
             android:name=".service.NotificationService"
@@ -119,16 +118,17 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.Transparent" />
-        <activity android:name=".view.ClipImageActivity"
-            android:excludeFromRecents="true"/>
-        <activity android:name=".view.AppChooseActivity"
-            android:excludeFromRecents="true"/>
+        <activity
+            android:name=".view.ClipImageActivity"
+            android:excludeFromRecents="true" />
+        <activity
+            android:name=".view.AppChooseActivity"
+            android:excludeFromRecents="true" />
 
         <service
             android:name=".service.FloatJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
-            android:process=":remote">
-        </service>
+            android:process=":remote"></service>
     </application>
 
 </manifest>

@@ -31,6 +31,8 @@ import net.grandcentrix.tray.AppPreferences;
 
 import java.util.List;
 
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.checkAccessibility;
+
 /**
  * Created by fg607 on 16-11-24.
  */
@@ -151,6 +153,8 @@ public class FloatService extends Service{
 
         registerReceiver(mReceiver, filter);
 
+
+
     }
 
     @Override
@@ -167,12 +171,6 @@ public class FloatService extends Service{
                         stopAccessibilityService();
                         stopSelf();
 
-                    }else {
-
-                        if (!AccessibilityUtil.checkAccessibility()) {
-
-                            openSettingActivity();
-                        }
                     }
                     break;
                 case Config.HIDE_BALL://屏幕截图隐藏悬浮球
@@ -214,6 +212,9 @@ public class FloatService extends Service{
                     break;
                 case Config.TEMP_MOVE:
                     mFloatManager.setFloatAutoMove(true);
+                    break;
+                case Config.AS_DEAD:
+                    openSettingActivity();
                     break;
                 default:
                     break;

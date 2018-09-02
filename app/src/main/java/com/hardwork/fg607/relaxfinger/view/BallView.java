@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,15 +25,10 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-
-import com.hardwork.fg607.relaxfinger.MyApplication;
 import com.hardwork.fg607.relaxfinger.R;
 import com.hardwork.fg607.relaxfinger.utils.DensityUtil;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 import com.hardwork.fg607.relaxfinger.utils.ImageUtils;
-import com.yinglan.shadowimageview.RoundImageView;
-import com.yinglan.shadowimageview.ShadowImageView;
 
 import net.grandcentrix.tray.AppPreferences;
 
@@ -40,13 +36,13 @@ import net.grandcentrix.tray.AppPreferences;
  * Created by fg607 on 16-11-24.
  */
 
-public class BallView extends RoundImageView {
+public class BallView extends View {
 
     public static final String TAG = "BallView";
     public static final int MIN_BALL_ALPHA = 255;
     public static final int MAX_BALL_ALPHA = 10;
-    public static final int MIN_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 35);
-    public static final int MAX_BALL_SIZE = DensityUtil.dip2px(MyApplication.getApplication(), 70);
+    public static final int MIN_BALL_SIZE = 105;
+    public static final int MAX_BALL_SIZE = 210;
 
     public static final int FEED_ZOOM = 10;
     public static final int SINGLE_TAP = 0;
@@ -293,7 +289,9 @@ public class BallView extends RoundImageView {
 
     public void showNotification(Drawable notifyIcon) {
 
-        setBackground(ImageUtils.toRoundDrawable(notifyIcon));
+        Drawable roundIcon = ImageUtils.toRoundDrawable(notifyIcon,DensityUtil.dip2px(mContext,mSize));
+
+        setBackground(roundIcon);
 
         showNotifyAnim();
     }
@@ -321,7 +319,11 @@ public class BallView extends RoundImageView {
 
         ObjectAnimator shakeAnim = FloatingBallUtils.shakeAnim(this,1.0f);
 
+        shakeAnim.setupEndValues();
+
         shakeAnim.start();
+
+
     }
 
     private void initAnimation() {
@@ -387,7 +389,7 @@ public class BallView extends RoundImageView {
         }
 
         mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mWinLayoutParams.x = mPreferences.getInt("ballWmParamsX", FloatingBallUtils.getScreenWidth() - mSize);
@@ -408,7 +410,7 @@ public class BallView extends RoundImageView {
 
     private void touchDownFeedback() {
 
-        getBackground().setAlpha(255);
+        getBackground().setAlpha(200);
 
         mParentLayout.setPadding(0,0,0,0);
 

@@ -1,13 +1,16 @@
 package com.hardwork.fg607.relaxfinger.service;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.inputmethod.InputMethodManager;
 
 
+import com.hardwork.fg607.relaxfinger.SettingActivity;
 import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
@@ -55,7 +58,24 @@ public class NavAccessibilityService extends AccessibilityService {
 
             notifyWindowChange(foregroundPackageName);
 
+            Log.i("float",accessibilityEvent.getClassName()+"");
+
+            //8.0以后选择输入法不在通知栏显示，此方法仅仅能识别输入法弹出事件，不能检测输入法关闭事件
+
+
+            if("android.inputmethodservice.SoftInputWindow".equals(accessibilityEvent.getClassName())){
+
+                notifyInputWindowShow();
+            }
+
+
+
         }
+
+    }
+
+    @Override
+    public void onInterrupt() {
 
     }
 
@@ -122,14 +142,11 @@ public class NavAccessibilityService extends AccessibilityService {
         startService(intent);
     }
 
-    @Override
-    public void onInterrupt() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        instance = null;
+    private void notifyInputWindowShow() {
+        Intent intent = new Intent();
+        intent.putExtra("what", Config.FLOAT_AUTOMOVE);
+        intent.putExtra("move",true);
+        intent.setClass(this, FloatService.class);
+        startService(intent);
     }
 }

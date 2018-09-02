@@ -371,7 +371,7 @@ public class MenuViewProxy implements View.OnClickListener {
         }
 
         mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS|
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+                WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mWinLayoutParams.width = MENU_WINDOW_WIDTH;

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.checkAccessibility;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_A;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_B;
 import static com.hardwork.fg607.relaxfinger.view.MenuViewProxy.MENU_C;
@@ -349,11 +350,6 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
     }
 
 
-    private boolean checkAccessibility(){
-
-        return AccessibilityUtil.checkAccessibility();
-    }
-
     private void executeAction(String action){
 
         switch (action) {
@@ -375,13 +371,17 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
 
                 break;
             case "返回键":
-                if (!checkAccessibility()) {
+                if (checkAccessibility()) {
+
+                    mManager.closeMenu();
+
+                    FloatingBallUtils.keyBack(NavAccessibilityService.instance);
+
+                }else {
 
                     AccessibilityUtil.openSettingActivity();
-                    return;
                 }
-                mManager.closeMenu();
-                FloatingBallUtils.keyBack(NavAccessibilityService.instance);
+
                 break;
             case "Home键":
                 mManager.closeMenu();

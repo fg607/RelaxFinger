@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.hardwork.fg607.floatassistant.view.AppChooseActivity">
+    tools:context="com.hardwork.fg607.relaxfinger.view.AppChooseActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <android.support.v7.widget.ListViewCompat
+        <ListView
             android:id="@+id/app_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

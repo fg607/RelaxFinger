@@ -15,6 +15,7 @@ import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +50,6 @@ public class SettingActivity extends AppCompatActivity {
     public static Messenger sMessenger = null;
     private boolean mBound = false;
     private FloatingActionButton mFab;
-    private boolean mIsAlertShowing = false;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -94,23 +94,13 @@ public class SettingActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        hideAlertDialog();
+        checkUpgrade();
 
-        if(checkAccessibility()){
 
-            mIsAlertShowing = false;
-            checkUpgrade();
-
-        }else {
-
-            mIsAlertShowing = true;
-            openAlertDialog();
-        }
-
-        if(isServiceRunning()){
+       /* if(isServiceRunning()){
 
             bindFloatService();
-        }
+        }*/
 
         if(mAppSettingFragment != null){
 
@@ -344,14 +334,6 @@ public class SettingActivity extends AppCompatActivity {
     }
 
 
-    private void hideAlertDialog() {
-
-        if (mAlertDialog != null && mAlertDialog.isShowing()) {
-
-            mAlertDialog.dismiss();
-        }
-    }
-
     private void checkUpgrade() {
         if (mPreferences.getInt("versionCode", 0) < AppUtils.getVersionCode(this)) {
 
@@ -448,7 +430,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0.2.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.2.5\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -461,7 +443,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setMessage("1.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
                 "2.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
                 "3.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
-                "4.避让软键盘无效：避让软键盘功能需要安装两个及以上输入法时生效（包含系统自带输入法）。" +
+                "4.避让软键盘无效：安卓7.0以下系统避让软键盘功能最好安装两个及以上输入法（单个输入法也可以用，但需要手动点击悬浮球恢复初始位置）（包含系统自带输入法）。" +
                 "如果仍然无效,打开输入法,把通知栏打开看一下选择输入法通知的标题,反馈给我,我加到软件里面就可以了。\r\n" +
                 "5.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
                 "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
@@ -482,13 +464,14 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0.2.1版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.2.5版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.进入临时移动模式悬浮球会变成飞碟主题。\r\n" +
-                "2.修复避让软键盘位置过高的问题。\r\n"+
-                "3.修复其他细节问题。"+
+                "1.增加安卓8.0以上系统避让输入法功能（安装一个输入法即可，建议手动点击悬浮球关闭输入法）。\r\n"+
+                "2.低于安卓8.0的系统安装一个输入法也可实现输入法避让，但是建议手动点击悬浮球关闭输入法（"+
+                "要实现关闭输入法悬浮球自动恢复位置需要安装两个输入法）\r\n"+
+                "3.修复已知bug。\r\n"+
                 "");
         dialog.show();
 
@@ -506,11 +489,6 @@ public class SettingActivity extends AppCompatActivity {
         unbindFloatService();
         stopFloatService();
         finish();
-    }
-
-    public boolean isAlertShowing() {
-
-        return mIsAlertShowing;
     }
 
     public void showFab(){
