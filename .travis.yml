@@ -2,23 +2,21 @@ language: android
 sudo: false
 android:
   components:
-   - tools
-   - platform-tools
-   - android-28
-   - build-tools-27.0.3
-   - extra
+  - tools
+  - platform-tools
+  - android-28
+  - build-tools-27.0.3
+  - extra
 jdk: oraclejdk8
 script:
 - "./gradlew assembleRelease"
 deploy:
   provider: releases
   api_key:
-    secure: BRFf+0Lin/76l6LbeBqPC2NOJuFWx/SnmJWD5Lmpzw6oe4arHKsnOZ2ky8nEn1prgp417W79+6QGrr+pB1CgGCeL22XsKWnUkGb0+GSsBWk+tK84B/ALVot2sE3+BrnZBovPJ0b0H4JFo1lC2W6QrRw6BF0BtHudg4KjVrkX6Zs07XcVs9hHSmPDrxPSYt3PdIgFCvqkjHQez62K9GjogJNtiDtJStPUa/97AyTA8kCjZS40O1dcN0ZPpc8x+5ZV3q40frjpzBWfd2oJYrQRIsjnUf/vimfJ2W9YhqMC+Cgsa2qpfghhFy/FPj0QwXjh3smYUfFrfYaQFfOPDJuIjnezkK+qJRim9TuflDAjmc+KaX5C77zey5jvNZxfQ5lQXRasFO4ty98jODAAmM2TP3pge/CIOMLlT2szVf3Vz5Ya7CTMDH3nKc9zk9s1JsyWjtM8hvrBdZRzqsSS8jzn96mLXs0ojO6EJO6Ikw2vSc8rbr4tPykmW1bMyQjf//DQkNpAF8wailg19lalWzG0GM1c1zhHcNL0Izf9tMznu07bOy4npKQQczs+Mz2CTsFTvrzxaK6SSfa5nrVtzPk0SnD9L/CL1en9HEhh5OnAgYM7iUEVT0BroDHBVFtR6m19l86PY0ov4Lbra7u5dXB8ohADChrEmzEOw4XjrTHCvOw=
+    secure: YsLGgc2h3CFzbJ90lLY6Sd1iLNQwhoFDeUadyNfgXhlgWNoSYEbtkAmCRsYZFl5en0I1jr4sdGnAMH+QWFa+NuMvsagCfVExteppOfw3CXgGvmzRz39o45vPRAIn1aH6kTiD3t/SxG3q9PcHFPJfgejIyPhr1sRPN4ehB7+nOLu/PWJ/tXiS9eqNYEVrz0NQ+VQyPWOBHuDc4V6NPixS0JdnM6di5G9h6IzoH+7pr2dMvgkrFbmj+W/hekcp53XRKWuaTr1y6Dj6aILrG3gENhar6EgkYPMLDCSVbtV59okEuWM2GVfLWMb298w/nSSODVxL0GfySTVRcoyXG9rSB7Qkb37qukrdAGD7f+3G1UV7wCy8mZQ7mMZ+LtPz2kKaK3XLiSg88TRuq8BJajlviDEIgf1C6H6666aTOVza/WxCDIFBtlagY4qsDe8gsek17vTxIJoP0I1dkBxx1Wcno4SxpI46Jok3tqkGXqFABx2nOjZEeahV+tmTqmKhIYheC1vr9Yzz99FDF+NUKvREyXOJco+12HBtwzRzCT3kw8z/k/hNq61HIFLnNESDxkIddifI0LpiQn8/1EQK7GEoIKKvY/q6j5nstiHOZpYgzhgcTzdLGvusRLTpaahslP/rilybC3RJeh8QmFVKBdy7F3oSmkTWiziQ/5beWn+ysCk=
   file: app/build/outputs/apk/app-release.apk
-  skip_cleanup: true
   on:
     repo: fg607/RelaxFinger
-    tags: true
 before_install:
 - openssl aes-256-cbc -K $encrypted_9ed914d03b12_key -iv $encrypted_9ed914d03b12_iv
   -in hardwork.jks.enc -out app/hardwork.jks -d
