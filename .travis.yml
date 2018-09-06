@@ -1,8 +1,5 @@
 language: android
 sudo: false
-env:
-  global:
-    - android.enableAapt2=false
 android:
   components:
    - tools
