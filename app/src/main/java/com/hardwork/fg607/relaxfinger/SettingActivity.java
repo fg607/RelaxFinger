@@ -430,7 +430,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0.2.5\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -464,14 +464,12 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0.2.5版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.3版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.增加安卓8.0以上系统避让输入法功能（安装一个输入法即可，建议手动点击悬浮球关闭输入法）。\r\n"+
-                "2.低于安卓8.0的系统安装一个输入法也可实现输入法避让，但是建议手动点击悬浮球关闭输入法（"+
-                "要实现关闭输入法悬浮球自动恢复位置需要安装两个输入法）\r\n"+
-                "3.修复已知bug。\r\n"+
+                "1.适配安卓9.0。\r\n"+
+                "2.修复已知bug。\r\n"+
                 "");
         dialog.show();
 

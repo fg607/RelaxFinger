@@ -15,15 +15,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -605,7 +608,6 @@ public class AppUtils {
                     title = c.getString(1);
                     intent = c.getString(2);
 
-
                     if(icon !=null && intent!=null){
 
                         ShortcutInfo shortcutInfo = new ShortcutInfo(ImageUtils.Bytes2Drawable(icon),
@@ -659,6 +661,7 @@ public class AppUtils {
         return list;
     }
 
+
     public static ArrayList<ShortcutInfo> getShortcuts(){
 
         ArrayList<ShortcutInfo> list = getShortcutsA();
@@ -706,23 +709,30 @@ public class AppUtils {
             shortcutUri = ShortcutSuperUtils.getUriFromLauncher(context);
         }
 
-        Cursor c = cr.query(shortcutUri, new String[] {"icon"},
-                "title=?", new String[]{title}, null);
+        try {
+            Cursor c = cr.query(shortcutUri, new String[] {"icon"},
+                    "title=?", new String[]{title}, null);
 
-        if (c != null && c.getCount() > 0) {
+            if (c != null && c.getCount() > 0) {
 
-            c.moveToFirst();
+                c.moveToFirst();
 
-            byte[] icon = c.getBlob(0);
+                byte[] icon = c.getBlob(0);
 
-            if(icon != null && icon.length>0){
+                if(icon != null && icon.length>0){
 
-                drawable = ImageUtils.Bytes2Drawable(icon);
+                    drawable = ImageUtils.Bytes2Drawable(icon);
+
+                }
+
 
             }
+        }catch (Exception e){
 
-
+            e.printStackTrace();
         }
+
+
 
         if(drawable == null){
 

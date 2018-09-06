@@ -54,11 +54,12 @@ public class NavAccessibilityService extends AccessibilityService {
         if (accessibilityEvent.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 
 
-            String foregroundPackageName = accessibilityEvent.getPackageName().toString();
+            if(accessibilityEvent.getPackageName()!=null) {
+                String foregroundPackageName = accessibilityEvent.getPackageName().toString();
 
-            notifyWindowChange(foregroundPackageName);
+                notifyWindowChange(foregroundPackageName);
+            }
 
-            Log.i("float",accessibilityEvent.getClassName()+"");
 
             //8.0以后选择输入法不在通知栏显示，此方法仅仅能识别输入法弹出事件，不能检测输入法关闭事件
 
