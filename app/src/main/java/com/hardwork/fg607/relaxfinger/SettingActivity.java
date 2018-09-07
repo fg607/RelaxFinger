@@ -430,7 +430,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0.4\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.4.1\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -443,8 +443,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setMessage("1.不能卸载软件：在设置界面关闭“开启锁屏”选项后，即可正常卸载。\r\n" +
                 "2.屏幕截图没反应：部分手机在第一次屏幕截图时需要稍等片刻，弹出授权框后，点击允许即可。\r\n" +
                 "3.截图保存在哪里：截图保存在系统存储卡根目录RelaxFinger文件夹里面。\r\n" +
-                "4.避让软键盘无效：安卓7.0以下系统避让软键盘功能最好安装两个及以上输入法（单个输入法也可以用，但需要手动点击悬浮球恢复初始位置）（包含系统自带输入法）。" +
-                "如果仍然无效,打开输入法,把通知栏打开看一下选择输入法通知的标题,反馈给我,我加到软件里面就可以了。\r\n" +
+                "4.避让软键盘无效：安卓7.0以下系统避让软键盘功能最好安装两个及以上输入法（包含系统自带输入法）。\r\n" +
                 "5.不能开机自启动：首先确保设置界面“开机启动”选项已开启，如果仍然不能启动，到系统设置->" +
                 "安全->应用程序许可中找到RelaxFinger,点击进去后打开自动运行开关即可。\r\n" +
                 "6.自定义主题不好看：在系统存储卡根目录找到RelaxFinger目录，将里面的DIY.png换成喜欢的图片" +
@@ -464,11 +463,15 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0.4版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.4.1版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.完整的避让软键盘功能（自动避让，自动复原，只需一个输入法）。\r\n"+
+                "3.0.4.1版本更新内容：\r\n"+
+                "1.优化避让速度。\r\n"+
+                "2.修复设置界面状态栏bug。\r\n"+
+                "3.0.4版本更新内容：\r\n"+
+                "1.完整的避让软键盘功能,基本适用所有安卓版本（自动避让，自动复原，只需一个输入法）。\r\n"+
                 "2.恢复锁屏功能。\r\n"+
                 "");
         dialog.show();

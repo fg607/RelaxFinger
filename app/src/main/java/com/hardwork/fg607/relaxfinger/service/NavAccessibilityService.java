@@ -28,7 +28,8 @@ public class NavAccessibilityService extends AccessibilityService {
 
     public  static AccessibilityService instance = null;
     private AppPreferences sp;
-    private InputMethodManager mIMM;
+    private InputMethodManager mIMM = null;
+    private Method getIMHeightMethod = null;
 
     @Override
     protected void onServiceConnected() {
@@ -39,6 +40,14 @@ public class NavAccessibilityService extends AccessibilityService {
         sp = FloatingBallUtils.getMultiProcessPreferences();
 
          mIMM = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        Class<InputMethodManager> iMSClass = InputMethodManager.class;
+        try {
+            getIMHeightMethod= iMSClass.getMethod("getInputMethodWindowVisibleHeight");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
 
 
       /*  //动态配置
@@ -70,48 +79,41 @@ public class NavAccessibilityService extends AccessibilityService {
             }
 
 
-            //8.0以后选择输入法不在通知栏显示，此方法仅仅能识别输入法弹出事件，不能检测输入法关闭事件
-
-
             if("android.inputmethodservice.SoftInputWindow".equals(accessibilityEvent.getClassName())){
 
                 notifyInputWindowShow(true);
 
+                if(getIMHeightMethod != null && mIMM != null){
 
-               new Thread(new Runnable() {
-                   @Override
-                   public void run() {
+                    new Thread(() -> {
 
-                       while (true){
+                        while (true){
 
-                           try {
-                               Thread.sleep(500);
-                               //反射判断键盘高度，为0则表明键盘关闭！
-                               Class<InputMethodManager> iMSClass = InputMethodManager.class;
-                               Method method = iMSClass.getMethod("getInputMethodWindowVisibleHeight");
+                            try {
+                                Thread.sleep(255);
 
-                               int imeHeight = (int) method.invoke(mIMM);
-                               if(imeHeight == 0){
+                                //反射判断键盘高度，为0则表明键盘关闭！
+                                int imeHeight = (int) getIMHeightMethod.invoke(mIMM);
+                                if(imeHeight == 0){
 
-                                   notifyInputWindowShow(false);
+                                    notifyInputWindowShow(false);
 
-                                   break;
-                               }
+                                    break;
+                                }
 
-                           } catch (InterruptedException e) {
-                               e.printStackTrace();
-                           } catch (NoSuchMethodException e) {
-                               e.printStackTrace();
-                           } catch (IllegalAccessException e) {
-                               e.printStackTrace();
-                           } catch (InvocationTargetException e) {
-                               e.printStackTrace();
-                           }
-                       }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
 
-                   }
-               }).start();
+                    }).start();
+                }
+
             }
 
 
