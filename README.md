@@ -2,7 +2,7 @@
 一款简洁的虚拟按键助手
 
 ## 从酷安市场下载悬浮助手
-[![CoolApk](https://github.com/fg607/RelaxFinger/blob/master/coolapk_logo.png)](https://www.coolapk.com/apk/com.hardwork.fg607.relaxfinger)
+[![Coolapk download](https://img.shields.io/badge/coolapk-download-blue.svg)](https://www.coolapk.com/apk/com.hardwork.fg607.relaxfinger)
 
 ### 特点：
 - 采用安卓辅助功能开发，绿色安全。
