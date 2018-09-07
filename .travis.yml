@@ -10,12 +10,14 @@ android:
 jdk: oraclejdk8
 script:
 - "./gradlew assembleRelease"
+before_deploy:
+  - ls app/build/outputs/apk/
 deploy:
   skip_cleanup: true
   provider: releases
   api_key:
     secure: YsLGgc2h3CFzbJ90lLY6Sd1iLNQwhoFDeUadyNfgXhlgWNoSYEbtkAmCRsYZFl5en0I1jr4sdGnAMH+QWFa+NuMvsagCfVExteppOfw3CXgGvmzRz39o45vPRAIn1aH6kTiD3t/SxG3q9PcHFPJfgejIyPhr1sRPN4ehB7+nOLu/PWJ/tXiS9eqNYEVrz0NQ+VQyPWOBHuDc4V6NPixS0JdnM6di5G9h6IzoH+7pr2dMvgkrFbmj+W/hekcp53XRKWuaTr1y6Dj6aILrG3gENhar6EgkYPMLDCSVbtV59okEuWM2GVfLWMb298w/nSSODVxL0GfySTVRcoyXG9rSB7Qkb37qukrdAGD7f+3G1UV7wCy8mZQ7mMZ+LtPz2kKaK3XLiSg88TRuq8BJajlviDEIgf1C6H6666aTOVza/WxCDIFBtlagY4qsDe8gsek17vTxIJoP0I1dkBxx1Wcno4SxpI46Jok3tqkGXqFABx2nOjZEeahV+tmTqmKhIYheC1vr9Yzz99FDF+NUKvREyXOJco+12HBtwzRzCT3kw8z/k/hNq61HIFLnNESDxkIddifI0LpiQn8/1EQK7GEoIKKvY/q6j5nstiHOZpYgzhgcTzdLGvusRLTpaahslP/rilybC3RJeh8QmFVKBdy7F3oSmkTWiziQ/5beWn+ysCk=
-  file: app/build/outputs/apk/app-release.apk
+  file: app-release.apk
   on:
     repo: fg607/RelaxFinger
     all_branches: true
