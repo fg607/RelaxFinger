@@ -1,9 +1,10 @@
 # RelaxFinger
 一款简洁的虚拟按键助手
 
-[![Google Play](https://raw.githubusercontent.com/xdtianyu/CallerInfo/master/screenshots/en-play-badge.png)](https://play.google.com/store/apps/details?id=com.hardwork.fg607.relaxfinger)
+## 从酷安市场下载悬浮助手
+[![CoolApk](https://github.com/fg607/RelaxFinger/blob/master/screenshot1.png)](https://www.coolapk.com/apk/com.hardwork.fg607.relaxfinger)
 
-###特点：
+### 特点：
 - 采用安卓辅助功能开发，绿色安全。
 - 不需要获取root权限。
 - 占用内存低，资源消耗少。
@@ -11,7 +12,7 @@
 - 可设置快捷应用，快速开启和切换。
 
 
-###使用方法：
+### 使用方法：
 - 第一次使用需要激活辅助功能，根据弹窗提示  
   开启RelaxFinger辅助服务即可。
 
@@ -27,7 +28,7 @@
 - 通过主设置页面底部"快捷应用设置"，可以设置快捷应用  
   默认左滑打开快捷应用菜单，点击应用图标即可快速打开和切换到对应的应用。
 
-###卸载注意事项:
+### 卸载注意事项:
 - 开启锁屏功能后不能直接卸载RelaxFinger。  
   在RelaxFinger设置主页面关闭"开启锁屏", 即可正常卸载RelaxFinger。  
  
