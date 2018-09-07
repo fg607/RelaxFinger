@@ -11,7 +11,7 @@ jdk: oraclejdk8
 script:
 - "./gradlew assembleRelease"
 before_deploy:
-  - ls app/build/outputs/apk/
+  - ls app/build/outputs/apk/release/
 deploy:
   skip_cleanup: true
   provider: releases
