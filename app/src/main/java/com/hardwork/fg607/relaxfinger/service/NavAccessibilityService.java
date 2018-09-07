@@ -3,6 +3,7 @@ package com.hardwork.fg607.relaxfinger.service;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
 import android.content.Intent;
+import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,6 +17,10 @@ import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import net.grandcentrix.tray.AppPreferences;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Created by fg607 on 16-1-23.
  */
@@ -23,6 +28,7 @@ public class NavAccessibilityService extends AccessibilityService {
 
     public  static AccessibilityService instance = null;
     private AppPreferences sp;
+    private InputMethodManager mIMM;
 
     @Override
     protected void onServiceConnected() {
@@ -31,6 +37,9 @@ public class NavAccessibilityService extends AccessibilityService {
         instance = this;
 
         sp = FloatingBallUtils.getMultiProcessPreferences();
+
+         mIMM = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
 
       /*  //动态配置
         AccessibilityServiceInfo config = new AccessibilityServiceInfo();
@@ -66,7 +75,43 @@ public class NavAccessibilityService extends AccessibilityService {
 
             if("android.inputmethodservice.SoftInputWindow".equals(accessibilityEvent.getClassName())){
 
-                notifyInputWindowShow();
+                notifyInputWindowShow(true);
+
+
+               new Thread(new Runnable() {
+                   @Override
+                   public void run() {
+
+                       while (true){
+
+                           try {
+                               Thread.sleep(500);
+                               //反射判断键盘高度，为0则表明键盘关闭！
+                               Class<InputMethodManager> iMSClass = InputMethodManager.class;
+                               Method method = iMSClass.getMethod("getInputMethodWindowVisibleHeight");
+
+                               int imeHeight = (int) method.invoke(mIMM);
+                               if(imeHeight == 0){
+
+                                   notifyInputWindowShow(false);
+
+                                   break;
+                               }
+
+                           } catch (InterruptedException e) {
+                               e.printStackTrace();
+                           } catch (NoSuchMethodException e) {
+                               e.printStackTrace();
+                           } catch (IllegalAccessException e) {
+                               e.printStackTrace();
+                           } catch (InvocationTargetException e) {
+                               e.printStackTrace();
+                           }
+                       }
+
+
+                   }
+               }).start();
             }
 
 
@@ -143,10 +188,10 @@ public class NavAccessibilityService extends AccessibilityService {
         startService(intent);
     }
 
-    private void notifyInputWindowShow() {
+    private void notifyInputWindowShow(boolean isShowing) {
         Intent intent = new Intent();
         intent.putExtra("what", Config.FLOAT_AUTOMOVE);
-        intent.putExtra("move",true);
+        intent.putExtra("move",isShowing);
         intent.setClass(this, FloatService.class);
         startService(intent);
     }

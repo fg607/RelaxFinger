@@ -430,7 +430,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.4\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -464,12 +464,12 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0.3版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.4版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.适配安卓9.0。\r\n"+
-                "2.修复已知bug。\r\n"+
+                "1.完整的避让软键盘功能（自动避让，自动复原，只需一个输入法）。\r\n"+
+                "2.恢复锁屏功能。\r\n"+
                 "");
         dialog.show();
 

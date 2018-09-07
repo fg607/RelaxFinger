@@ -12,6 +12,7 @@ public class ScreenOffAdminReceiver extends DeviceAdminReceiver {
 
     @Override
     public void onEnabled(Context context, Intent intent) {
+
     }
 
     @Override

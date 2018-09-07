@@ -88,7 +88,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-     <!--   <receiver
+        <receiver
             android:name=".receiver.ScreenOffAdminReceiver"
             android:description="@string/admin"
             android:label="@string/admin"
@@ -100,7 +100,7 @@
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
 
         <service
             android:name=".service.NotificationService"
