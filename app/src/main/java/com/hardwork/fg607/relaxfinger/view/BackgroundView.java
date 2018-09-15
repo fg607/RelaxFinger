@@ -43,7 +43,8 @@ public class BackgroundView extends View {
             mWinLayoutParams.type = WindowManager.LayoutParams.TYPE_PRIORITY_PHONE;
         }
 
-        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        mWinLayoutParams.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS|
+                WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         mWinLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
         mWinLayoutParams.x = 0;
@@ -52,8 +53,9 @@ public class BackgroundView extends View {
         mWinLayoutParams.width = DensityUtil.getScreenWidth(mContext);
         mWinLayoutParams.height = DensityUtil.getScreenHeight(mContext);
         mWinLayoutParams.format = PixelFormat.RGBA_8888;
+        mWinLayoutParams.dimAmount = 0.5f;
 
-        setBackgroundColor(mContext.getResources().getColor(R.color.popbackground));
+        //setBackgroundColor(mContext.getResources().getColor(R.color.popbackground));
 
         setClickable(true);
     }

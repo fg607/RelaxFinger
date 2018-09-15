@@ -22,8 +22,8 @@ public class ClipImageActivity extends AppCompatActivity {
 
         mImageView = (ClipImageView) findViewById(R.id.src_pic);
         // 设置需要裁剪的图片
-        if(FloatingBallUtils.bitmap != null) {
-            mImageView.setImageBitmap(FloatingBallUtils.bitmap);
+        if(FloatingBallUtils.screenShotBitmap != null) {
+            mImageView.setImageBitmap(FloatingBallUtils.screenShotBitmap);
         }
 
     }
@@ -39,7 +39,7 @@ public class ClipImageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_clip) {
             // 此处获取剪裁后的bitmap,进行缩放后暂存
-            FloatingBallUtils.bitmap = mImageView.clip();
+            FloatingBallUtils.screenShotBitmap = mImageView.clip();
             //当前时间为图标名字
             String fileName = "DIY.png";
             Intent intent = new Intent();

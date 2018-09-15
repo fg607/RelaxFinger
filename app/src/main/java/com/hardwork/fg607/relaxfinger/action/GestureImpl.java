@@ -576,7 +576,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                     //Toast.makeText(this,"截图失败！",Toast.LENGTH_SHORT).show();
                 }
 
-                FloatingBallUtils.bitmap = null;
+                FloatingBallUtils.screenShotBitmap = null;
                 bitmap.recycle();
 
             }

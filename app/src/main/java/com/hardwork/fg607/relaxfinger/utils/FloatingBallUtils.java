@@ -68,26 +68,24 @@ import static android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE;
 
 
 public class FloatingBallUtils {
-
-    public static OutputStream os;
-    public static Bitmap bitmap;
+    
     public static Context context = MyApplication.getApplication();
-
     public static final AppPreferences multiProcessPreferences = new AppPreferences(context);
     public static SharedPreferences sp = getSharedPreferences();
-    public static AudioManager mAudioManager=null;
-    public static WindowManager sWindowManager = null;
-    public static  WifiManager mWifiManager = null;
-    public static ConnectivityManager mConnectivityManager = null;
+    public static AudioManager audioManager=null;
+    public static WindowManager windowManager = null;
+    public static  WifiManager wifiManager = null;
+    public static ConnectivityManager connectivityManager = null;
     public static NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    public static PowerManager mPowerManager = null;
-    public static PowerManager.WakeLock mWakeLock = null;
-    public static Method msetDataMethod = null;
-    public static Method mgetDataMethod = null;
-    public static  Camera mCamera = null;
+    public static PowerManager powerManager = null;
+    public static PowerManager.WakeLock wakeLock = null;
+    public static Method setDataMethod = null;
+    public static Method getDataMethod = null;
+    public static  Camera camera = null;
     public static AudioManager.OnAudioFocusChangeListener listener= null;
-    public static  boolean mIsFlashOpened = false;
+    public static  boolean isFlashOpened = false;
+    public static Bitmap screenShotBitmap;
 
     public static Object wmgInstnace = null;
     public static Method trimMemory = null;
@@ -212,16 +210,16 @@ public class FloatingBallUtils {
      */
     public static void volumeUp() {
 
-        if(mAudioManager ==null){
-            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager ==null){
+            audioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
-        if(mAudioManager.isMusicActive()){
+        if(audioManager.isMusicActive()){
 
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
         }else {
 
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
 
         }
 
@@ -232,16 +230,16 @@ public class FloatingBallUtils {
      */
     public static void volumeDown() {
 
-        if(mAudioManager ==null){
-            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager ==null){
+            audioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
-        if(mAudioManager.isMusicActive()){
+        if(audioManager.isMusicActive()){
 
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
         }else {
 
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI|AudioManager.FLAG_PLAY_SOUND);
 
         }
 
@@ -844,11 +842,11 @@ public class FloatingBallUtils {
     private static void switchMusic() {
 
 
-        if(mAudioManager ==null){
-            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager ==null){
+            audioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
-        if(mAudioManager.isMusicActive()){
+        if(audioManager.isMusicActive()){
 
             if(listener == null){
 
@@ -860,13 +858,13 @@ public class FloatingBallUtils {
                 };
             }
 
-            mAudioManager.requestAudioFocus(listener,AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            audioManager.requestAudioFocus(listener,AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 
         }else {
 
             if(listener != null){
 
-                mAudioManager.abandonAudioFocus(listener);
+                audioManager.abandonAudioFocus(listener);
 
                 listener = null;
             }
@@ -941,8 +939,8 @@ public class FloatingBallUtils {
 
     private static void muteMode() {
 
-        if(mAudioManager ==null){
-            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager ==null){
+            audioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
@@ -958,9 +956,9 @@ public class FloatingBallUtils {
             return;
         }
 
-        if(mAudioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
+        if(audioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
 
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -970,7 +968,7 @@ public class FloatingBallUtils {
 
         }else {
 
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -988,8 +986,8 @@ public class FloatingBallUtils {
 
     private static void vibrationMode() {
 
-        if(mAudioManager ==null){
-            mAudioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager ==null){
+            audioManager= (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
@@ -1005,9 +1003,9 @@ public class FloatingBallUtils {
             return;
         }
 
-        if(mAudioManager.getRingerMode()==AudioManager.RINGER_MODE_NORMAL){
+        if(audioManager.getRingerMode()==AudioManager.RINGER_MODE_NORMAL){
 
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -1017,7 +1015,7 @@ public class FloatingBallUtils {
 
         }else {
 
-            mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -1035,19 +1033,19 @@ public class FloatingBallUtils {
 
 
         if(Build.VERSION.SDK_INT < 23) {
-            if (mCamera == null) {
+            if (camera == null) {
 
-                mCamera = Camera.open();
+                camera = Camera.open();
             }
 
-            Camera.Parameters parameter = mCamera.getParameters();
+            Camera.Parameters parameter = camera.getParameters();
 
 
             if (!parameter.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
 
-                mCamera.startPreview();
+                camera.startPreview();
                 parameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                mCamera.setParameters(parameter);
+                camera.setParameters(parameter);
 
                 MyApplication.getMainThreadHandler().post(new Runnable() {
                     @Override
@@ -1058,9 +1056,9 @@ public class FloatingBallUtils {
 
             } else {
                 parameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                mCamera.setParameters(parameter);
-                mCamera.release();
-                mCamera = null;
+                camera.setParameters(parameter);
+                camera.release();
+                camera = null;
 
                 MyApplication.getMainThreadHandler().post(new Runnable() {
                     @Override
@@ -1075,12 +1073,12 @@ public class FloatingBallUtils {
 
             String[] list={};
 
-            if(!mIsFlashOpened){
+            if(!isFlashOpened){
 
                 try {
                     list = manager.getCameraIdList();
                     manager.setTorchMode(list[0], true);
-                    mIsFlashOpened = true;
+                    isFlashOpened = true;
                     MyApplication.getMainThreadHandler().post(new Runnable() {
                         @Override
                         public void run() {
@@ -1098,7 +1096,7 @@ public class FloatingBallUtils {
                 try {
                     list = manager.getCameraIdList();
                     manager.setTorchMode(list[0], false);
-                    mIsFlashOpened = false;
+                    isFlashOpened = false;
                     MyApplication.getMainThreadHandler().post(new Runnable() {
                         @Override
                         public void run() {
@@ -1149,21 +1147,21 @@ public class FloatingBallUtils {
         Class[] getArgArray =null;
         Object[] getArgInvoke =null;
 
-        if(mConnectivityManager==null){
+        if(connectivityManager==null){
 
-            mConnectivityManager=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            connectivityManager=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         }
 
         try {
-            if (mgetDataMethod == null) {
+            if (getDataMethod == null) {
 
-                mgetDataMethod = mConnectivityManager.getClass().getDeclaredMethod("getMobileDataEnabled",getArgArray);
+                getDataMethod = connectivityManager.getClass().getDeclaredMethod("getMobileDataEnabled",getArgArray);
             }
 
-            if (mgetDataMethod != null) {
+            if (getDataMethod != null) {
 
                 //判断当前手机是否在使用MobileData(移动数据)
-                if ((boolean)mgetDataMethod.invoke(mConnectivityManager, getArgInvoke)) {
+                if ((boolean)getDataMethod.invoke(connectivityManager, getArgInvoke)) {
                     isMobileDataEnabled = true;
                 } else {
                     isMobileDataEnabled = false;
@@ -1175,15 +1173,15 @@ public class FloatingBallUtils {
             }
 
 
-            if(msetDataMethod == null){
-                msetDataMethod=mConnectivityManager.getClass().getDeclaredMethod("setMobileDataEnabled", boolean.class);
+            if(setDataMethod == null){
+                setDataMethod=connectivityManager.getClass().getDeclaredMethod("setMobileDataEnabled", boolean.class);
             }
 
 
-            if(msetDataMethod!= null){
+            if(setDataMethod!= null){
 
-                msetDataMethod.setAccessible(true);
-                msetDataMethod.invoke(mConnectivityManager, !isMobileDataEnabled);
+                setDataMethod.setAccessible(true);
+                setDataMethod.invoke(connectivityManager, !isMobileDataEnabled);
 
                 if(isMobileDataEnabled){
 
@@ -1217,14 +1215,14 @@ public class FloatingBallUtils {
 
     private static void switchWifi() {
 
-        if (mWifiManager == null) {
-            mWifiManager = (WifiManager) context
+        if (wifiManager == null) {
+            wifiManager = (WifiManager) context
                     .getSystemService(Context.WIFI_SERVICE);
         }
 
-        boolean isWifiEnabled = mWifiManager.isWifiEnabled();
+        boolean isWifiEnabled = wifiManager.isWifiEnabled();
 
-        mWifiManager.setWifiEnabled(!mWifiManager.isWifiEnabled());
+        wifiManager.setWifiEnabled(!wifiManager.isWifiEnabled());
 
         if (isWifiEnabled) {
 
@@ -1292,20 +1290,20 @@ public class FloatingBallUtils {
 
     public static void switchKeepScreenOn(){
 
-        if(mWakeLock == null){
+        if(wakeLock == null){
 
-            if(mPowerManager == null){
+            if(powerManager == null){
 
-                mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             }
 
-            mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "RelaxFinger");
+            wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "RelaxFinger");
 
         }
 
-        if(!mWakeLock.isHeld()){
+        if(!wakeLock.isHeld()){
 
-            mWakeLock.acquire();
+            wakeLock.acquire();
 
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
@@ -1317,7 +1315,7 @@ public class FloatingBallUtils {
 
         }else {
 
-            mWakeLock.release();
+            wakeLock.release();
             MyApplication.getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -1386,12 +1384,12 @@ public class FloatingBallUtils {
 
     public static WindowManager getWindowManager(){
 
-        if(sWindowManager == null){
+        if(windowManager == null){
 
-            sWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         }
 
-        return sWindowManager;
+        return windowManager;
     }
 
     public static ObjectAnimator shakeAnim(View view, float shakeFactor) {

@@ -989,7 +989,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
 
                     try {
                         //将选择的图片进行暂存
-                        FloatingBallUtils.bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), imageUri);
+                        FloatingBallUtils.screenShotBitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), imageUri);
                         Intent intent = new Intent();
                         intent.setClass(mContext, ClipImageActivity.class);
                         startActivityForResult(intent,Config.REQUEST_CLIP);
@@ -1016,21 +1016,21 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
             }
 
 
-            if (iconName != null && FloatingBallUtils.bitmap!=null) {
+            if (iconName != null && FloatingBallUtils.screenShotBitmap!=null) {
                 try {
-                    FloatingBallUtils.saveBitmap(FloatingBallUtils.bitmap,iconName);
+                    FloatingBallUtils.saveBitmap(FloatingBallUtils.screenShotBitmap,iconName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 if(mImg5==null){
 
-                    FloatingBallUtils.bitmap = null;
+                    FloatingBallUtils.screenShotBitmap = null;
                     return;
                 }
 
                 //显示裁剪后的图标
-                mImg5.setBackground(ImageUtils.bitmap2Drawable(FloatingBallUtils.bitmap));
+                mImg5.setBackground(ImageUtils.bitmap2Drawable(FloatingBallUtils.screenShotBitmap));
 
                 mImg5.setClickable(true);
 
@@ -1054,7 +1054,7 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                     mFloatBallTheme.setSummary(mThemeChoosed);
                 }
 
-                FloatingBallUtils.bitmap = null;
+                FloatingBallUtils.screenShotBitmap = null;
             }
         }
 
