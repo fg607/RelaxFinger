@@ -396,7 +396,7 @@ public class GestureImpl implements BallView.OnGestureListener,MenuViewProxy.OnM
                 FloatingBallUtils.openRecnetTask(NavAccessibilityService.instance);
                 break;
             case "切换上一个应用":
-                FloatingBallUtils.previousApp();
+                FloatingBallUtils.previousApp(NavAccessibilityService.instance);
                 break;
             case "休眠(需要开启锁屏功能)":
                 FloatingBallUtils.lockScreen();

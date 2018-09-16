@@ -174,6 +174,8 @@ public class FloatingBallUtils {
     public static void openRecnetTask(AccessibilityService service){
 
         service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
+
+
     }
 
     public static void openNotificationBar(AccessibilityService service){
@@ -246,46 +248,10 @@ public class FloatingBallUtils {
     }
 
 
-    public static void previousApp(){
+    public static void previousApp(AccessibilityService service){
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                String prePackageName = null;
-
-                try {
-
-                    prePackageName = AppUtils.getPreviousApp();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if(prePackageName!=null){
-
-                    try {
-                        AppUtils.startApplication(prePackageName);
-                    }catch (ActivityNotFoundException e){
-
-                        e.printStackTrace();
-                    }
-
-
-                }else {
-
-                    MyApplication.getMainThreadHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            Toast.makeText(MyApplication.getApplication(),"没有更早的应用了！",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        }).start();
-
-
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
 
     }
 

@@ -572,9 +572,6 @@ public class SettingFragment extends PreferenceFragment implements OnPreferenceC
                 }
 
                 break;
-            /*case "autoStartSwitch":
-                autoStartChange((boolean) newValue);
-                break;*/
             case "autoHideSwitch":
                 autoHideChange((boolean) newValue);
                 break;

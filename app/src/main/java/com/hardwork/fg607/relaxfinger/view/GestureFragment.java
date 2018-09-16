@@ -10,7 +10,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.view.View;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.hardwork.fg607.relaxfinger.R;
@@ -19,10 +18,7 @@ import com.hardwork.fg607.relaxfinger.model.Config;
 import com.hardwork.fg607.relaxfinger.utils.FloatingBallUtils;
 
 import net.grandcentrix.tray.AppPreferences;
-import net.grandcentrix.tray.TrayAppPreferences;
 
-import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.isUsageAccess;
-import static com.hardwork.fg607.relaxfinger.utils.AccessibilityUtil.requestUsageAccessPermission;
 
 
 public class GestureFragment extends PreferenceFragment implements OnPreferenceClickListener {
@@ -139,15 +135,6 @@ public class GestureFragment extends PreferenceFragment implements OnPreferenceC
                 .itemsCallbackSingleChoice(pos, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-
-                        if(text.equals("切换上一个应用")){
-
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !isUsageAccess()){
-                                Toast.makeText(getActivity(),"切换上一应用需要打开通知使用权限!", Toast.LENGTH_SHORT).show();
-                                requestUsageAccessPermission();
-                                return false;
-                            }
-                        }
 
                         switch (preference.getKey()) {
 

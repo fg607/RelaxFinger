@@ -430,7 +430,7 @@ public class SettingActivity extends AppCompatActivity {
         dialog.setTitle("关于悬浮助手");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
-        dialog.setMessage("版本：3.0.4.2\r\n作者：fg607\r\n邮箱：fg607@sina.com");
+        dialog.setMessage("版本：3.0.4.3\r\n作者：fg607\r\n邮箱：fg607@sina.com");
         dialog.show();
     }
 
@@ -463,11 +463,14 @@ public class SettingActivity extends AppCompatActivity {
     public void showUpdateInfo() {
 
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("悬浮助手-3.0.4.2版本更新内容");
+        dialog.setTitle("悬浮助手-3.0.4.3版本更新内容");
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setMessage("" +
-                "1.优化快捷菜单半透明背景，覆盖状态栏和导航栏。\r\n"+
+                "1.全新的切换上一应用模式，速度更快，不再需要“使用情况访问权限”。\r\n"+
+                "2.修复屏幕旋转权限问题。\r\n"+
+                "3.优化快捷菜单半透明背景，覆盖状态栏和导航栏。\r\n"+
+                "4.修复选择切换上一应用手势不能立即生效的问题。"+
                 "");
         dialog.show();
 

@@ -91,19 +91,6 @@ public class AccessibilityUtil {
         return true;
     }
 
-    public static void requestUsageAccessPermission() {
-
-        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-
-            context.startActivity(intent);
-
-        } catch (Exception e) {
-
-            Toast.makeText(context, "该ROM不支持切换上一应用功能!", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public static boolean isServiceRunning(Context mContext,String className) {
 
